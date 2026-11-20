@@ -3,7 +3,8 @@ import {useSearchParams} from 'react-router-dom';
 import {useFitWidth} from '../../components/ui/useFitWidth';
 import {AlertTriangle, FileText, Printer} from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
-import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
+import {type SelectFilter} from '../../components/assets/FilterMenu';
+import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {useSurgi} from '../../store/SurgiStore';
@@ -69,6 +70,8 @@ export default function ReportsPage() {
   // The period (from, to), for the reports of things that happened on a day.
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  // A word in any column of the report.
+  const [query, setQuery] = useState('');
   const sterilizerNames = useMemo(
     () =>
       Array.from(new Set(processLoads.filter(l => l.kind === 'STERILIZATION').map(l => l.equipment))).sort((a, b) =>
@@ -160,17 +163,21 @@ export default function ReportsPage() {
   // The period cuts the dated reports to the days in it (a record without a readable day stays).
   const dateKey = DATE_OF[active];
   const reportData = useMemo(() => {
-    if (!dateKey || (!dateFrom && !dateTo)) return built;
+    const needle = query.trim().toLowerCase();
+    if (!needle && (!dateKey || (!dateFrom && !dateTo))) return built;
     return {
       ...built,
       rows: built.rows.filter(row => {
+        if (needle && !built.columns.some(c => cellText(c.key, row[c.key]).toLowerCase().includes(needle)))
+          return false;
+        if (!dateKey || (!dateFrom && !dateTo)) return true;
         const at = parseDisplayDate(String(row[dateKey] ?? ''));
         if (!at) return true;
         const day = dayKey(at);
         return (!dateFrom || day >= dateFrom) && (!dateTo || day <= dateTo);
       }),
     };
-  }, [built, dateKey, dateFrom, dateTo]);
+  }, [built, dateKey, dateFrom, dateTo, query]);
   const period =
     dateKey && (dateFrom || dateTo)
       ? [dateFrom ? showDay(dateFrom) : '…', dateTo ? showDay(dateTo) : '…'].join(' – ')
@@ -441,6 +448,7 @@ export default function ReportsPage() {
       signature,
       dateFrom,
       dateTo,
+      query,
     ].join('|'),
   );
   const resultBody = useFitWidth<HTMLDivElement>([reportData, shownRows.visible.length]);
@@ -495,11 +503,6 @@ export default function ReportsPage() {
                 );
               })}
             </div>
-            {/* Filters and the download on the right, as on every other list. */}
-            <div className="reports-stage-actions" data-tour="report-download">
-              <FilterMenu filters={reportFilters} />
-              <DownloadMenu table={reportTable} onPrint={openPreview} />
-            </div>
           </header>
           <div className="reports-overview">
             <ul className="reports-summary" aria-label={tr('Σύνολα')}>
@@ -519,6 +522,19 @@ export default function ReportsPage() {
               ))}
             </ul>
           </div>
+          {/* The search, Filters and the download on one bar, as above every other list. */}
+          <AssetFilterBar
+            className="reports-filter-bar"
+            query={query}
+            onQueryChange={setQuery}
+            placeholder={tr('Αναζήτηση στην αναφορά…')}
+            filters={reportFilters}
+            extra={
+              <span data-tour="report-download">
+                <DownloadMenu table={reportTable} onPrint={openPreview} />
+              </span>
+            }
+          />
           <div className="reports-result-card">
             {/* The count is the «Σύνολο» figure above: the line shows only for a list a figure narrowed (with «Εμφάνιση
                 όλων») or with a warning; otherwise it is read out only. */}

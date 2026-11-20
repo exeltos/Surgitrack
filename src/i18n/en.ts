@@ -2528,4 +2528,5 @@ export const en: Record<string, string> = {
   'Κλίβανος · κύκλος': 'Sterilizer · cycle',
   Απογραφή: 'Inventory',
   'Βλάβες & απώλειες': 'Damage & losses',
+  'Αναζήτηση στην αναφορά…': 'Search the report…',
 };

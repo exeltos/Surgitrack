@@ -4937,3 +4937,23 @@ html body .issues-fixed td > .issue-asset {
 html body .issues-fixed .issue-age {
   white-space: nowrap;
 }
+
+/* Every search box the same: 38 px high, a thin frame, the same type as the lists' search bar (13 px); the one in
+   «Αντικαταστάσεις» as wide as the bar so «Φίλτρα» and «Λήψη» sit on its right as above every other list. */
+html body :is(.replacements-search, .department-search, .studio-search) {
+  min-height: 38px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
+}
+html body :is(.replacements-search, .department-search, .studio-search) input {
+  font-size: 13px;
+}
+html body .replacements-toolbar > .replacements-search {
+  flex: 1 1 auto;
+}
+@media (min-width: 701px) {
+  html body .replacements-toolbar > .replacements-spacer {
+    display: none;
+  }
+}

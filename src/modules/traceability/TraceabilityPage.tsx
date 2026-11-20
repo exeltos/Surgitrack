@@ -196,24 +196,27 @@ export default function TraceabilityPage() {
         <LoadTrace key={loadId} loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
       ) : (
         <>
+          {/* The same search bar as above every other list; Enter or «Αναζήτηση» opens what was typed. */}
           <form
-            className="trace-search"
+            className="asset-filter-bar trace-search-bar"
             onSubmit={e => {
               e.preventDefault();
               commit(q);
             }}
           >
-            <Search />
-            <input
-              type="search"
-              value={q}
-              onChange={e => setQ(e.target.value)}
-              onKeyDown={suggest.onKeyDown}
-              onBlur={() => needle && commit(q)}
-              placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
-              aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
-            />
-            <button className="primary" type="submit">
+            <div className="asset-filter-search">
+              <Search size={17} />
+              <input
+                type="search"
+                value={q}
+                onChange={e => setQ(e.target.value)}
+                onKeyDown={suggest.onKeyDown}
+                onBlur={() => needle && commit(q)}
+                placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+                aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+              />
+            </div>
+            <button className="asset-filter-toggle" type="submit">
               {tr('Αναζήτηση')}
             </button>
             {suggest.listbox}

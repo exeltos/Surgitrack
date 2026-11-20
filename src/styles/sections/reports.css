@@ -311,9 +311,6 @@ html body .reports-stage-head .reports-catalog-list {
   flex: 1 1 auto;
   padding: 0;
 }
-html body .reports-stage-head .reports-stage-actions {
-  flex: 0 0 auto;
-}
 /* «355 εγγραφές» next to its title, on one line. */
 html body .reports-result-head > div {
   display: flex;
@@ -567,10 +564,6 @@ html body .reports-page-workspace .reports-stage-head {
   min-height: 0;
   padding: 0;
   align-items: center;
-}
-html body .reports-page-workspace .reports-stage-actions {
-  gap: 8px;
-  padding-bottom: 6px;
 }
 html body .reports-page-workspace .reports-overview {
   padding: 12px 0 0;

@@ -75,34 +75,39 @@ export default function LoadTrace({
 
   return (
     <>
+      {/* The same bar as above every other list: the sterilizer, the cycle's number, «Αναζήτηση». */}
       <form
-        className="trace-load-search"
+        className="asset-filter-bar trace-load-search"
         onSubmit={e => {
           e.preventDefault();
           find();
         }}
       >
-        <label>
-          {tr('Κλίβανος')}
-          <select value={sterilizer} onChange={e => setSterilizer(e.target.value)}>
-            {sterilizers.map(s => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          {tr('Κύκλος')}
+        <select
+          className="trace-load-sterilizer"
+          value={sterilizer}
+          onChange={e => setSterilizer(e.target.value)}
+          aria-label={tr('Κλίβανος')}
+        >
+          {sterilizers.map(s => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+        <div className="asset-filter-search">
+          <Search size={17} />
           <input
             value={cycle}
             inputMode="numeric"
+            placeholder={tr('Αριθμός κύκλου')}
+            aria-label={tr('Κύκλος')}
             // The number only: the sterilizer chosen gives the letter.
             onChange={e => setCycle(e.target.value.replace(/[^\d\-/]/g, ''))}
           />
-        </label>
-        <button className="primary" type="submit">
-          <Search size={16} /> {tr('Αναζήτηση')}
+        </div>
+        <button className="asset-filter-toggle" type="submit">
+          {tr('Αναζήτηση')}
         </button>
       </form>
       {missing && <p className="trace-hint">{missing}</p>}
