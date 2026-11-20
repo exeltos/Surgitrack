@@ -20,28 +20,41 @@ export const MOVEMENT_KINDS = [
 ] as const;
 export type MovementKind = (typeof MOVEMENT_KINDS)[number]['key'];
 
-const KIND_RULES: Array<[MovementKind, RegExp]> = [
-  ['LOSS', /απώλει|service|απόσυρ|εκτός χρήσης|lost|retir/i],
-  ['RELEASE', /αποδέσμευ|ανάκληση|releas|recall/i],
-  ['DELIVERY', /παράδοση|προωθημένο|deliver|forward/i],
-  ['CYCLE', /φόρτωση|κύκλο|κλιβανισμ|load|cycle/i],
-  ['WASH', /καθαρισμ|πλύση|wash|clean/i],
-  ['PREP', /σύνθεσ|συσκευασ|compos|packag|prep/i],
-  ['RECEIVE', /παραλαβή|receiv/i],
-  ['SEND', /αποστολή|send|sent/i],
+/** The text without accents, in small letters: «Αποδεσμεύτηκε» and «ΑΝΑΚΛΗΣΗ» read as «αποδεσμευτηκε», «ανακληση». */
+const plain = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+
+/** By how a movement's text begins: the texts the actions write (useLoadActions, useReceiptAndCycleActions, …). */
+const START_RULES: Array<[MovementKind, RegExp]> = [
+  ['WASH', /^(φορτιο πλυντηριου|washer load)\s/],
+  ['CYCLE', /^(φορτιο|load)\s|^(βιολογικος δεικτης|αποτυχια κυκλου|επιστροφη στον κλιβανο)/],
+  ['PREP', /^(ολοκληρωση ελεγχου|check completed)/],
+  ['DELIVERY', /^επιστροφη στο τμημα/],
+  ['OTHER', /^παραλαβη παραγγελιας/],
 ];
 
+/** Otherwise by what the text's first part says. */
+const KIND_RULES: Array<[MovementKind, RegExp]> = [
+  ['RELEASE', /αποδεσμευ|ανακληση|releas|recall/],
+  ['DELIVERY', /παραδοση|προωθημενο|deliver|forward/],
+  ['CYCLE', /φορτωση|κυκλο|κλιβανισμ|load|cycle/],
+  ['WASH', /καθαρισμ|πλυση|wash|clean/],
+  ['PREP', /συνθεσ|συσκευασ|compos|packag|prep/],
+  ['RECEIVE', /παραλαβη|receiv/],
+  ['SEND', /αποστολη|send|sent/],
+];
+
+/** A loss, Service or retirement anywhere in the text. */
+const LOSS = /απωλει|service|αποσυρ|εκτος χρησης|lost|retir/;
+
 /**
- * The kind of a movement, from its text: a loss or Service anywhere in it, otherwise what its first part says
- * («Κύκλος … ολοκληρώθηκε · αναμονή αποδέσμευσης» is a cycle, not a release).
+ * The kind of a movement, from its text, whatever its accents: a loss or Service anywhere in it, otherwise how it
+ * begins or what its first part says («Κύκλος … ολοκληρώθηκε · αναμονή αποδέσμευσης» is a cycle, not a release).
  */
 export const movementKindOf = (status: string): MovementKind => {
-  if (KIND_RULES[0][1].test(status)) return 'LOSS';
-  // A load's own entries name the load first: «Φορτίο πλυντηρίου L… · …» is washing, «Φορτίο L… · …» a cycle.
-  if (/^(φορτίο πλυντηρίου|washer load)\s/i.test(status)) return 'WASH';
-  if (/^(φορτίο|load)\s/i.test(status)) return 'CYCLE';
-  // A stage's check done (packaging and labelling, …): the preparation of the item.
-  if (/^(ολοκλήρωση ελέγχου|check completed)/i.test(status)) return 'PREP';
-  const head = status.split(' · ')[0];
+  const text = plain(status.trim());
+  if (LOSS.test(text)) return 'LOSS';
+  const start = START_RULES.find(([, rule]) => rule.test(text));
+  if (start) return start[0];
+  const head = text.split(' · ')[0];
   return KIND_RULES.find(([, rule]) => rule.test(head))?.[0] || 'OTHER';
 };
