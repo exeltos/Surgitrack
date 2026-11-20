@@ -1,5 +1,5 @@
 import {useState, type ReactNode} from 'react';
-import {CheckCircle2, ShoppingCart, Trash2, Wrench} from 'lucide-react';
+import {Archive, CheckCircle2, ShoppingCart, Trash2, Wrench} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {useHasModule} from '../../data/cloud/modulesContext';
@@ -36,10 +36,12 @@ export default function IssueActions({
   /** In an active reprocessing: Service, Stock and composition wait for it, as the item's «Διαχείριση» does. */
   locked?: boolean;
 }): ReactNode {
-  const {resolveIssues, deleteIssue, can, role} = useSurgi();
+  const {resolveIssues, deleteIssue, retireForWear, can, role} = useSurgi();
   const withReplacements = useHasModule('REPLACEMENTS');
   const [replacing, setReplacing] = useState(false);
   if (issue.status !== 'OPEN' || !can('asset.composition.manage')) return null;
+  // Wear reported on an instrument counted until wear: Sterilization checks it and decides, keep it or retire it.
+  const wearDecision = !!replaceable?.wearCheck && !replaceable.maxUses && /Φθορ/i.test(issue.type);
   // The instrument itself in washing, sterilization or on its way waits too, whatever page the report is on.
   const replaceLocked = locked || (!!replaceable && inActiveProcess(replaceable));
   return (
@@ -53,12 +55,44 @@ export default function IssueActions({
             message: tr('Η εκκρεμότητα «{0}» για {1} θα σημειωθεί ως επιλυμένη.', trData(issue.type), issue.asset),
             confirmLabel: tr('Επίλυση'),
             note: {label: tr('Πώς επιλύθηκε (προαιρετικό)'), placeholder: tr('π.χ. Ακονίστηκε, κόβει κανονικά')},
-            onConfirm: how => resolveIssues([issue.id], how || tr('Ελέγχθηκε · παραμένει σε χρήση')),
+            onConfirm: how =>
+              resolveIssues(
+                [issue.id],
+                [
+                  wearDecision ? tr('Έλεγχος φθοράς στις {0} χρήσεις', replaceable?.uses || 0) : '',
+                  how || tr('Ελέγχθηκε · παραμένει σε χρήση'),
+                ]
+                  .filter(Boolean)
+                  .join(' · '),
+              ),
           })
         }
       >
         {tr('Ελέγχθηκε · σε χρήση')}
       </AppButton>
+      {wearDecision && replaceable && (
+        <AppButton
+          size="sm"
+          icon={<Archive size={14} />}
+          disabled={replaceable.state === 'IN_WASHING' || replaceable.state === 'IN_STERILIZATION'}
+          onClick={() =>
+            ask({
+              title: tr('Απόσυρση λόγω φθοράς;'),
+              message: tr(
+                'Το {0} βγαίνει από τη χρήση μετά από {1} χρήσεις{2}. Μένει στο ιστορικό και στις αναφορές.',
+                replaceable.barcode,
+                replaceable.uses || 0,
+                replaceable.setId ? tr(' και φεύγει από το Σετ του') : '',
+              ),
+              confirmLabel: tr('Απόσυρση'),
+              note: {label: tr('Τι βρέθηκε στον έλεγχο'), placeholder: tr('π.χ. Δεν κόβει, φθαρμένη μόνωση')},
+              onConfirm: note => retireForWear(replaceable.id, note),
+            })
+          }
+        >
+          {tr('Απόσυρση')}
+        </AppButton>
+      )}
       <AppButton
         size="sm"
         icon={<Wrench size={14} />}
