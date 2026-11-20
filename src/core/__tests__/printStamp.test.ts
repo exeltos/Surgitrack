@@ -22,6 +22,11 @@ describe('the common foot of the prints', () => {
     expect(a4).toContain('@bottom-left{content:"Νοσοκομείο \\"Α\\" · Εκτυπώθηκε');
     expect(a4).toContain('counter(pages)');
     expect(markPrintHtml(a4)).toBe(a4);
+    setPrintStamp({hospital: '</style><img src=x onerror=alert(1)>', user: 'Μαρία'});
+    const hostile = markPrintHtml('<style>@page{size:A4 portrait}</style><body>x</body>');
+    expect(hostile).not.toContain('</style><img');
+    const marginless = '<style>@page{size:A4 portrait;margin:0}</style><body>x</body>';
+    expect(markPrintHtml(marginless)).toBe(marginless);
     const label = '<style>@page{size:50mm 25mm;margin:0}</style><body>x</body>';
     expect(markPrintHtml(label)).toBe(label);
   });

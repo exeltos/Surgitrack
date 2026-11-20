@@ -39,11 +39,13 @@ const beforeBody = (html: string, extra: string) => {
 
 /**
  * A print page as it goes to paper: an A4 page gets the common foot (hospital, printed when and by whom, page X / Y;
- * see printStamp), and sample data the DEMO mark. A label keeps its own small page as it is.
+ * see printStamp), and sample data the DEMO mark. A label, and an A4 form with no page margin, keep their page as it is.
  */
 export const markPrintHtml = (html: string) => {
   let out = html;
-  if (/size:\s*A4/i.test(out) && !out.includes(FRAMED)) out = beforeBody(out, FRAMED + printFrameCss());
+  // An A4 page with no margin (the count form lays out its own head and foot) has nowhere to put the foot.
+  const a4 = /@page\s*\{[^}]*size:\s*A4/i.test(out) && !/@page\s*\{[^}]*margin:\s*0\s*[;}]/i.test(out);
+  if (a4 && !out.includes(FRAMED)) out = beforeBody(out, FRAMED + printFrameCss());
   if (marked && !out.includes('st-demo-mark')) out = beforeBody(out, MARK());
   return out;
 };

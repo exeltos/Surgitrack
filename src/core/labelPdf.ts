@@ -149,17 +149,20 @@ export async function labelToPdf(html: string, widthMm: number, heightMm: number
       // Text the page wrapped (a long name on two lines): each line where the browser put it, the lines the box
       // hides left out, and the last one shown ending in «…» when some were.
       if (range.getClientRects().length > 1) {
+        // Letter by letter, so a word the browser broke inside (a long code) is split where it was broken.
         const lines: Array<{text: string; left: number; top: number}> = [];
-        const words = /\S+/g;
-        for (let m = words.exec(text); m; m = words.exec(text)) {
-          const word = doc.createRange();
-          word.setStart(node, first + m.index);
-          word.setEnd(node, first + m.index + m[0].length);
-          const at = word.getBoundingClientRect();
+        const letter = doc.createRange();
+        // (Over the node's own characters, which the offsets count; each line composed as the font has it.)
+        for (let i = first; i < last; i++) {
+          letter.setStart(node, i);
+          letter.setEnd(node, i + 1);
+          const at = letter.getClientRects()[0];
           const line = lines[lines.length - 1];
-          if (line && Math.abs(line.top - at.top) < 1) line.text += ` ${m[0]}`;
-          else lines.push({text: m[0], left: at.left, top: at.top});
+          if (!at || (line && Math.abs(line.top - at.top) < 1)) {
+            if (line) line.text += raw[i];
+          } else if (raw[i].trim()) lines.push({text: raw[i], left: at.left, top: at.top});
         }
+        for (const line of lines) line.text = line.text.normalize('NFC').trimEnd();
         const bottom = element.getBoundingClientRect().bottom + 0.5;
         const shown = lines.filter(line => line.top + sizePx * 0.8 <= bottom);
         if (shown.length < lines.length && shown.length) {

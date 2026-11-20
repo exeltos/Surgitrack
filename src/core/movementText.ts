@@ -37,6 +37,9 @@ const KIND_RULES: Array<[MovementKind, RegExp]> = [
  */
 export const movementKindOf = (status: string): MovementKind => {
   if (KIND_RULES[0][1].test(status)) return 'LOSS';
+  // A load's own entries name the load first: «Φορτίο πλυντηρίου L… · …» is washing, «Φορτίο L… · …» a cycle.
+  if (/^(φορτίο πλυντηρίου|washer load)\s/i.test(status)) return 'WASH';
+  if (/^(φορτίο|load)\s/i.test(status)) return 'CYCLE';
   const head = status.split(' · ')[0];
   return KIND_RULES.find(([, rule]) => rule.test(head))?.[0] || 'OTHER';
 };

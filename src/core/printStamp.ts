@@ -17,7 +17,13 @@ export const printHospital = (hospital?: string) => trData(hospital || stamp.hos
 /** «Εκτυπώθηκε 20/11/2026 18:40 · Νίκος Παππάς». */
 export const printedLine = () => [tr('Εκτυπώθηκε {0}', formatDateTime()), stamp.user].filter(Boolean).join(' · ');
 
-const cssText = (text: string) => `"${text.replace(/[\\"]/g, '\\$&').replace(/[\r\n]+/g, ' ')}"`;
+// A CSS string inside a <style>: quotes and backslashes escaped for the string, and «<» as a CSS escape so a name
+// holding «</style>» cannot end the stylesheet.
+const cssText = (text: string) =>
+  `"${text
+    .replace(/[\\"]/g, '\\$&')
+    .replace(/</g, '\\3c ')
+    .replace(/[\r\n]+/g, ' ')}"`;
 
 /**
  * The page's foot for an A4 print: hospital, printed when and by whom on the left, «Σελίδα X / Y» on the right,
