@@ -92,3 +92,19 @@ describe('retiring during a process', () => {
     expect(result.current.tools.find(t => t.id === busy.id)!.state).toBe(busy.state);
   });
 });
+
+describe('editing an instrument', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    localStorage.clear();
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+  });
+
+  it('writes what changed, from what to what, in its history', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const tool = result.current.tools.find(t => t.state === 'IN_DEPARTMENT' || t.state === 'IN_STOCK')!;
+    act(() => result.current.updateTool(tool.id, {name: `${tool.name} ΔΙΟΡΘΩΣΗ`}));
+    const entry = result.current.movements.find(m => m.asset.startsWith(tool.barcode))!;
+    expect(entry.status).toContain(`Ονομασία: «${tool.name}» → «${tool.name} ΔΙΟΡΘΩΣΗ»`);
+  });
+});

@@ -3,6 +3,7 @@ import type {AssetKind, AssetState} from '../../types/domain';
 import {getLifecycleAlerts, normalizeUsageLimit} from '../helpers';
 import type {SetUpdatePatch, ToolUpdatePatch} from '../types';
 import {renameComposition, staleCompositionLines} from '../../core/nameCheck';
+import {describeChanges} from '../../core/editChanges';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -72,7 +73,11 @@ export function useAssetEditActions(
             : t,
         ),
       );
-    const changedBarcode = barcodeChanged ? ` · Barcode ${before.barcode} → ${normalizedBarcode}` : '';
+    // What changed, field by field, so the history shows a correction and what was there before.
+    const changes = describeChanges(
+      before as unknown as Record<string, unknown>,
+      {...patch, ...(normalizedBarcode ? {barcode: normalizedBarcode} : {})} as Record<string, unknown>,
+    );
     const stockChange =
       before.state !== nextState
         ? inStock
@@ -84,7 +89,7 @@ export function useAssetEditActions(
       assetKind: 'SET',
       from: 'Στοιχεία Σετ',
       to: inStock ? 'Απόθεμα Σετ' : 'Στοιχεία Σετ',
-      status: `Επεξεργασία στοιχείων Σετ${changedBarcode}${stockChange}`,
+      status: ['Επεξεργασία στοιχείων Σετ', ...changes].join(' · ') + stockChange,
       by: currentUser.name,
     });
     notify(tr('{0}: οι αλλαγές αποθηκεύτηκαν.', normalizedBarcode || before.barcode));
@@ -135,7 +140,10 @@ export function useAssetEditActions(
       ...(barcodeChanged ? {legacyBarcodes: [...(before.legacyBarcodes || []), before.barcode]} : {}),
     };
     setTools(list => list.map(t => (t.id === id ? {...t, ...nextPatch} : t)));
-    const changedBarcode = barcodeChanged ? ` · Barcode ${before.barcode} → ${normalizedBarcode}` : '';
+    const changes = describeChanges(
+      before as unknown as Record<string, unknown>,
+      {...patch, ...(normalizedBarcode ? {barcode: normalizedBarcode} : {})} as Record<string, unknown>,
+    );
     const locationChange =
       before.mode !== mode
         ? mode === 'STOCK'
@@ -147,7 +155,7 @@ export function useAssetEditActions(
       assetKind: 'TOOL',
       from: 'Στοιχεία Εργαλείου',
       to: mode === 'STOCK' ? 'Απόθεμα εργαλείων' : 'Στοιχεία Εργαλείου',
-      status: `Επεξεργασία στοιχείων εργαλείου${changedBarcode}${locationChange}`,
+      status: ['Επεξεργασία στοιχείων εργαλείου', ...changes].join(' · ') + locationChange,
       by: currentUser.name,
     });
     notify(tr('{0}: οι αλλαγές αποθηκεύτηκαν.', normalizedBarcode || before.barcode));
