@@ -5,6 +5,7 @@ import {formatExpiry, sterilizedOnOf} from '../../core/sterileExpiry';
 import {expirySymbolSvg, sterileSymbolSvg} from '../../core/sterileSymbols';
 import {code128Svg, openPrintWindow} from '../../modules/sterilization/printUtils';
 import {escapeHtml} from '../../core/escapeHtml';
+import {printHospital} from '../../core/printStamp';
 
 export type CountFormItem = {id: string; barcode: string; name: string; code?: string};
 export type CountFormData = {
@@ -104,7 +105,7 @@ export function countFormBody({asset, items, hospital, preparation, release, cou
   @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:12mm 11mm;background:#fff;min-height:297mm}.pg>thead,.pg>tfoot{display:none}}
   @media print{tr{break-inside:avoid}.pg>tbody>tr{break-inside:auto}}
   </style></head><body><table class="pg"><thead><tr><td></td></tr></thead><tfoot><tr><td></td></tr></tfoot><tbody><tr><td>
-  <div class="top"><div><div class="brand">${escapeHtml(hospital || 'SurgiTrack')}</div><div class="doc">${escapeHtml(tr('Έντυπο καταμέτρησης εργαλείων'))}</div><h1>${escapeHtml(asset.name)}</h1></div><div class="barcode">${code128Svg(asset.barcode, 48)}<div class="barcode-code">${escapeHtml(asset.barcode)}</div></div></div>
+  <div class="top"><div><div class="brand">${escapeHtml(printHospital(hospital))}</div><div class="doc">${escapeHtml(tr('Έντυπο καταμέτρησης εργαλείων'))}</div><h1>${escapeHtml(asset.name)}</h1></div><div class="barcode">${code128Svg(asset.barcode, 48)}<div class="barcode-code">${escapeHtml(asset.barcode)}</div></div></div>
   <h2>${escapeHtml(tr('Α. Αποστείρωση · ελεγμένο και αποστειρωμένο'))}<small class="${release ? 'signed' : 'pending'}">${escapeHtml(release ? tr('Υπογεγραμμένο ηλεκτρονικά') : tr('Χωρίς αποδέσμευση'))}</small></h2>
   <div class="meta">${partA}</div>
   <h2>${escapeHtml(tr('Β. Χειρουργείο · καταμέτρηση μετά την επέμβαση'))}<small class="${signed ? 'signed' : 'pending'}">${escapeHtml(signed ? tr('Υπογεγραμμένη {0}', count?.at || '') : tr('Εκκρεμεί υπογραφή'))}</small></h2>

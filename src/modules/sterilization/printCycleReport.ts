@@ -6,6 +6,7 @@ import {MIN_HOLD_PRESSURE, planFor, type CycleData, type CycleProblem} from '../
 import {code128Svg, openPrintWindow} from './printUtils';
 import {escapeHtml} from '../../core/escapeHtml';
 import {formatDateTime} from '../../core/displayDate';
+import {printHospital} from '../../core/printStamp';
 
 export type CycleReportData = {
   load: ProcessLoadRecord & {cycleData: CycleData};
@@ -66,7 +67,7 @@ export function cycleReportBody({load, hospital, release, label: labelSettings}:
       ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
       : label.header === 'TEXT' && label.text?.trim()
         ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
-        : '<div class="brand">SurgiTrack</div>';
+        : `<div class="brand">${escapeHtml(printHospital(hospital))}</div>`;
   const meta = [
     [tr('Κλίβανος'), trData(load.equipment)],
     [tr('Κύκλος'), shortCycleNumber(load.cycleNumber)],

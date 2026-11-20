@@ -7,6 +7,7 @@ import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/st
 import {STERILE_STATES, formatExpiry, isoDate, sterileUntil, sterilizedOnOf} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 import {labelToPdf} from '../../core/labelPdf';
+import {printHospital} from '../../core/printStamp';
 
 // Code 128 B: same symbology used by the legacy FileMaker Barcode_Code128 webview.
 const CODE128_PATTERNS = [
@@ -444,7 +445,7 @@ function compositionBody(
       ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
       : label.header === 'TEXT' && label.text?.trim()
         ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
-        : '<div class="brand">SurgiTrack</div>';
+        : `<div class="brand">${escapeHtml(printHospital())}</div>`;
   const marker = markerChips(options.marker);
   const meta =
     [

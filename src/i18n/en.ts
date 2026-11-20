@@ -351,7 +351,6 @@ export const en: Record<string, string> = {
   Αναφορά: 'Report',
   'Αναφορά Σετ': 'Report set',
   'Αναφορά απόκλισης': 'Report deviation',
-  'Αναφορά συστήματος': 'System report',
   Αναφορές: 'Reports',
   'Προβλήματα και εκκρεμότητες του τμήματος {0}.': 'Problems and issues of department {0}.',
   Ανοικτές: 'Open',
@@ -2515,4 +2514,5 @@ export const en: Record<string, string> = {
   'Απώλεια & Service': 'Loss & service',
   Άλλες: 'Other',
   'Καθαρισμός & απολύμανση': 'Cleaning & disinfection',
+  Σελίδα: 'Page',
 };

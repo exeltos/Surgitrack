@@ -6,6 +6,7 @@ import {useSurgiStore} from './slices/useSurgiStore';
 import {useLibraries} from '../core/LibraryStore';
 import {cancelledRecordIds} from '../core/movementUndo';
 import {createHolder, publish, useTrackedValue, type StoreHolder} from './trackedStore';
+import {setPrintStamp} from '../core/printStamp';
 
 export type {
   DeliveryPayload,
@@ -148,6 +149,11 @@ export function SurgiProvider({
   // Studio settings the actions read (workflow stages and policies, permissions): a change must reach them.
   const {sterilizationWorkflow, rolePermissions, systemSettings, sterilizers, washers} = useLibraries();
 
+  // Every print names the hospital and the person printing (see printStamp).
+  const organizationName = cloud?.organizationName;
+  useLayoutEffect(() => {
+    setPrintStamp({hospital: organizationName, user: currentUser.name});
+  }, [organizationName, currentUser.name]);
   const activeTools = useMemo(() => tools.filter(t => t.state !== 'RETIRED'), [tools]);
   const retiredTools = useMemo(() => tools.filter(t => t.state === 'RETIRED'), [tools]);
   // A receipt, delivery, preparation or stage check whose movement was undone stays recorded but no longer counts.
