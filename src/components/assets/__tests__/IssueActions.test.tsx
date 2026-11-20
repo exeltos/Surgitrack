@@ -49,3 +49,36 @@ describe('Replacing an instrument from its report', () => {
     expect((await screen.findAllByText('Service')).length).toBeGreaterThan(0);
   });
 });
+
+describe('Deleting a report', () => {
+  it('the hospital admin deletes one written twice, with why, and it goes to the bin', () => {
+    const issue = issues.find(i => i.id === 'i9')!;
+    const tool = tools.find(t => issue.asset.startsWith(`${t.barcode} `))!;
+    renderPage(<ToolDetailPage />, {
+      path: `/tools/${tool.id}`,
+      route: '/tools/:id',
+      signedIn: {id: 'u-admin', name: 'Διαχειριστής', role: 'ADMIN', department: 'Κεντρική Αποστείρωση'},
+    });
+    fireEvent.click(screen.getByRole('button', {name: /^Εκκρεμότητες/}));
+    fireEvent.click(screen.getByRole('button', {name: 'Διαγραφή'}));
+    const dialog = screen.getByRole('dialog');
+    const confirm = within(dialog).getByRole('button', {name: 'Διαγραφή'});
+    // The reason is required.
+    expect(confirm).toBeDisabled();
+    fireEvent.change(within(dialog).getByRole('textbox'), {target: {value: 'Διπλή αναφορά'}});
+    fireEvent.click(confirm);
+    expect(screen.getByText('Δεν υπάρχουν ανοικτές εκκρεμότητες.')).toBeInTheDocument();
+  });
+
+  it('Sterilization staff cannot delete a report', () => {
+    const issue = issues.find(i => i.id === 'i9')!;
+    const tool = tools.find(t => issue.asset.startsWith(`${t.barcode} `))!;
+    renderPage(<ToolDetailPage />, {
+      path: `/tools/${tool.id}`,
+      route: '/tools/:id',
+      signedIn: {id: 'u-ster', name: 'Αποστείρωση', role: 'STERILIZATION', department: 'Κεντρική Αποστείρωση'},
+    });
+    fireEvent.click(screen.getByRole('button', {name: /^Εκκρεμότητες/}));
+    expect(screen.queryByRole('button', {name: 'Διαγραφή'})).not.toBeInTheDocument();
+  });
+});

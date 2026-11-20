@@ -44,6 +44,7 @@ const issueAge = (created: string) => {
 
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
 import EquipmentProblems from './EquipmentProblems';
+import {DeleteIssueButton} from '../../components/assets/IssueActions';
 
 export default function IssuesPage() {
   const {
@@ -57,8 +58,11 @@ export default function IssuesPage() {
     movements,
     purchaseOrders,
     resolveIssues,
+    deleteIssue,
     createPurchaseOrder,
   } = useSurgi();
+  // Only the hospital admin (or the owner acting as one) deletes a report someone wrote.
+  const canDelete = role === 'ADMIN';
   const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
   const [figureOpened, setFigureOpened] = useState(0);
   const [confirm, ask] = useConfirm();
@@ -292,7 +296,7 @@ export default function IssuesPage() {
                           sort={order.sort}
                           onSort={order.toggle}
                         />
-                        {withReplacements && (
+                        {(withReplacements || canDelete) && (
                           <th className="col-actions">
                             <span className="visually-hidden">{tr('Ενέργειες')}</span>
                           </th>
@@ -351,10 +355,10 @@ export default function IssuesPage() {
                               <span className="badge">{tr('Επιλυμένη')}</span>
                             )}
                           </td>
-                          {withReplacements && (
+                          {(withReplacements || canDelete) && (
                             <td className="issue-actions">
                               <div className="issue-actions-row">
-                                {i.status === 'OPEN' && (
+                                {withReplacements && i.status === 'OPEN' && (
                                   <button
                                     type="button"
                                     className="issue-action wide slot-resolve"
@@ -381,7 +385,7 @@ export default function IssuesPage() {
                                     {tr('Επίλυση')}
                                   </button>
                                 )}
-                                {subject(i).tool && (
+                                {withReplacements && subject(i).tool && (
                                   <button
                                     type="button"
                                     className="issue-action slot-order"
@@ -402,6 +406,7 @@ export default function IssuesPage() {
                                     <ExternalLink size={14} />
                                   </Link>
                                 )}
+                                {canDelete && <DeleteIssueButton issue={i} ask={ask} onDelete={deleteIssue} compact />}
                               </div>
                             </td>
                           )}
@@ -409,7 +414,7 @@ export default function IssuesPage() {
                       ))}
                       {rows.hasMore && (
                         <MoreRows
-                          colSpan={4 + (withPhotos ? 1 : 0) + (withReplacements ? 1 : 0)}
+                          colSpan={4 + (withPhotos ? 1 : 0) + (withReplacements || canDelete ? 1 : 0)}
                           onVisible={rows.showMore}
                         />
                       )}

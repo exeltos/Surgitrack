@@ -1,7 +1,7 @@
 import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {useEffect, useState} from 'react';
-import {Cable, Layers3, Palette, RotateCcw, Tags, Trash2, Wrench} from 'lucide-react';
+import {Cable, Layers3, Palette, RotateCcw, Tags, Trash2, TriangleAlert, Wrench} from 'lucide-react';
 import {deviceClockTrusted} from '../../data/cloud/clockCheck';
 import {useSurgi} from '../../store/SurgiStore';
 import {useLibraries} from '../../core/LibraryStore';
@@ -36,6 +36,7 @@ const KIND: Record<BinEntry['kind'], {label: string; icon: typeof Layers3}> = {
   LIBRARY: {label: 'Βιβλιοθήκη Studio', icon: Tags},
   COLOR_TAPE: {label: 'Ταινία χρώματος', icon: Palette},
   DEVICE: {label: 'Συσκευή', icon: Cable},
+  ISSUE: {label: 'Αναφορά προβλήματος', icon: TriangleAlert},
 };
 
 const detailOf = (entry: BinEntry) =>
@@ -76,12 +77,12 @@ export default function BinPage() {
 
   // Studio libraries are saved by the hospital admin only, so only an admin can put one back.
   const canRestore = (entry: BinEntry) =>
-    entry.kind === 'LIBRARY' || entry.kind === 'COLOR_TAPE' ? role === 'ADMIN' : true;
+    entry.kind === 'LIBRARY' || entry.kind === 'COLOR_TAPE' || entry.kind === 'ISSUE' ? role === 'ADMIN' : true;
 
   const restore = async (entry: BinEntry) => {
     setNotice(null);
     try {
-      if (entry.kind === 'SET' || entry.kind === 'TOOL') {
+      if (entry.kind === 'SET' || entry.kind === 'TOOL' || entry.kind === 'ISSUE') {
         restoreFromBin(entry.id);
         return;
       }

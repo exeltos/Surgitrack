@@ -35,6 +35,7 @@ export function useAssetCatalogActions(
     sets,
     tools,
     setMovements,
+    role,
   } = p;
 
   /**
@@ -344,6 +345,28 @@ export function useAssetCatalogActions(
       issueIds.length === 1 ? tr('Η εκκρεμότητα επιλύθηκε.') : tr('{0} εκκρεμότητες επιλύθηκαν.', issueIds.length),
     );
   };
+  /**
+   * A report written by mistake or twice: only the hospital admin (and the platform owner, who acts as one) takes it
+   * away, with why. It goes to the recycle bin, from where it can come back.
+   */
+  const deleteIssue = (issueId: string, reason: string) => {
+    const issue = issues.find(i => i.id === issueId);
+    if (role !== 'ADMIN' || !issue || !reason.trim()) return;
+    setIssues(list => list.filter(i => i.id !== issueId));
+    setRecycleBin(x => [
+      {
+        id: `bin-issue-${issue.id}-${uniqueStamp()}`,
+        kind: 'ISSUE',
+        label: `${issue.type} · ${issue.asset}`,
+        detail: `${issue.created}${issue.reportedBy ? ` · ${issue.reportedBy}` : ''} · ${reason.trim()}`,
+        payload: {tools: [], toolsDeleted: false, issue},
+        deletedAt: new Date().toISOString(),
+        deletedByName: currentUser.name,
+      },
+      ...x,
+    ]);
+    notify(tr('Η αναφορά διαγράφηκε· μπορεί να επανέλθει από τον Κάδο.'));
+  };
   const addAssetPhotos = (kind: AssetKind, id: string, photos: AssetPhoto[]) => {
     if (!photos.length) return;
     if (kind === 'SET') setSets(x => x.map(a => (a.id === id ? {...a, photos: [...(a.photos || []), ...photos]} : a)));
@@ -639,5 +662,6 @@ export function useAssetCatalogActions(
     replaceToolInSet,
     reportIssue,
     resolveIssues,
+    deleteIssue,
   };
 }

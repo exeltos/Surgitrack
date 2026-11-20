@@ -1605,6 +1605,13 @@ export const en: Record<string, string> = {
   'Δεν υπάρχει ίδιο μεμονωμένο εργαλείο.': 'No such loose instrument.',
   'Θα αφαιρεθεί από το Σετ {0}, το οποίο θα μείνει με έλλειψη.':
     'It will be taken out of Set {0}, which will then be short.',
+  'Διαγραφή αναφοράς;': 'Delete the report?',
+  'Η αναφορά «{0}» για {1} θα πάει στον Κάδο, απ’ όπου μπορεί να επανέλθει.':
+    'The «{0}» report for {1} goes to the Bin, from where it can be restored.',
+  'Αιτία διαγραφής': 'Reason for deleting',
+  'π.χ. Διπλή αναφορά': 'e.g. Reported twice',
+  'Διαγραφή αναφοράς': 'Delete report',
+  'Η αναφορά διαγράφηκε· μπορεί να επανέλθει από τον Κάδο.': 'Report deleted; it can be restored from the Bin.',
   'Αντικατάσταση από Απόθεμα ({0})': 'Replace from Stock ({0})',
   Αντικαταστάθηκε: 'Replaced',
   'Αντικαταστάθηκε από {0}': 'Replaced by {0}',
