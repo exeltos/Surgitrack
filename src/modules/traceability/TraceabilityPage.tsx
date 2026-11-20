@@ -1,3 +1,4 @@
+import PageHeader from '../../components/ui/PageHeader';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {ArrowLeft, Search, History, Flame, Users, Package} from 'lucide-react';
@@ -156,10 +157,10 @@ export default function TraceabilityPage() {
   return (
     // The movements tab fills the page, as «Ιστορικό» did on its own.
     <div className={tab === 'HISTORY' ? 'trace-with-history' : 'trace-page'}>
-      {/* No page title: the menu says where this is. On a tab's list, the tabs; inside one of its cards (a Set or
-          instrument found, a patient, a load), only «Πίσω» in their place, as «Πίσω στη λίστα» on the Set and
+      {/* The page's title, as on every other page; under it the tabs, or inside one of its cards (a Set or
+          instrument found, a patient, a load) only «Πίσω» in their place, as «Πίσω στη λίστα» on the Set and
           instrument pages: to the previous step, or with nothing before it, to the tab's list. */}
-      <h1 className="visually-hidden">{tr('Ιχνηλάτηση')}</h1>
+      <PageHeader title={tr('Ιχνηλάτηση')} />
       {detailOpen ? (
         <div className="trace-head">
           <AppButton icon={<ArrowLeft size={18} />} onClick={goBack} className="trace-page-back">
