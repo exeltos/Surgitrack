@@ -100,5 +100,7 @@ describe('Closing a report with retirement', () => {
     fireEvent.click(within(dialog).getByRole('button', {name: 'Απόσυρση'}));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByText('Δεν υπάρχουν ανοικτές εκκρεμότητες.')).toBeInTheDocument();
+    // Its page is now its record: nothing there can bring it back into use.
+    expect(screen.queryByRole('button', {name: /Ενέργειες/})).not.toBeInTheDocument();
   });
 });

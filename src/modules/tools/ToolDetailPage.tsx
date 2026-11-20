@@ -147,6 +147,8 @@ export default function ToolDetailPage() {
   const departmentView = role === 'DEPARTMENT';
   const backTo = departmentView ? (tool.mode === 'STANDALONE' ? '/department/tools' : '/department') : '/tools';
   const workflowLocked = !['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST'].includes(tool.state);
+  // Out of use: its page is its record (history, why and when), with nothing to change that could bring it back.
+  const retired = tool.state === 'RETIRED';
 
   return (
     <div className="asset-detail-workspace tool-detail-workspace legacy-inspired-workspace">
@@ -175,79 +177,83 @@ export default function ToolDetailPage() {
                 : []),
             ]}
           />
-          <ActionMenu
-            icon={<Settings2 size={18} />}
-            label={tr('Ενέργειες')}
-            align="right"
-            items={[
-              ...(can('issue.create')
-                ? [
-                    {
-                      key: 'report',
-                      icon: <Flag size={16} />,
-                      label: tr('Αναφορά προβλήματος'),
-                      hint: can('asset.composition.manage')
-                        ? tr('Βλάβη, φθορά ή άλλο πρόβλημα')
-                        : tr('Βλάβη, φθορά, απώλεια ή άλλο πρόβλημα'),
-                      onSelect: () => setReportOpen(true),
-                    },
-                  ]
-                : []),
-              ...(can('asset.composition.manage')
-                ? [
-                    {
-                      key: 'moves',
-                      icon: <ArrowRightLeft size={16} />,
-                      label: tr('Διαχείριση'),
-                      hint: tr('Τμήμα, Σετ, Απόθεμα, Service, απώλεια'),
-                      disabled: workflowLocked,
-                      title: workflowLocked
-                        ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
-                        : undefined,
-                      onSelect: () => setManageOpen(true),
-                    },
-                  ]
-                : []),
-              ...(can('asset.barcode.reissue')
-                ? [
-                    {
-                      key: 'barcode',
-                      icon: <Barcode size={16} />,
-                      label: tr('Νέο barcode'),
-                      hint: tr('Όταν η ετικέτα χάθηκε, φθάρηκε ή είναι διπλή'),
-                      onSelect: () => setNewBarcodeOpen(true),
-                    },
-                  ]
-                : []),
-              ...(can('asset.duplicate')
-                ? [
-                    {
-                      key: 'duplicate',
-                      icon: <Copy size={16} />,
-                      label: tr('Αντίγραφο'),
-                      hint: tr('Νέο εργαλείο με τα ίδια στοιχεία'),
-                      onSelect: () => setDuplicateOpen(true),
-                    },
-                  ]
-                : []),
-              ...(can('asset.delete')
-                ? [
-                    {
-                      key: 'delete',
-                      icon: <Trash2 size={16} />,
-                      label: tr('Διαγραφή Εργαλείου'),
-                      danger: true,
-                      title: workflowLocked
-                        ? tr('Η διαγραφή είναι κλειδωμένη όσο το εργαλείο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
-                        : undefined,
-                      onSelect: () => (workflowLocked ? setDeleteBlockedOpen(true) : setDeleteOpen(true)),
-                    },
-                  ]
-                : []),
-              ...(undo.item ? [undo.item] : []),
-              ...(stageBack.item ? [stageBack.item] : []),
-            ]}
-          />
+          {!retired && (
+            <ActionMenu
+              icon={<Settings2 size={18} />}
+              label={tr('Ενέργειες')}
+              align="right"
+              items={[
+                ...(can('issue.create')
+                  ? [
+                      {
+                        key: 'report',
+                        icon: <Flag size={16} />,
+                        label: tr('Αναφορά προβλήματος'),
+                        hint: can('asset.composition.manage')
+                          ? tr('Βλάβη, φθορά ή άλλο πρόβλημα')
+                          : tr('Βλάβη, φθορά, απώλεια ή άλλο πρόβλημα'),
+                        onSelect: () => setReportOpen(true),
+                      },
+                    ]
+                  : []),
+                ...(can('asset.composition.manage')
+                  ? [
+                      {
+                        key: 'moves',
+                        icon: <ArrowRightLeft size={16} />,
+                        label: tr('Διαχείριση'),
+                        hint: tr('Τμήμα, Σετ, Απόθεμα, Service, απώλεια'),
+                        disabled: workflowLocked,
+                        title: workflowLocked
+                          ? tr('Η διαχείριση είναι κλειδωμένη όσο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.')
+                          : undefined,
+                        onSelect: () => setManageOpen(true),
+                      },
+                    ]
+                  : []),
+                ...(can('asset.barcode.reissue')
+                  ? [
+                      {
+                        key: 'barcode',
+                        icon: <Barcode size={16} />,
+                        label: tr('Νέο barcode'),
+                        hint: tr('Όταν η ετικέτα χάθηκε, φθάρηκε ή είναι διπλή'),
+                        onSelect: () => setNewBarcodeOpen(true),
+                      },
+                    ]
+                  : []),
+                ...(can('asset.duplicate')
+                  ? [
+                      {
+                        key: 'duplicate',
+                        icon: <Copy size={16} />,
+                        label: tr('Αντίγραφο'),
+                        hint: tr('Νέο εργαλείο με τα ίδια στοιχεία'),
+                        onSelect: () => setDuplicateOpen(true),
+                      },
+                    ]
+                  : []),
+                ...(can('asset.delete')
+                  ? [
+                      {
+                        key: 'delete',
+                        icon: <Trash2 size={16} />,
+                        label: tr('Διαγραφή Εργαλείου'),
+                        danger: true,
+                        title: workflowLocked
+                          ? tr(
+                              'Η διαγραφή είναι κλειδωμένη όσο το εργαλείο βρίσκεται σε ενεργή διαδικασία αποστείρωσης.',
+                            )
+                          : undefined,
+                        onSelect: () => (workflowLocked ? setDeleteBlockedOpen(true) : setDeleteOpen(true)),
+                      },
+                    ]
+                  : []),
+                ...(undo.item ? [undo.item] : []),
+                ...(stageBack.item ? [stageBack.item] : []),
+              ]}
+            />
+          )}
           {undo.node}
           {stageBack.node}
           {can('department.dispatch') && tool.state === 'IN_DEPARTMENT' && (
@@ -458,7 +464,7 @@ export default function ToolDetailPage() {
                 photos={tool.photos || []}
                 onAdd={async files => addAssetPhotos('TOOL', tool.id, await filesToAssetPhotos(files))}
                 onRemove={photoId => removeAssetPhoto('TOOL', tool.id, photoId)}
-                readOnly={!can('asset.photos.manage')}
+                readOnly={retired || !can('asset.photos.manage')}
                 bare
                 description={
                   !can('asset.photos.manage')
