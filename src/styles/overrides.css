@@ -4641,3 +4641,27 @@ html
     font-size: 14px;
   }
 }
+
+/* Everything that can be pressed shows the hand; what is switched off does not. */
+html
+  body
+  :is(
+    button,
+    a[href],
+    summary,
+    select,
+    label:has(> input:is([type='checkbox'], [type='radio'])),
+    input:is([type='checkbox'], [type='radio'], [type='file'], [type='submit'], [type='button'], [type='color']),
+    [role='button'],
+    [role='tab'],
+    [role='menuitem'],
+    [role='option'],
+    [role='switch'],
+    [onclick]
+  ):not(:disabled, [aria-disabled='true'], .disabled, .self) {
+  cursor: pointer;
+}
+html body :is(button, select, input):disabled,
+html body [aria-disabled='true'] {
+  cursor: not-allowed;
+}
