@@ -1,8 +1,9 @@
+import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import ExpiryBadge from '../../components/ui/ExpiryBadge';
 import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Search, Wrench} from 'lucide-react';
+import {ArrowLeft, ChevronRight, ClipboardList, Layers3, Wrench} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import type {SetAsset, Tool} from '../../types/domain';
@@ -149,43 +150,34 @@ export default function DepartmentPage() {
         ]}
       />
 
-      <section className="department-assets-panel">
-        {/* The department's own menu chooses Sets or instruments; the admin viewing a department switches here. */}
-        {viewing && (
-          <div className="department-category-tabs">
-            <button className={category === 'SETS' ? 'active' : ''} onClick={() => setCategory('SETS')}>
-              <Layers3 size={19} />
-              <span>
-                <strong>{tr('Σετ εργαλείων')}</strong>
-                <small>
-                  {departmentSets.length} {tr('Σετ του τμήματος')}
-                </small>
-              </span>
-              <b>{departmentSets.length}</b>
-            </button>
-            <button className={category === 'TOOLS' ? 'active' : ''} onClick={() => setCategory('TOOLS')}>
-              <Wrench size={19} />
-              <span>
-                <strong>{tr('Μεμονωμένα εργαλεία')}</strong>
-                <small>
-                  {departmentTools.length} {tr('εργαλεία σε αυτόνομη χρήση')}
-                </small>
-              </span>
-              <b>{departmentTools.length}</b>
-            </button>
-          </div>
-        )}
-        <div className="department-list-toolbar">
-          <label className="department-search">
-            <Search size={17} />
-            <input
-              type="search"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder={tr('Ονομασία, κωδικός ή barcode...')}
-            />
-          </label>
+      {/* The department's own menu chooses Sets or instruments; the admin viewing a department switches here. */}
+      {viewing && (
+        <div className="department-category-tabs">
+          <button className={category === 'SETS' ? 'active' : ''} onClick={() => setCategory('SETS')}>
+            <Layers3 size={19} />
+            <span>
+              <strong>{tr('Σετ εργαλείων')}</strong>
+              <small>
+                {departmentSets.length} {tr('Σετ του τμήματος')}
+              </small>
+            </span>
+            <b>{departmentSets.length}</b>
+          </button>
+          <button className={category === 'TOOLS' ? 'active' : ''} onClick={() => setCategory('TOOLS')}>
+            <Wrench size={19} />
+            <span>
+              <strong>{tr('Μεμονωμένα εργαλεία')}</strong>
+              <small>
+                {departmentTools.length} {tr('εργαλεία σε αυτόνομη χρήση')}
+              </small>
+            </span>
+            <b>{departmentTools.length}</b>
+          </button>
         </div>
+      )}
+      {/* The search on the bar every list has, above the list. */}
+      <AssetFilterBar query={query} onQueryChange={setQuery} placeholder={tr('Ονομασία, κωδικός ή barcode...')} />
+      <section className="department-assets-panel">
         <div className="department-list-head" aria-hidden="true">
           <span />
           <span>{tr('Ονομασία')}</span>

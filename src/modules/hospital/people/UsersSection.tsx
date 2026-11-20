@@ -138,9 +138,10 @@ export default function UsersSection({s}: {s: PeopleState}) {
         />
       )}
       {tab === 'USERS' && (
-        <section className="hospital-card hospital-members">
-          <div className="people-toolbar">
-            <div className="studio-search">
+        <>
+          {/* The search, Filters, the download and «Προσθήκη χρήστη» on the bar every list has, above it. */}
+          <div className="asset-filter-bar people-toolbar">
+            <div className="asset-filter-search">
               <Search size={17} />
               <input
                 type="search"
@@ -327,363 +328,372 @@ export default function UsersSection({s}: {s: PeopleState}) {
               )}
             </div>
           </div>
-          {demoSeats && (
-            <div className={`people-demo-seats ${demoSeats.left === 0 ? 'full' : ''}`}>
-              <Users size={16} />
-              <span>
-                <b>
-                  {L(
-                    `Συνάδελφοι στο Demo: ${demoSeats.max - demoSeats.left} / ${demoSeats.max}`,
-                    `Colleagues in the Demo: ${demoSeats.max - demoSeats.left} / ${demoSeats.max}`,
-                  )}
-                </b>
-                <small>
-                  {demoSeats.left === 0
-                    ? L(
-                        'Το όριο συμπληρώθηκε. Για περισσότερους συναδέλφους επικοινωνήστε μαζί μας.',
-                        'The limit is reached. For more colleagues, contact us.',
-                      )
-                    : L(
-                        `Μπορείτε να προσκαλέσετε ακόμα ${demoSeats.left}. Οι προσκλήσεις που περιμένουν εγγραφή μετράνε κι αυτές.`,
-                        `You can invite ${demoSeats.left} more. Invitations waiting for signup count too.`,
-                      )}
-                </small>
-              </span>
-            </div>
-          )}
-
-          {pending.length > 0 && (
-            <div className="people-requests">
-              <header
-                title={L(
-                  'Ελέγξτε τα στοιχεία, επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης έχει ήδη όνομα χρήστη και κωδικό· με την έγκριση λαμβάνει ένα email και συνδέεται.',
-                  'Check the details, pick a role and department, then approve. The user already has a username and password; on approval they get one email and can sign in.',
-                )}
-              >
-                <UserCheck size={17} />
-                <b>
-                  {L(
-                    `${pending.length} ${pending.length === 1 ? 'αίτημα περιμένει' : 'αιτήματα περιμένουν'} έγκριση`,
-                    `${pending.length} ${pending.length === 1 ? 'request awaits' : 'requests await'} approval`,
-                  )}
-                </b>
-              </header>
-              {pending.map(r => {
-                const d = decisionFor(r);
-                return (
-                  <article key={r.id} className="hospital-request">
-                    <div className="hospital-request-who">
-                      <strong>{r.full_name}</strong>
-                      <small>
-                        {r.user_code && (
-                          <>
-                            <code>{r.user_code}</code> ·{' '}
-                          </>
+          <section className="hospital-card hospital-members">
+            {demoSeats && (
+              <div className={`people-demo-seats ${demoSeats.left === 0 ? 'full' : ''}`}>
+                <Users size={16} />
+                <span>
+                  <b>
+                    {L(
+                      `Συνάδελφοι στο Demo: ${demoSeats.max - demoSeats.left} / ${demoSeats.max}`,
+                      `Colleagues in the Demo: ${demoSeats.max - demoSeats.left} / ${demoSeats.max}`,
+                    )}
+                  </b>
+                  <small>
+                    {demoSeats.left === 0
+                      ? L(
+                          'Το όριο συμπληρώθηκε. Για περισσότερους συναδέλφους επικοινωνήστε μαζί μας.',
+                          'The limit is reached. For more colleagues, contact us.',
+                        )
+                      : L(
+                          `Μπορείτε να προσκαλέσετε ακόμα ${demoSeats.left}. Οι προσκλήσεις που περιμένουν εγγραφή μετράνε κι αυτές.`,
+                          `You can invite ${demoSeats.left} more. Invitations waiting for signup count too.`,
                         )}
-                        {r.email}
-                        {r.department_id && (
-                          <>
-                            {' '}
-                            · {L('ζήτησε', 'asked for')} <b>{departmentName(r.department_id)}</b>
-                          </>
-                        )}{' '}
-                        · {date(r.requested_at)}
-                      </small>
-                    </div>
-                    <label>
-                      {L('Ρόλος', 'Role')}
-                      <select value={d.role} onChange={e => setDecision(r, {role: e.target.value})}>
-                        {assignableRoles(platform, d.role).map(role => (
-                          <option key={role.id} value={role.id}>
-                            {el ? role.el : role.en}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label>
-                      {L('Τμήμα', 'Department')}
-                      {wholeHospital(d.role) ? (
-                        <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
-                      ) : (
-                        <select value={d.departmentId} onChange={e => setDecision(r, {departmentId: e.target.value})}>
-                          {activeDepartments.map(dep => (
-                            <option key={dep.id} value={dep.id}>
-                              {localizedName(dep.name, lang)}
+                  </small>
+                </span>
+              </div>
+            )}
+
+            {pending.length > 0 && (
+              <div className="people-requests">
+                <header
+                  title={L(
+                    'Ελέγξτε τα στοιχεία, επιλέξτε ρόλο και τμήμα και εγκρίνετε. Ο χρήστης έχει ήδη όνομα χρήστη και κωδικό· με την έγκριση λαμβάνει ένα email και συνδέεται.',
+                    'Check the details, pick a role and department, then approve. The user already has a username and password; on approval they get one email and can sign in.',
+                  )}
+                >
+                  <UserCheck size={17} />
+                  <b>
+                    {L(
+                      `${pending.length} ${pending.length === 1 ? 'αίτημα περιμένει' : 'αιτήματα περιμένουν'} έγκριση`,
+                      `${pending.length} ${pending.length === 1 ? 'request awaits' : 'requests await'} approval`,
+                    )}
+                  </b>
+                </header>
+                {pending.map(r => {
+                  const d = decisionFor(r);
+                  return (
+                    <article key={r.id} className="hospital-request">
+                      <div className="hospital-request-who">
+                        <strong>{r.full_name}</strong>
+                        <small>
+                          {r.user_code && (
+                            <>
+                              <code>{r.user_code}</code> ·{' '}
+                            </>
+                          )}
+                          {r.email}
+                          {r.department_id && (
+                            <>
+                              {' '}
+                              · {L('ζήτησε', 'asked for')} <b>{departmentName(r.department_id)}</b>
+                            </>
+                          )}{' '}
+                          · {date(r.requested_at)}
+                        </small>
+                      </div>
+                      <label>
+                        {L('Ρόλος', 'Role')}
+                        <select value={d.role} onChange={e => setDecision(r, {role: e.target.value})}>
+                          {assignableRoles(platform, d.role).map(role => (
+                            <option key={role.id} value={role.id}>
+                              {el ? role.el : role.en}
                             </option>
                           ))}
                         </select>
-                      )}
-                    </label>
-                    <label className="hospital-request-note">
-                      {L('Σχόλιο (προαιρετικό)', 'Note (optional)')}
-                      <input value={d.note} onChange={e => setDecision(r, {note: e.target.value})} />
-                    </label>
-                    <div className="hospital-request-actions">
-                      <AppButton
-                        variant="primary"
-                        disabled={busy}
-                        onClick={() => void decide(r, true)}
-                        icon={<UserCheck size={15} />}
-                      >
-                        {L('Έγκριση', 'Approve')}
-                      </AppButton>
-                      <AppButton
-                        variant="danger"
-                        disabled={busy}
-                        onClick={() => void decide(r, false)}
-                        icon={<UserX size={15} />}
-                      >
-                        {L('Απόρριψη', 'Reject')}
-                      </AppButton>
-                    </div>
+                      </label>
+                      <label>
+                        {L('Τμήμα', 'Department')}
+                        {wholeHospital(d.role) ? (
+                          <span className="hospital-whole">{L('Όλο το νοσοκομείο', 'Whole hospital')}</span>
+                        ) : (
+                          <select value={d.departmentId} onChange={e => setDecision(r, {departmentId: e.target.value})}>
+                            {activeDepartments.map(dep => (
+                              <option key={dep.id} value={dep.id}>
+                                {localizedName(dep.name, lang)}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </label>
+                      <label className="hospital-request-note">
+                        {L('Σχόλιο (προαιρετικό)', 'Note (optional)')}
+                        <input value={d.note} onChange={e => setDecision(r, {note: e.target.value})} />
+                      </label>
+                      <div className="hospital-request-actions">
+                        <AppButton
+                          variant="primary"
+                          disabled={busy}
+                          onClick={() => void decide(r, true)}
+                          icon={<UserCheck size={15} />}
+                        >
+                          {L('Έγκριση', 'Approve')}
+                        </AppButton>
+                        <AppButton
+                          variant="danger"
+                          disabled={busy}
+                          onClick={() => void decide(r, false)}
+                          icon={<UserX size={15} />}
+                        >
+                          {L('Απόρριψη', 'Reject')}
+                        </AppButton>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+            {invitedToSignup.length > 0 && (
+              <div className="people-invitations">
+                <header>
+                  <Mail size={16} />
+                  <b>
+                    {L(
+                      `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'πρόσκληση περιμένει' : 'προσκλήσεις περιμένουν'} την εγγραφή του χρήστη`,
+                      `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'invitation waits' : 'invitations wait'} for the person to sign up`,
+                    )}
+                  </b>
+                </header>
+                {invitedToSignup.map(r => (
+                  <article key={r.id} className="people-invitation">
+                    <span className="people-who">
+                      <b>{r.email}</b>
+                      <small>
+                        {r.invited_role ? roleLabel(r.invited_role) : ''}
+                        {r.invited_at ? ` · ${L('στάλθηκε', 'sent')} ${date(r.invited_at)}` : ''}
+                      </small>
+                    </span>
+                    {r.invite_token && <CopyField value={signupFormUrl(r.invite_token)} L={L} compact />}
+                    <AppButton
+                      size="sm"
+                      disabled={busy}
+                      icon={<Send size={14} />}
+                      onClick={() =>
+                        void invite(
+                          {
+                            name: '',
+                            email: r.email,
+                            role:
+                              r.invited_role === 'STERILIZATION' && r.supervisor
+                                ? SUPERVISOR
+                                : r.invited_role || 'DEPARTMENT',
+                            departmentId: r.department_id || '',
+                            active: true,
+                            demoEnabled: false,
+                          },
+                          true,
+                        )
+                      }
+                    >
+                      {L('Επαναποστολή', 'Resend')}
+                    </AppButton>
+                    <AppButton
+                      size="sm"
+                      variant="danger"
+                      disabled={busy}
+                      icon={<X size={14} />}
+                      onClick={() => void cancelInvitation(r)}
+                    >
+                      {L('Ακύρωση', 'Cancel')}
+                    </AppButton>
                   </article>
+                ))}
+              </div>
+            )}
+
+            {platform && !demo && !demoSeats && <PasswordReminder s={s} />}
+            <div className="people-counts" role="group" aria-label={L('Σύνοψη χρηστών', 'Users at a glance')}>
+              {online && (
+                <button
+                  type="button"
+                  className={`people-count online${filters.online ? ' on' : ''}`}
+                  aria-pressed={!!filters.online}
+                  onClick={() => setFilters(f => ({...f, online: f.online ? '' : 'ONLINE'}))}
+                >
+                  <i></i>
+                  {L('Συνδεδεμένοι τώρα', 'Connected now')} <b>{listed.filter(m => online.has(m.id)).length}</b>
+                </button>
+              )}
+              {(
+                [
+                  [
+                    'INITIAL',
+                    'default',
+                    L('Προσωρινός κωδικός', 'Temporary password'),
+                    (m: (typeof listed)[number]) => m.password_change_required && m.active,
+                  ],
+                  [
+                    'OWN',
+                    'changed',
+                    L('Δικός τους κωδικός', 'Own password'),
+                    (m: (typeof listed)[number]) => !m.password_change_required,
+                  ],
+                  [
+                    'LOCKED',
+                    'locked',
+                    L('Κλειδωμένοι', 'Locked'),
+                    (m: (typeof listed)[number]) => m.password_change_required && !m.active,
+                  ],
+                ] as const
+              ).map(([value, kind, label, test]) => (
+                <button
+                  type="button"
+                  key={value}
+                  className={`people-count ${kind}${filters.password === value ? ' on' : ''}`}
+                  aria-pressed={filters.password === value}
+                  onClick={() => setFilters(f => ({...f, password: f.password === value ? '' : value}))}
+                >
+                  <i></i>
+                  {label} <b>{listed.filter(m => invitedAt(m) === undefined && test(m)).length}</b>
+                </button>
+              ))}
+            </div>
+            <div className="people-head">
+              <span>
+                <SortHeader label={L('Χρήστης', 'User')} sortKey="name" sort={people.sort} onSort={people.toggle} />
+              </span>
+              <span>
+                <SortHeader
+                  label={L('Όνομα χρήστη', 'Username')}
+                  sortKey="username"
+                  sort={people.sort}
+                  onSort={people.toggle}
+                />
+              </span>
+              <span>
+                <SortHeader
+                  label={L('Τμήμα', 'Department')}
+                  sortKey="department"
+                  sort={people.sort}
+                  onSort={people.toggle}
+                />
+              </span>
+              <span>
+                <SortHeader label={L('Ρόλος', 'Role')} sortKey="role" sort={people.sort} onSort={people.toggle} />
+              </span>
+              <span>
+                <SortHeader
+                  label={L('Πρόσβαση', 'Access')}
+                  sortKey="access"
+                  sort={people.sort}
+                  onSort={people.toggle}
+                />
+              </span>
+              <span></span>
+            </div>
+            <div className="people-rows">
+              {shown.length === 0 && (
+                <div className="hospital-users-empty">
+                  <Users size={22} />
+                  <strong>
+                    {q || filters.department || filters.role || filters.access || filters.password || filters.online
+                      ? L(
+                          'Κανένας χρήστης δεν ταιριάζει στην αναζήτηση ή στα φίλτρα.',
+                          'No user matches the search or filters.',
+                        )
+                      : L('Δεν υπάρχουν χρήστες ακόμα.', 'No users yet.')}
+                  </strong>
+                  {!q && (
+                    <small>
+                      {L(
+                        'Πατήστε «Προσθήκη χρήστη» για να προσθέσετε τον πρώτο.',
+                        'Press «Add user» to add the first one.',
+                      )}
+                    </small>
+                  )}
+                </div>
+              )}
+              {people.rows.map(m => {
+                // Your own account is changed by another admin (or the platform owner), never by you.
+                const self = m.id === me?.id;
+                // Another admin's account is changed only by the platform owner (the staff functions and the database
+                // refuse a hospital admin too).
+                const ownerOnly = !self && !platform && m.role === 'ADMIN';
+                const locked = self || ownerOnly;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    className={`people-row${self ? ' self' : ''}`}
+                    disabled={locked}
+                    title={
+                      self
+                        ? L(
+                            'Τον δικό σας λογαριασμό τον αλλάζει άλλος διαχειριστής.',
+                            'Another admin changes your own account.',
+                          )
+                        : ownerOnly
+                          ? L(
+                              'Τους λογαριασμούς διαχειριστών τους αλλάζει μόνο ο διαχειριστής της πλατφόρμας.',
+                              'Only the platform owner changes an admin account.',
+                            )
+                          : undefined
+                    }
+                    onClick={() => setDrawer({member: m})}
+                  >
+                    <span className="people-who">
+                      <b>
+                        {online?.has(m.id) && (
+                          <span
+                            className="people-online"
+                            role="img"
+                            aria-label={L('Συνδεδεμένος τώρα', 'Connected now')}
+                            title={L('Συνδεδεμένος τώρα', 'Connected now')}
+                          >
+                            <i></i>
+                          </span>
+                        )}
+                        {m.name}
+                        {self && <em className="people-you">{L('Εσείς', 'You')}</em>}
+                      </b>
+                      <small>{m.email}</small>
+                    </span>
+                    <code>{m.user_code || '—'}</code>
+                    <span className={`people-value${wholeHospital(m.role) ? ' whole' : ''}`}>
+                      {wholeHospital(m.role)
+                        ? L('Όλο το νοσοκομείο', 'Whole hospital')
+                        : departmentName(m.department_id)}
+                    </span>
+                    <span className="people-value">{roleLabel(roleValue(m))}</span>
+                    <span className="people-state">
+                      {invitedAt(m) !== undefined ? (
+                        <span className="hospital-member-status invited">
+                          <i></i>
+                          {L('Εκκρεμεί πρόσκληση', 'Invitation pending')}
+                        </span>
+                      ) : (
+                        <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
+                          <i></i>
+                          {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
+                        </span>
+                      )}
+                      {invitedAt(m) === undefined && passwordBadge(m) && (
+                        <span
+                          className={`people-password ${passwordBadge(m)!.kind}`}
+                          title={`${passwordBadge(m)!.text}. ${passwordBadge(m)!.title}`}
+                        >
+                          {passwordBadge(m)!.kind === 'changed' ? (
+                            <ShieldCheck size={12} />
+                          ) : passwordBadge(m)!.kind === 'locked' ? (
+                            <LockKeyhole size={12} />
+                          ) : (
+                            <KeyRound size={12} />
+                          )}
+                          {passwordBadge(m)!.short}
+                        </span>
+                      )}
+                    </span>
+                    {locked ? (
+                      <Lock size={15} className="people-open" />
+                    ) : (
+                      <ChevronRight size={16} className="people-open" />
+                    )}
+                  </button>
                 );
               })}
             </div>
-          )}
-          {invitedToSignup.length > 0 && (
-            <div className="people-invitations">
-              <header>
-                <Mail size={16} />
-                <b>
-                  {L(
-                    `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'πρόσκληση περιμένει' : 'προσκλήσεις περιμένουν'} την εγγραφή του χρήστη`,
-                    `${invitedToSignup.length} ${invitedToSignup.length === 1 ? 'invitation waits' : 'invitations wait'} for the person to sign up`,
-                  )}
-                </b>
-              </header>
-              {invitedToSignup.map(r => (
-                <article key={r.id} className="people-invitation">
-                  <span className="people-who">
-                    <b>{r.email}</b>
-                    <small>
-                      {r.invited_role ? roleLabel(r.invited_role) : ''}
-                      {r.invited_at ? ` · ${L('στάλθηκε', 'sent')} ${date(r.invited_at)}` : ''}
-                    </small>
-                  </span>
-                  {r.invite_token && <CopyField value={signupFormUrl(r.invite_token)} L={L} compact />}
-                  <AppButton
-                    size="sm"
-                    disabled={busy}
-                    icon={<Send size={14} />}
-                    onClick={() =>
-                      void invite(
-                        {
-                          name: '',
-                          email: r.email,
-                          role:
-                            r.invited_role === 'STERILIZATION' && r.supervisor
-                              ? SUPERVISOR
-                              : r.invited_role || 'DEPARTMENT',
-                          departmentId: r.department_id || '',
-                          active: true,
-                          demoEnabled: false,
-                        },
-                        true,
-                      )
-                    }
-                  >
-                    {L('Επαναποστολή', 'Resend')}
-                  </AppButton>
-                  <AppButton
-                    size="sm"
-                    variant="danger"
-                    disabled={busy}
-                    icon={<X size={14} />}
-                    onClick={() => void cancelInvitation(r)}
-                  >
-                    {L('Ακύρωση', 'Cancel')}
-                  </AppButton>
-                </article>
-              ))}
-            </div>
-          )}
-
-          {platform && !demo && !demoSeats && <PasswordReminder s={s} />}
-          <div className="people-counts" role="group" aria-label={L('Σύνοψη χρηστών', 'Users at a glance')}>
-            {online && (
-              <button
-                type="button"
-                className={`people-count online${filters.online ? ' on' : ''}`}
-                aria-pressed={!!filters.online}
-                onClick={() => setFilters(f => ({...f, online: f.online ? '' : 'ONLINE'}))}
-              >
-                <i></i>
-                {L('Συνδεδεμένοι τώρα', 'Connected now')} <b>{listed.filter(m => online.has(m.id)).length}</b>
-              </button>
-            )}
-            {(
-              [
-                [
-                  'INITIAL',
-                  'default',
-                  L('Προσωρινός κωδικός', 'Temporary password'),
-                  (m: (typeof listed)[number]) => m.password_change_required && m.active,
-                ],
-                [
-                  'OWN',
-                  'changed',
-                  L('Δικός τους κωδικός', 'Own password'),
-                  (m: (typeof listed)[number]) => !m.password_change_required,
-                ],
-                [
-                  'LOCKED',
-                  'locked',
-                  L('Κλειδωμένοι', 'Locked'),
-                  (m: (typeof listed)[number]) => m.password_change_required && !m.active,
-                ],
-              ] as const
-            ).map(([value, kind, label, test]) => (
-              <button
-                type="button"
-                key={value}
-                className={`people-count ${kind}${filters.password === value ? ' on' : ''}`}
-                aria-pressed={filters.password === value}
-                onClick={() => setFilters(f => ({...f, password: f.password === value ? '' : value}))}
-              >
-                <i></i>
-                {label} <b>{listed.filter(m => invitedAt(m) === undefined && test(m)).length}</b>
-              </button>
-            ))}
-          </div>
-          <div className="people-head">
-            <span>
-              <SortHeader label={L('Χρήστης', 'User')} sortKey="name" sort={people.sort} onSort={people.toggle} />
-            </span>
-            <span>
-              <SortHeader
-                label={L('Όνομα χρήστη', 'Username')}
-                sortKey="username"
-                sort={people.sort}
-                onSort={people.toggle}
-              />
-            </span>
-            <span>
-              <SortHeader
-                label={L('Τμήμα', 'Department')}
-                sortKey="department"
-                sort={people.sort}
-                onSort={people.toggle}
-              />
-            </span>
-            <span>
-              <SortHeader label={L('Ρόλος', 'Role')} sortKey="role" sort={people.sort} onSort={people.toggle} />
-            </span>
-            <span>
-              <SortHeader label={L('Πρόσβαση', 'Access')} sortKey="access" sort={people.sort} onSort={people.toggle} />
-            </span>
-            <span></span>
-          </div>
-          <div className="people-rows">
-            {shown.length === 0 && (
-              <div className="hospital-users-empty">
-                <Users size={22} />
-                <strong>
-                  {q || filters.department || filters.role || filters.access || filters.password || filters.online
-                    ? L(
-                        'Κανένας χρήστης δεν ταιριάζει στην αναζήτηση ή στα φίλτρα.',
-                        'No user matches the search or filters.',
-                      )
-                    : L('Δεν υπάρχουν χρήστες ακόμα.', 'No users yet.')}
-                </strong>
-                {!q && (
-                  <small>
-                    {L(
-                      'Πατήστε «Προσθήκη χρήστη» για να προσθέσετε τον πρώτο.',
-                      'Press «Add user» to add the first one.',
-                    )}
-                  </small>
-                )}
-              </div>
-            )}
-            {people.rows.map(m => {
-              // Your own account is changed by another admin (or the platform owner), never by you.
-              const self = m.id === me?.id;
-              // Another admin's account is changed only by the platform owner (the staff functions and the database
-              // refuse a hospital admin too).
-              const ownerOnly = !self && !platform && m.role === 'ADMIN';
-              const locked = self || ownerOnly;
-              return (
-                <button
-                  key={m.id}
-                  type="button"
-                  className={`people-row${self ? ' self' : ''}`}
-                  disabled={locked}
-                  title={
-                    self
-                      ? L(
-                          'Τον δικό σας λογαριασμό τον αλλάζει άλλος διαχειριστής.',
-                          'Another admin changes your own account.',
-                        )
-                      : ownerOnly
-                        ? L(
-                            'Τους λογαριασμούς διαχειριστών τους αλλάζει μόνο ο διαχειριστής της πλατφόρμας.',
-                            'Only the platform owner changes an admin account.',
-                          )
-                        : undefined
-                  }
-                  onClick={() => setDrawer({member: m})}
-                >
-                  <span className="people-who">
-                    <b>
-                      {online?.has(m.id) && (
-                        <span
-                          className="people-online"
-                          role="img"
-                          aria-label={L('Συνδεδεμένος τώρα', 'Connected now')}
-                          title={L('Συνδεδεμένος τώρα', 'Connected now')}
-                        >
-                          <i></i>
-                        </span>
-                      )}
-                      {m.name}
-                      {self && <em className="people-you">{L('Εσείς', 'You')}</em>}
-                    </b>
-                    <small>{m.email}</small>
-                  </span>
-                  <code>{m.user_code || '—'}</code>
-                  <span className={`people-value${wholeHospital(m.role) ? ' whole' : ''}`}>
-                    {wholeHospital(m.role) ? L('Όλο το νοσοκομείο', 'Whole hospital') : departmentName(m.department_id)}
-                  </span>
-                  <span className="people-value">{roleLabel(roleValue(m))}</span>
-                  <span className="people-state">
-                    {invitedAt(m) !== undefined ? (
-                      <span className="hospital-member-status invited">
-                        <i></i>
-                        {L('Εκκρεμεί πρόσκληση', 'Invitation pending')}
-                      </span>
-                    ) : (
-                      <span className={`hospital-member-status ${m.active ? 'active' : ''}`}>
-                        <i></i>
-                        {m.active ? L('Ενεργός', 'Active') : L('Ανενεργός', 'Inactive')}
-                      </span>
-                    )}
-                    {invitedAt(m) === undefined && passwordBadge(m) && (
-                      <span
-                        className={`people-password ${passwordBadge(m)!.kind}`}
-                        title={`${passwordBadge(m)!.text}. ${passwordBadge(m)!.title}`}
-                      >
-                        {passwordBadge(m)!.kind === 'changed' ? (
-                          <ShieldCheck size={12} />
-                        ) : passwordBadge(m)!.kind === 'locked' ? (
-                          <LockKeyhole size={12} />
-                        ) : (
-                          <KeyRound size={12} />
-                        )}
-                        {passwordBadge(m)!.short}
-                      </span>
-                    )}
-                  </span>
-                  {locked ? (
-                    <Lock size={15} className="people-open" />
-                  ) : (
-                    <ChevronRight size={16} className="people-open" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </section>
+          </section>
+        </>
       )}
     </>
   );

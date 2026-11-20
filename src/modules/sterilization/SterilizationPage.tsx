@@ -1,5 +1,5 @@
 import FilterMenu from '../../components/assets/FilterMenu';
-import {ScanBarcode, Barcode, X} from 'lucide-react';
+import {ScanBarcode, X} from 'lucide-react';
 import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
 import {tr} from '../../i18n';
 import {limitFilterOptions, usageFilterOptions} from '../../core/usageFilter';
@@ -55,16 +55,10 @@ export default function SterilizationPage() {
           <p>{tr('Η πορεία των εργαλείων από την παραλαβή έως την παράδοση στο τμήμα.')}</p>
         </div>
       </div>
-      <div className="ster-scan ster-scan-restored">
-        <div className="ster-scan-icon">
-          <ScanBarcode size={23} />
-        </div>
-        <div className="ster-scan-copy">
-          <strong>{tr('Αναζήτηση & σάρωση')}</strong>
-          <span>{tr('Σάρωση barcode ή πληκτρολόγηση · φιλτράρει την καρτέλα · Enter ανοίγει το barcode')}</span>
-        </div>
-        <div className="ster-scan-input" data-tour="ster-scan">
-          <Barcode size={17} />
+      {/* The scan or search on the bar every list has: Enter or «Άνοιγμα» opens the barcode, typing filters the tab. */}
+      <div className="asset-filter-bar ster-scan-bar">
+        <div className="asset-filter-search" data-tour="ster-scan">
+          <ScanBarcode size={17} />
           <input
             type="search"
             autoComplete="off"
@@ -80,7 +74,7 @@ export default function SterilizationPage() {
               }
               if (e.key === 'Escape') setQuery('');
             }}
-            placeholder={tr('Barcode, ονομασία, κωδικός ή τμήμα…')}
+            placeholder={tr('Σάρωση ή αναζήτηση: barcode, ονομασία, κωδικός ή τμήμα…')}
             aria-label={tr('Αναζήτηση & σάρωση')}
           />
           {query && (
@@ -93,61 +87,59 @@ export default function SterilizationPage() {
               <X size={15} />
             </button>
           )}
-          <button type="button" onClick={s.scanQuery}>
-            {tr('Άνοιγμα')}
-          </button>
         </div>
-        <div className="ster-scan-filters">
-          <FilterMenu
-            filters={[
-              {
-                key: 'attention',
-                value: attentionFilter,
-                placeholder: tr('Όλα'),
-                options: [
-                  {value: 'NOTE', label: tr('Με σημείωση τμήματος')},
-                  {value: 'SHORT', label: tr('Σετ με έλλειψη')},
-                  {value: 'WAITING', label: tr('Περιμένουν πάνω από {0} ώρες', LONG_WAIT_HOURS)},
-                ],
-                onChange: setAttentionFilter,
-              },
-              {
-                key: 'department',
-                value: departmentFilter,
-                placeholder: tr('Όλα τα τμήματα'),
-                options: queueValues('department').map(value => ({value, label: value})),
-                onChange: setDepartmentFilter,
-              },
-              {
-                key: 'specialty',
-                value: specialtyFilter,
-                placeholder: tr('Όλες οι ειδικότητες'),
-                options: queueValues('specialty').map(value => ({value, label: value})),
-                onChange: setSpecialtyFilter,
-              },
-              {
-                key: 'kind',
-                value: kindFilter,
-                placeholder: tr('Σετ & εργαλεία'),
-                options: [
-                  {value: 'SET', label: tr('Μόνο Σετ')},
-                  {value: 'TOOL', label: tr('Μόνο εργαλεία')},
-                ],
-                onChange: setKindFilter,
-              },
-              {
-                key: 'usage',
-                value: usageFilter,
-                // Instruments with a limit of uses until they wear out, and how far along they are.
-                placeholder: tr('Με ή χωρίς όριο'),
-                options: [...limitFilterOptions(), ...usageFilterOptions()],
-                onChange: setUsageFilter,
-              },
-            ]}
-          />
-        </div>
-        {quickScanFeedback && <div className="ster-scan-feedback-inline">{quickScanFeedback}</div>}
+        <button type="button" className="asset-filter-toggle" onClick={s.scanQuery}>
+          {tr('Άνοιγμα')}
+        </button>
+        <FilterMenu
+          filters={[
+            {
+              key: 'attention',
+              value: attentionFilter,
+              placeholder: tr('Όλα'),
+              options: [
+                {value: 'NOTE', label: tr('Με σημείωση τμήματος')},
+                {value: 'SHORT', label: tr('Σετ με έλλειψη')},
+                {value: 'WAITING', label: tr('Περιμένουν πάνω από {0} ώρες', LONG_WAIT_HOURS)},
+              ],
+              onChange: setAttentionFilter,
+            },
+            {
+              key: 'department',
+              value: departmentFilter,
+              placeholder: tr('Όλα τα τμήματα'),
+              options: queueValues('department').map(value => ({value, label: value})),
+              onChange: setDepartmentFilter,
+            },
+            {
+              key: 'specialty',
+              value: specialtyFilter,
+              placeholder: tr('Όλες οι ειδικότητες'),
+              options: queueValues('specialty').map(value => ({value, label: value})),
+              onChange: setSpecialtyFilter,
+            },
+            {
+              key: 'kind',
+              value: kindFilter,
+              placeholder: tr('Σετ & εργαλεία'),
+              options: [
+                {value: 'SET', label: tr('Μόνο Σετ')},
+                {value: 'TOOL', label: tr('Μόνο εργαλεία')},
+              ],
+              onChange: setKindFilter,
+            },
+            {
+              key: 'usage',
+              value: usageFilter,
+              // Instruments with a limit of uses until they wear out, and how far along they are.
+              placeholder: tr('Με ή χωρίς όριο'),
+              options: [...limitFilterOptions(), ...usageFilterOptions()],
+              onChange: setUsageFilter,
+            },
+          ]}
+        />
       </div>
+      {quickScanFeedback && <div className="ster-scan-feedback-inline">{quickScanFeedback}</div>}
       <QueueTabs s={s} />
       <WorkPanel s={s} />
       <LoadModal s={s} />

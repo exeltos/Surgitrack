@@ -1,10 +1,11 @@
 import type {CSSProperties, ReactNode} from 'react';
 import {useMemo, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
-import {CheckCircle2, ClipboardList, PackageCheck, RefreshCcw, Search, ShoppingCart, Undo2, X} from 'lucide-react';
+import {CheckCircle2, ClipboardList, PackageCheck, RefreshCcw, ShoppingCart, Undo2, X} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
-import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
+import AssetFilterBar from '../../components/assets/AssetFilterBar';
+import {type SelectFilter} from '../../components/assets/FilterMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {useSurgi} from '../../store/SurgiStore';
 import type {ExportTable} from '../../core/exportTable';
@@ -317,25 +318,21 @@ export default function ReplacementsPage({
               },
             ]}
           />
-          <section className="replacements-card">
-            <div className="replacements-toolbar">
-              <label className="replacements-search">
-                <Search size={15} />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  placeholder={tr('Αναζήτηση barcode, ονομασίας, κωδικού ή Σετ…')}
-                />
-              </label>
-              <FilterMenu filters={filters} />
-              <span className="replacements-spacer" />
+          {/* The search, Filters and the download on the bar every list has, above the list. */}
+          <AssetFilterBar
+            query={query}
+            onQueryChange={setQuery}
+            placeholder={tr('Αναζήτηση barcode, ονομασίας, κωδικού ή Σετ…')}
+            filters={filters}
+            extra={
               <DownloadMenu
                 table={listTable}
                 onPrint={printList}
                 printLabel={picked.length ? tr('PDF / Εκτύπωση επιλεγμένων') : undefined}
               />
-            </div>
+            }
+          />
+          <section className="replacements-card">
             {editable && picked.length > 0 && (
               <div className="replacements-bulk">
                 <b>{tr('{0} επιλεγμένα', picked.length)}</b>

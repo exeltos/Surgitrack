@@ -177,13 +177,6 @@
   font: inherit;
   font-size: 13px;
 }
-.hospital-people .people-toolbar .studio-search input {
-  height: auto;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  box-shadow: none;
-}
 .people-row.self {
   cursor: default;
   background: var(--c-white);
@@ -818,9 +811,6 @@ html body .dash-more {
 @media (max-width: 700px) {
   html body .people-toolbar {
     flex-wrap: wrap;
-  }
-  html body .people-toolbar .studio-search {
-    flex: 1 1 100%;
   }
   html body .people-toolbar .people-invite,
   html body .people-toolbar .people-invite > .app-button {

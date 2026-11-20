@@ -110,7 +110,6 @@ export default function SetContents({
         </div>
       </div>
       <AssetFilterBar
-        compact
         className="set-composition-filters"
         query={toolQuery}
         onQueryChange={setToolQuery}

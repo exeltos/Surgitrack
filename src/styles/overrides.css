@@ -100,9 +100,6 @@
   font: inherit;
   font-size: 13px;
 }
-.studio-users-panel > .studio-search {
-  margin: 0 22px 12px !important;
-}
 
 /* Studio — Users: the page stays put and only the list of people scrolls (see sections/hospital.css). */
 .studio-body-users {
@@ -1349,10 +1346,6 @@ div.asset-import-hospital b {
   grid-column: 1 / -1;
   overflow: visible;
 }
-.people-toolbar .studio-search {
-  flex: 1;
-  margin: 0;
-}
 .people-invite-menu {
   position: absolute;
   right: 0;
@@ -1695,9 +1688,6 @@ div.asset-import-hospital b {
   gap: 14px;
   padding-bottom: 24px;
 }
-.replacements-spacer {
-  flex: 1;
-}
 .replacements-bulk {
   display: flex;
   flex-wrap: wrap;
@@ -1936,12 +1926,6 @@ div.asset-import-hospital b {
 }
 
 /* The toolbar of the replacements list keeps its buttons on one row: Excel and print shrink to icons. */
-.replacements-toolbar {
-  flex-wrap: nowrap;
-}
-.replacements-toolbar > * {
-  flex-shrink: 0;
-}
 
 /* A tablet keeps the page buttons beside the title; only a phone stacks them. */
 @media (min-width: 641px) and (max-width: 900px) {
@@ -3796,14 +3780,11 @@ html body .screen-guide-actions {
 .color-search:focus-within,
 .asset-import-tools-search:focus-within,
 .name-check-search:focus-within,
-.replacements-search:focus-within,
 .trace-search:focus-within,
-.ster-scan-input:focus-within,
 .load-barcode-entry:focus-within,
 .composer-search:focus-within,
 .asset-filter-search:focus-within,
 .department-search:focus-within,
-.studio-search:focus-within,
 .manual-search:focus-within,
 html body .scan-search:focus-within,
 .studio-setting-input:focus-within,
@@ -4003,18 +3984,6 @@ html body .devices-empty.small {
    into one screen the stages and departments were cut and the department bars vanished). */
 /* Issue actions in fixed places: «open» at the far right, «Επίλυση» left of it, «Παραγγελία» before. */
 /* Compact KPI cards keep one row of four down to a portrait tablet. */
-@media (max-width: 700px) {
-  /* The phone card has its own barcode line. */
-  html body .replacements-toolbar > :not(.replacements-search) button,
-  html body .replacements-toolbar > button {
-    gap: 5px;
-    width: 100%;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-}
 /* Hospitals and the Studio's hospital status on a phone: one card per hospital, every figure labelled and
    «Είσοδος» always in view (the table hid the requests, the link and the actions past the right edge). */
 /* Name check on a phone: card titles take two lines, the tabs keep their whole names, and each fix is a small
@@ -4409,31 +4378,28 @@ html body .compact-kpis.kpis-wide {
   }
 }
 
-/* The day of a list download and the Download button side by side as one control. */
+/* The day of a list download beside the Download button: two buttons like every other on the bar. */
 html body .export-group {
   display: inline-flex;
   align-items: stretch;
+  gap: 8px;
   flex: 0 0 auto;
 }
 html body .export-day {
   position: relative;
   display: inline-flex;
 }
-html body .export-day-toggle {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-right-width: 0;
-}
+
 html body .export-day-clear {
   position: relative;
   z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
+  width: 30px;
+  margin-left: 4px;
   border: 1px solid var(--c-gray-90);
-  border-left: 0;
-  border-right: 0;
+  border-radius: 9px;
   background: var(--c-white);
   color: var(--c-cyan-35-2);
   cursor: pointer;
@@ -4468,10 +4434,6 @@ html body .export-day-input::-webkit-calendar-picker-indicator {
 html body .export-day:focus-within .export-day-toggle {
   outline: 2px solid var(--c-cyan-45);
   outline-offset: 1px;
-}
-html body .export-group .action-menu-toggle {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
 }
 
 /* The platform owner's network rule for a hospital. */
@@ -4949,11 +4911,16 @@ html body :is(.replacements-search, .department-search, .studio-search) {
 html body :is(.replacements-search, .department-search, .studio-search) input {
   font-size: 13px;
 }
-html body .replacements-toolbar > .replacements-search {
-  flex: 1 1 auto;
+/* The bar's search field is the bar itself: no frame of its own wherever the page styles its fields. */
+html body .asset-filter-bar .asset-filter-search input {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
 }
-@media (min-width: 701px) {
-  html body .replacements-toolbar > .replacements-spacer {
-    display: none;
-  }
+/* «Καθαρισμός» on the bar readable (its pale grey failed the contrast check). */
+html body .asset-filter-bar .asset-filter-clear {
+  color: var(--c-blue-25);
 }
