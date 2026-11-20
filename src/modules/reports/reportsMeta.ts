@@ -57,6 +57,8 @@ export const reports: Array<{
   id: ReportId;
   group: ReportGroup;
   title: string;
+  /** Its short name on the row of report tabs (the title is the tooltip and the printed heading). */
+  tab: string;
   description: string;
   /** What it is used for, in one line. */
   purpose: string;
@@ -67,6 +69,7 @@ export const reports: Array<{
     group: 'EQUIPMENT',
     purpose: 'Για απογραφή και έλεγχο: τι υπάρχει και πού βρίσκεται.',
     title: 'Απογραφή εξοπλισμού',
+    tab: 'Απογραφή',
     description: 'Σετ και εργαλεία ανά τμήμα ή ανά ειδικότητα.',
     icon: Boxes,
   },
@@ -76,6 +79,7 @@ export const reports: Array<{
     purpose:
       'Για αρχείο και έλεγχο: τι χάλασε, πότε, ποιος το δήλωσε και πώς έκλεισε. Ό,τι εκκρεμεί διαχειρίζεται στις Εκκρεμότητες.',
     title: 'Ιστορικό βλαβών & απωλειών',
+    tab: 'Βλάβες & απώλειες',
     description: 'Όλες οι βλάβες, φθορές και απώλειες, ανοιχτές και κλειστές, για εκτύπωση.',
     icon: Wrench,
   },
@@ -84,6 +88,7 @@ export const reports: Array<{
     group: 'EQUIPMENT',
     purpose: 'Για να προλάβεις εργαλεία που φτάνουν στο όριο χρήσεων.',
     title: 'Χρήσεις & αποσύρσεις',
+    tab: 'Χρήσεις',
     description: 'Υπόλοιπο χρήσεων, κρίσιμα όρια και εργαλεία που τέθηκαν εκτός χρήσης.',
     icon: Activity,
   },
@@ -92,6 +97,7 @@ export const reports: Array<{
     group: 'STERILIZATION',
     purpose: 'Για τεκμηρίωση κύκλων και αποδεσμεύσεων σε έλεγχο.',
     title: 'Φορτία κλιβάνου',
+    tab: 'Φορτία',
     description: 'Φορτία, κύκλοι, δείκτες και αποδεσμεύσεις ανά κλίβανο.',
     icon: Flame,
   },
@@ -100,6 +106,7 @@ export const reports: Array<{
     group: 'STERILIZATION',
     purpose: 'Για να ξανα-αποστειρώσεις πριν λήξει ό,τι είναι στα ράφια.',
     title: 'Λήξεις αποστείρωσης',
+    tab: 'Λήξεις',
     description: 'Αποστειρωμένα Σετ και εργαλεία με διάρκεια και ημερομηνία λήξης.',
     icon: CalendarClock,
   },
@@ -108,6 +115,7 @@ export const reports: Array<{
     group: 'HANDOVER',
     purpose: 'Για να δεις ποιος παρέδωσε σε ποιον και ποιες υπογραφές λείπουν.',
     title: 'Παραδόσεις & παραλαβές',
+    tab: 'Παραδόσεις',
     description: 'Ποιος παρέδωσε σε ποιον, και αν ο άλλος υπέγραψε με τον δικό του κωδικό.',
     icon: PenLine,
   },

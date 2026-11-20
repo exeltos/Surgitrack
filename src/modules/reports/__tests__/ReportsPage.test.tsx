@@ -2,7 +2,6 @@ import {fireEvent, screen, within} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 import {renderPage} from '../../../test/renderPage';
 import ReportsPage from '../ReportsPage';
-import {reportGroups, reports} from '../reportsMeta';
 
 const REPORTS = [
   'Απογραφή εξοπλισμού',
@@ -41,10 +40,7 @@ const column = (label: string) => {
     .map(cells => cells[index].textContent);
 };
 const choose = (report: string) => {
-  // A report sits under its category: open the category first.
-  const meta = reports.find(r => report.startsWith(r.title))!;
-  const category = reportGroups.find(g => g.id === meta.group)!;
-  fireEvent.click(screen.getByRole('button', {name: new RegExp(`^${category.title}\\d`)}));
+  // Every report on one row of tabs, named by its title.
   fireEvent.click(screen.getByRole('button', {name: new RegExp(`^${report}`)}));
 };
 const filter = (placeholder: string, value: string) => {
@@ -63,13 +59,9 @@ describe('Reports', () => {
 
   it('has six reports: Set composition prints from the Set card', () => {
     renderPage(<ReportsPage />);
-    // The six reports sit under three categories; each category lists only its own.
-    expect(document.querySelectorAll('.reports-category')).toHaveLength(3);
-    const total = reportGroups.reduce((n, g) => {
-      fireEvent.click(screen.getByRole('button', {name: new RegExp(`^${g.title}\\d`)}));
-      return n + document.querySelectorAll('.reports-catalog-item').length;
-    }, 0);
-    expect(total).toBe(6);
+    // The six reports on one row of tabs, no row of categories over them.
+    expect(document.querySelectorAll('.reports-category')).toHaveLength(0);
+    expect(document.querySelectorAll('.reports-catalog-item')).toHaveLength(6);
     expect(screen.queryByRole('button', {name: /^Σύνθεση Σετ/})).not.toBeInTheDocument();
   });
 

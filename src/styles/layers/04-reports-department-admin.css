@@ -32,17 +32,12 @@
   grid-template-columns: 290px minmax(0, 1fr);
   gap: 14px;
 }
-.reports-catalog,
 .reports-stage {
   background: var(--c-white);
   border: 1px solid var(--c-gray-90);
   border-radius: 15px;
   min-height: 0;
   overflow: hidden;
-}
-.reports-catalog {
-  display: flex;
-  flex-direction: column;
 }
 .reports-catalog-head {
   height: 54px;
@@ -283,10 +278,6 @@
   .reports-workbench {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
-  }
-  .reports-catalog {
-    min-height: auto;
-    overflow: visible;
   }
   .reports-catalog-head {
     display: none;

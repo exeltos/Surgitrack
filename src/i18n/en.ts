@@ -1292,8 +1292,6 @@ export const en: Record<string, string> = {
   'Το όριο χρήσεων αφαιρέθηκε.': 'The usage limit was removed.',
   'Τρέχουσα θέση': 'Current location',
   'Τρέχουσα σύνθεση': 'Current composition',
-  'Τύποι αναφορών': 'Report types',
-  'Κατηγορίες αναφορών': 'Report categories',
   Τύπος: 'Type',
   'Τύπος αναφοράς': 'Report type',
   'Τύπος αντικειμένου': 'Item type',
@@ -1362,7 +1360,6 @@ export const en: Record<string, string> = {
   από: 'of',
   'αυτόματα στο Απόθεμα': 'automatically to stock',
   'αυτόματα ως ενιαίο Απόθεμα Σετ': 'automatically as a whole stock set',
-  διαθέσιμες: 'available',
   εγγραφές: 'records',
   εγγραφή: 'record',
   εκκρεμή: 'pending',
@@ -2529,4 +2526,6 @@ export const en: Record<string, string> = {
   'Κεντρική Αποστείρωση → {0}': 'Central Sterilization → {0}',
   Δηλώθηκε: 'Reported',
   'Κλίβανος · κύκλος': 'Sterilizer · cycle',
+  Απογραφή: 'Inventory',
+  'Βλάβες & απώλειες': 'Damage & losses',
 };

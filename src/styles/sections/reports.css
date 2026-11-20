@@ -1,8 +1,5 @@
 /* Reports. Moved together from overrides.css; cascade order is intentional. */
 /* A one-line page description must not widen a grid page. */
-html body .reports-catalog {
-  overflow-y: auto;
-}
 @media (min-width: 761px) {
   .reports-result-body {
     overflow-x: auto;
@@ -133,10 +130,6 @@ html body .reports-workbench {
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
 }
-html body .reports-catalog {
-  min-height: auto;
-  overflow: visible;
-}
 html body .reports-catalog-head {
   display: none;
 }
@@ -178,11 +171,6 @@ html body .reports-summary button {
 }
 
 /* Fewer frames: the report choices sit on the page itself, and inside the report there is one card, not cards in cards. */
-html body .reports-catalog {
-  border: 0;
-  background: transparent;
-  border-radius: 0;
-}
 html body .reports-catalog-item {
   border: 1px solid var(--c-gray-90-4);
   background: var(--c-white);
@@ -285,11 +273,6 @@ html body .reports-summary button b {
 
 /* Reports in two levels: the category (Εξοπλισμός · Αποστείρωση · Παραδόσεις) as tabs, and under them only the
    reports of that category. Nothing from different categories sits side by side. */
-html body .reports-categories {
-  display: flex;
-  gap: 4px;
-  border-bottom: 1px solid var(--c-gray-90);
-}
 html body .reports-category {
   position: relative;
   display: inline-flex;
@@ -636,4 +619,20 @@ html body .reports-page-workspace .reports-table .badge-lost::before {
 html body .reports-page-workspace .reports-table .badge-in_department::before {
   background: var(--c-blue-35-2);
   opacity: 1;
+}
+/* On a narrow screen the report tabs stay one row that scrolls sideways, not three rows. */
+@media (max-width: 900px) {
+  html body .reports-page-workspace .reports-stage-head {
+    flex-wrap: wrap;
+  }
+  html body .reports-page-workspace .reports-stage-head .reports-catalog-list {
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  html body .reports-page-workspace .reports-catalog-item {
+    flex: none;
+    white-space: nowrap;
+  }
 }

@@ -20,7 +20,6 @@ import {
   LOAD_STATUS,
   cellText,
   genericReportHtml,
-  reportGroups,
   reports,
   stateLabel,
   type InventoryGroup,
@@ -465,65 +464,36 @@ export default function ReportsPage() {
       </div>
       <HistoryWindowNote auto />
       <div className="reports-workbench">
-        <aside className="reports-catalog" aria-label={tr('Τύποι αναφορών')}>
-          <div className="reports-catalog-head">
-            <strong>{tr('Αναφορές')}</strong>
-            <span>
-              {reports.length} {tr('διαθέσιμες')}
-            </span>
-          </div>
-          <div className="reports-categories" role="group" aria-label={tr('Κατηγορίες αναφορών')}>
-            {reportGroups.map(g => (
-              <button
-                key={g.id}
-                type="button"
-                className={`reports-category ${activeMeta.group === g.id ? 'active' : ''}`}
-                aria-pressed={activeMeta.group === g.id}
-                onClick={() => {
-                  if (activeMeta.group === g.id) return;
-                  setActive(reports.find(r => r.group === g.id)!.id);
-                  setView(null);
-                }}
-              >
-                {tr(g.title)}
-                <b>{reports.filter(r => r.group === g.id).length}</b>
-              </button>
-            ))}
-          </div>
-        </aside>
         <section className="reports-stage">
           <header className="reports-stage-head">
             {/* The title of the report is its button below; the heading is for readers who navigate by headings. */}
             <h2 className="visually-hidden">{tr(activeMeta.title)}</h2>
-            <div
-              className="reports-catalog-list"
-              role="group"
-              aria-label={tr(reportGroups.find(g => g.id === activeMeta.group)!.title)}
-            >
-              {reports
-                .filter(report => report.group === activeMeta.group)
-                .map(report => {
-                  const Icon = report.icon;
-                  return (
-                    <button
-                      key={report.id}
-                      title={tr(report.purpose)}
-                      className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
-                      onClick={() => {
-                        setActive(report.id);
-                        setView(null);
-                      }}
-                    >
-                      <span className="reports-catalog-icon">
-                        <Icon size={18} />
-                      </span>
-                      <span>
-                        <strong>{tr(report.title)}</strong>
-                        <small>{tr(report.purpose)}</small>
-                      </span>
-                    </button>
-                  );
-                })}
+            <div className="reports-catalog-list" role="group" aria-label={tr('Αναφορές')}>
+              {/* Every report on one row of tabs (no row of categories over them): its short name, its title in the
+                  tooltip and for screen readers. */}
+              {reports.map(report => {
+                const Icon = report.icon;
+                return (
+                  <button
+                    key={report.id}
+                    title={tr(report.purpose)}
+                    aria-label={tr(report.title)}
+                    className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setActive(report.id);
+                      setView(null);
+                    }}
+                  >
+                    <span className="reports-catalog-icon">
+                      <Icon size={18} />
+                    </span>
+                    <span>
+                      <strong>{tr(report.tab)}</strong>
+                      <small>{tr(report.purpose)}</small>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
             {/* Filters and the download on the right, as on every other list. */}
             <div className="reports-stage-actions" data-tour="report-download">
