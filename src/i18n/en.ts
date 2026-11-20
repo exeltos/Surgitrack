@@ -2510,4 +2510,9 @@ export const en: Record<string, string> = {
   'Π.χ. εξουσιοδοτημένη παραλαβή για άλλο τμήμα…': 'E.g. authorised pickup for another department…',
   'Η πολιτική της μονάδας δεν επιτρέπει παράδοση σε άλλο τμήμα.':
     'The unit policy does not allow delivery to another department.',
+  'Φόρτωση & κύκλος': 'Loading & cycle',
+  'Αποδέσμευση & ανάκληση': 'Release & recall',
+  'Απώλεια & Service': 'Loss & service',
+  Άλλες: 'Other',
+  'Καθαρισμός & απολύμανση': 'Cleaning & disinfection',
 };
