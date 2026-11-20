@@ -4881,3 +4881,59 @@ html body .report-slip-button:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
 }
+
+/* «Εκκρεμότητες»: the equipment out of order as one low row of chips above the records on every screen (it was a
+   column on the right, which left the records too narrow), so the list has the whole width. */
+html body .issues-layout:not(.solo) {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+}
+html body .issues-layout > .problem-aside {
+  order: -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+html body .problem-aside h2 {
+  margin: 0;
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 500;
+}
+html body .problem-aside .problem-kpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+html body .problem-aside .problem-kpi {
+  gap: 6px;
+  width: auto;
+  padding: 3px 10px;
+  border: 1px solid var(--c-gray-90);
+  border-left-width: 3px;
+  border-radius: 999px;
+  background: var(--c-white);
+}
+html body .problem-aside .problem-kpi span {
+  font-size: 12.5px;
+}
+html body .problem-aside .problem-kpi b {
+  font-size: 13px;
+}
+/* A record on two short lines: what it is on one line (the whole name in the tooltip), its kind, department and
+   note under it. */
+html body .issues-fixed td > .issue-asset {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .issues-fixed .issue-age {
+  white-space: nowrap;
+}

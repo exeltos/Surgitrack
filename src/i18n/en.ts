@@ -500,7 +500,6 @@ export const en: Record<string, string> = {
   'Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes στο Απόθεμα.':
     '{0} instruments created in stock with unique barcodes.',
   'Δημιουργήθηκαν {0} εργαλεία με μοναδικά barcodes.': '{0} instruments created with unique barcodes.',
-  Δημιουργήθηκε: 'Created',
   Δημιουργία: 'Creation',
   'Δημιουργία Set': 'Set created',
   'Δημιουργία νέου φυσικού εργαλείου από υπάρχουσα καρτέλα': 'New physical instrument created from an existing card',
@@ -2528,4 +2527,6 @@ export const en: Record<string, string> = {
     "The handover was not confirmed with the other party's password.",
   Δελτίο: 'Slip',
   'Κεντρική Αποστείρωση → {0}': 'Central Sterilization → {0}',
+  Δηλώθηκε: 'Reported',
+  'Κλίβανος · κύκλος': 'Sterilizer · cycle',
 };

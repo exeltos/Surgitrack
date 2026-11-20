@@ -107,7 +107,7 @@ export default function LoadTrace({
       </form>
       {missing && <p className="trace-hint">{missing}</p>}
       {matches.length > 1 ? (
-        <section className="trace-recent-list" aria-label={tr('Φορτία με αυτόν τον κύκλο')}>
+        <section className="trace-recent-list trace-loads" aria-label={tr('Φορτία με αυτόν τον κύκλο')}>
           <h3 className="trace-section-title">
             {tr(
               'Ο κύκλος {0} του {1} υπάρχει σε {2} ημέρες: διαλέξτε ποιον.',
@@ -116,6 +116,12 @@ export default function LoadTrace({
               matches.length,
             )}
           </h3>
+          <div className="trace-list-head" aria-hidden="true">
+            <span>{tr('Κλίβανος · κύκλος')}</span>
+            <span>{tr('Ημερομηνία')}</span>
+            <span>{tr('Αντικείμενα')}</span>
+            <span>{tr('Κατάσταση')}</span>
+          </div>
           <ul>
             {matches.map(l => (
               <li key={l.id}>
@@ -152,8 +158,14 @@ export default function LoadTrace({
         />
       ) : (
         recent.length > 0 && (
-          <section className="trace-recent-list" aria-label={tr('Πρόσφατα φορτία')}>
+          <section className="trace-recent-list trace-loads" aria-label={tr('Πρόσφατα φορτία')}>
             <h3 className="trace-section-title">{tr('Πρόσφατα φορτία')}</h3>
+            <div className="trace-list-head" aria-hidden="true">
+              <span>{tr('Κλίβανος · κύκλος')}</span>
+              <span>{tr('Ημερομηνία')}</span>
+              <span>{tr('Αντικείμενα')}</span>
+              <span>{tr('Κατάσταση')}</span>
+            </div>
             <ul>
               {recent.slice(0, 10).map(l => (
                 <li key={l.id}>

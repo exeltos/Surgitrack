@@ -6,14 +6,14 @@ import TraceabilityPage from '../TraceabilityPage';
 const field = () => screen.getByRole('searchbox', {name: 'Barcode (S..., T...) ή όνομα Σετ/εργαλείου'});
 
 describe('Ιχνηλάτηση and its «Πίσω»', () => {
-  it('inside a card shows «Πίσω» in place of the tabs, and «Πίσω» returns to the tab’s list with its tabs', async () => {
+  it('inside a card shows «Πίσω» beside the tabs, and «Πίσω» returns to the tab’s list with its tabs', async () => {
     renderPage(<TraceabilityPage />, {path: '/traceability'});
     expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Πίσω'})).toBeNull();
     fireEvent.change(field(), {target: {value: 'S000321'}});
     fireEvent.submit(field().closest('form')!);
     expect(await screen.findByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
-    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
     // Into a patient of that Set, then back to the Set, then back to the empty search.
     const patientLink = screen.queryAllByRole('button', {name: /^PT-|^Ασθενής /})[0];
     if (patientLink) {

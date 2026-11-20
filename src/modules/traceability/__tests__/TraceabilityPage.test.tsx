@@ -21,7 +21,7 @@ describe('TraceabilityPage', () => {
     fireEvent.click(uses().querySelector('.ledger-row')!);
     // Inside the patient: «Πίσω» in place of the tabs.
     expect(screen.getByText('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')).toBeInTheDocument();
-    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
     expect(screen.getByRole('region', {name: 'Καταγραφές με κωδικό ασθενούς'})).toBeInTheDocument();
     expect(screen.getByRole('tab', {name: /Ασθενής/})).toHaveAttribute('aria-selected', 'true');

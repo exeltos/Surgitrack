@@ -1,7 +1,7 @@
 import PageHeader from '../../components/ui/PageHeader';
 import {useEffect, useState} from 'react';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, Search, History, Flame, Users, Package} from 'lucide-react';
+import {ArrowLeft, Search, History, Flame, Users, Package, Layers3, Wrench} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
@@ -161,13 +161,9 @@ export default function TraceabilityPage() {
           instrument found, a patient, a load) only «Πίσω» in their place, as «Πίσω στη λίστα» on the Set and
           instrument pages: to the previous step, or with nothing before it, to the tab's list. */}
       <PageHeader title={tr('Ιχνηλάτηση')} />
-      {detailOpen ? (
-        <div className="trace-head">
-          <AppButton icon={<ArrowLeft size={18} />} onClick={goBack} className="trace-page-back">
-            {tr('Πίσω')}
-          </AppButton>
-        </div>
-      ) : (
+      {/* The tabs stay on every step; inside a found card (a Set or instrument, a patient, a load) «Πίσω» on their
+          right goes to the previous step, or with nothing before it, to the tab's list. */}
+      <div className="trace-tabs-row">
         <div className="name-check-tabs trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
           {tabs.map(t => (
             <button
@@ -182,7 +178,12 @@ export default function TraceabilityPage() {
             </button>
           ))}
         </div>
-      )}
+        {detailOpen && (
+          <AppButton icon={<ArrowLeft size={16} />} onClick={goBack} className="trace-page-back">
+            {tr('Πίσω')}
+          </AppButton>
+        )}
+      </div>
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}
       {tab === 'HISTORY' ? (
@@ -294,7 +295,14 @@ export default function TraceabilityPage() {
                     {recentlyMoved.map(({item, at, status}) => (
                       <li key={item.id}>
                         <button type="button" onClick={() => commit(item.barcode)}>
-                          <b className="mono">{item.barcode}</b>
+                          <b className="mono trace-code">
+                            {'expected' in item ? (
+                              <Layers3 size={15} aria-label={tr('Σετ')} />
+                            ) : (
+                              <Wrench size={15} aria-label={tr('Εργαλείο')} />
+                            )}
+                            {item.barcode}
+                          </b>
                           <span>{item.name}</span>
                           <span>{movementText(status)}</span>
                           <span>{at}</span>

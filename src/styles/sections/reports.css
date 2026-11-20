@@ -216,9 +216,6 @@ html body .reports-result-head {
 html body .reports-result-body {
   padding: 0 16px 12px;
 }
-html body .reports-filter-strip {
-  border-bottom: 0;
-}
 
 /* Reports, a lower top: the page title alone, the report choices on one compact line, the report's title and the
    download on one line, the filters beside the totals. The list gets the height this frees. */
@@ -274,11 +271,6 @@ html body .reports-overview {
   align-items: center;
   gap: 6px 10px;
   padding: 4px 16px 6px;
-}
-html body .reports-overview .reports-filter-strip {
-  flex: 0 0 auto;
-  padding: 0;
-  border: 0;
 }
 html body .reports-overview .reports-summary {
   flex: 1 1 auto;
@@ -455,7 +447,6 @@ html body .reports-table tr.report-group-row th span {
 /* The reports of a group as a row of tabs under the group's tab (text, underlined when chosen), and the totals as
    the same figures as above every other list: the figure, then what it counts, the chosen one underlined. */
 html body .reports-page-workspace .reports-stage-head {
-  align-items: flex-end;
   border-bottom: 1px solid var(--c-gray-90);
 }
 html body .reports-page-workspace .reports-catalog-list {
@@ -579,4 +570,70 @@ html body .reports-page-workspace .reports-summary button:disabled {
 }
 html body .reports-page-workspace .reports-summary button:disabled b {
   color: var(--c-gray-65);
+}
+
+/* Reports on the page itself, as every other list: no frame around the report (its tabs, figures and list sit on
+   the page), Filters and the download on the right of the report's tabs. */
+html body .reports-page-workspace .reports-stage {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+html body .reports-page-workspace .reports-stage-head {
+  min-height: 0;
+  padding: 0;
+  align-items: center;
+}
+html body .reports-page-workspace .reports-stage-actions {
+  gap: 8px;
+  padding-bottom: 6px;
+}
+html body .reports-page-workspace .reports-overview {
+  padding: 12px 0 0;
+}
+html body .reports-page-workspace .reports-result-card {
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+/* The state in a report's list: its word with a small coloured dot, not a coloured pill. */
+html body .reports-page-workspace .reports-table .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--c-blue-25);
+  font-size: 13px;
+  font-weight: 400;
+}
+html body .reports-page-workspace .reports-table .badge::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.55;
+}
+html body .reports-page-workspace .reports-table .badge-ready_for_pickup::before,
+html body .reports-page-workspace .reports-table .badge-in_storage::before {
+  background: var(--c-green-45);
+  opacity: 1;
+}
+html body .reports-page-workspace .reports-table .badge-pending_sterilization::before,
+html body .reports-page-workspace .reports-table .badge-awaiting_release::before {
+  background: var(--c-orange-45);
+  opacity: 1;
+}
+html body .reports-page-workspace .reports-table .badge-service::before,
+html body .reports-page-workspace .reports-table .badge-lost::before {
+  background: var(--c-red-40-2);
+  opacity: 1;
+}
+html body .reports-page-workspace .reports-table .badge-in_department::before {
+  background: var(--c-blue-35-2);
+  opacity: 1;
 }

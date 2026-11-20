@@ -525,14 +525,13 @@ export default function ReportsPage() {
                   );
                 })}
             </div>
+            {/* Filters and the download on the right, as on every other list. */}
             <div className="reports-stage-actions" data-tour="report-download">
-              <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
+              <FilterMenu filters={reportFilters} />
+              <DownloadMenu table={reportTable} onPrint={openPreview} />
             </div>
           </header>
           <div className="reports-overview">
-            <div className="reports-filter-strip">
-              <FilterMenu filters={reportFilters} align="left" />
-            </div>
             <ul className="reports-summary" aria-label={tr('Σύνολα')}>
               {summary.map(chip => (
                 <li key={chip.label}>
@@ -551,7 +550,19 @@ export default function ReportsPage() {
             </ul>
           </div>
           <div className="reports-result-card">
-            <div className="reports-result-head">
+            {/* The count is the «Σύνολο» figure above: the line shows only for a list a figure narrowed (with «Εμφάνιση
+                όλων») or with a warning; otherwise it is read out only. */}
+            <div
+              className={`reports-result-head${
+                view ||
+                (active === 'usage' &&
+                  reportData.rows.some(
+                    (r: Row) => r.stateLabel === 'Σε χρήση' && Number(r.remaining) <= warningThreshold,
+                  ))
+                  ? ''
+                  : ' visually-hidden'
+              }`}
+            >
               <div>
                 <strong>{view ? view.label : tr('Αποτελέσματα')}</strong>
                 <span>
