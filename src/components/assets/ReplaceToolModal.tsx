@@ -6,9 +6,13 @@ import {useSurgi} from '../../store/SurgiStore';
 import {inActiveProcess, isMovable, kindKey} from '../../core/replacements';
 import {tr, trData} from '../../i18n';
 import {useSetColorQuestion} from './useSetColorQuestion';
-import type {Tool} from '../../types/domain';
+import type {Issue, Tool} from '../../types/domain';
 
 type Source = 'STOCK' | 'SET' | 'STANDALONE';
+
+/** The barcodes with an open report (a report names its asset as "<barcode> · <name>" or the barcode alone). */
+const reportedBarcodes = (issues: readonly Issue[]) =>
+  new Set(issues.filter(i => i.status === 'OPEN').map(i => i.asset.split(' ')[0]));
 
 /**
  * Replacing one instrument right where its report is: the same instrument in Stock, in another Set or loose in a
@@ -17,7 +21,7 @@ type Source = 'STOCK' | 'SET' | 'STANDALONE';
  */
 export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: () => void}) {
   const store = useSurgi();
-  const {tools, sets} = store;
+  const {tools, sets, issues} = store;
   const colorQuestion = useSetColorQuestion();
   // The store as it is when the step is confirmed (after the color question), not when it was opened: another
   // workstation may have started a process meanwhile.
@@ -26,10 +30,12 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
   const target = tool.setId ? sets.find(s => s.id === tool.setId) : undefined;
   const kind = kindKey(tool);
   const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
-  // Where each usable instrument is now; one in Service, lost, out of use or in an active process (washing,
-  // sterilization, on its way) replaces nothing.
-  const sourceOf = (t: Tool): Source | undefined =>
-    t.id === tool.id || !isMovable(t)
+  // Instruments with an open report (damage, wear…) wait for their own fix or replacement.
+  const reported = useMemo(() => reportedBarcodes(issues), [issues]);
+  // Where each usable instrument is now; one in Service, lost, out of use, in an active process (washing,
+  // sterilization, on its way) or with an open report replaces nothing.
+  const sourceOf = (t: Tool, open: ReadonlySet<string> = reported): Source | undefined =>
+    t.id === tool.id || !isMovable(t) || open.has(t.barcode)
       ? undefined
       : t.mode === 'STOCK'
         ? 'STOCK'
@@ -38,7 +44,7 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
             ? 'SET'
             : undefined
           : 'STANDALONE';
-  const same = useMemo(() => tools.filter(t => kindKey(t) === kind && sourceOf(t)), [tools, kind]); // eslint-disable-line react-hooks/exhaustive-deps
+  const same = useMemo(() => tools.filter(t => kindKey(t) === kind && sourceOf(t)), [tools, kind, reported]); // eslint-disable-line react-hooks/exhaustive-deps
   const countOf = (source: Source) => same.filter(t => sourceOf(t) === source).length;
   const [source, setSource] = useState<Source>(() =>
     countOf('STOCK') ? 'STOCK' : countOf('SET') ? 'SET' : countOf('STANDALONE') ? 'STANDALONE' : 'STOCK',
@@ -72,7 +78,8 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
     const donor = now.tools.find(t => t.id === choice.id);
     const outgoing = now.tools.find(t => t.id === tool.id);
     const set = now.sets.find(s => s.id === target.id);
-    if (!donor || !sourceOf(donor) || !outgoing || !set || outgoing.setId !== set.id) return onClose();
+    if (!donor || !sourceOf(donor, reportedBarcodes(now.issues)) || !outgoing || !set || outgoing.setId !== set.id)
+      return onClose();
     if (inActiveProcess(outgoing) || inActiveProcess(set)) return onClose();
     if (sourceOf(donor) === 'STOCK')
       now.replaceFromStock([{toolId: outgoing.id, stockToolId: donor.id, setId: set.id}]);
