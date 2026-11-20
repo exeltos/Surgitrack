@@ -45,6 +45,7 @@ const issueAge = (created: string) => {
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
 import EquipmentProblems from './EquipmentProblems';
 import {DeleteIssueButton} from '../../components/assets/IssueActions';
+import ResolveIssueDialog from '../../components/assets/ResolveIssueDialog';
 
 export default function IssuesPage() {
   const {
@@ -57,7 +58,6 @@ export default function IssuesPage() {
     sets,
     movements,
     purchaseOrders,
-    resolveIssues,
     deleteIssue,
     createPurchaseOrder,
   } = useSurgi();
@@ -66,6 +66,7 @@ export default function IssuesPage() {
   const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
   const [figureOpened, setFigureOpened] = useState(0);
   const [confirm, ask] = useConfirm();
+  const [resolving, setResolving] = useState<Issue | null>(null);
   // Sterilization and admins also see the instruments to replace, as a second tab (in a hospital the platform
   // owner gave the Replacements & Orders module).
   const hasReplacements = useHasModule('REPLACEMENTS');
@@ -364,22 +365,7 @@ export default function IssuesPage() {
                                     className="issue-action wide slot-resolve"
                                     title={tr('Επίλυση')}
                                     aria-label={tr('Επίλυση')}
-                                    onClick={() =>
-                                      ask({
-                                        title: tr('Επίλυση εκκρεμότητας;'),
-                                        message: tr(
-                                          'Η εκκρεμότητα «{0}» για {1} θα σημειωθεί ως επιλυμένη.',
-                                          trData(i.type),
-                                          i.asset,
-                                        ),
-                                        confirmLabel: tr('Επίλυση'),
-                                        note: {
-                                          label: tr('Πώς επιλύθηκε (προαιρετικό)'),
-                                          placeholder: tr('π.χ. Αντικαταστάθηκε από το Απόθεμα'),
-                                        },
-                                        onConfirm: how => resolveIssues([i.id], how || tr('Επιλύθηκε χειροκίνητα')),
-                                      })
-                                    }
+                                    onClick={() => setResolving(i)}
                                   >
                                     <CheckCircle2 size={14} />
                                     {tr('Επίλυση')}
@@ -454,6 +440,9 @@ export default function IssuesPage() {
         />
       )}
       {confirm}
+      {resolving && (
+        <ResolveIssueDialog issue={resolving} tool={subject(resolving).tool} onClose={() => setResolving(null)} />
+      )}
     </div>
   );
 }

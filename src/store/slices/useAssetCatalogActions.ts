@@ -368,7 +368,7 @@ export function useAssetCatalogActions(
     notify(tr('Η αναφορά διαγράφηκε· μπορεί να επανέλθει από τον Κάδο.'));
   };
   /**
-   * An instrument counted until wear, reported worn and checked by Sterilization: it is taken out of use (out of its
+   * An instrument with a report (wear, damage), checked by Sterilization and not to be used again: it is taken out of use (out of its
    * Set, kept in the history with its uses), and its open reports close with the decision. Not while it is in
    * washing or in a sterilizer.
    */
@@ -377,7 +377,7 @@ export function useAssetCatalogActions(
     if (!tool || tool.state === 'RETIRED' || tool.state === 'IN_WASHING' || tool.state === 'IN_STERILIZATION') return;
     const at = formatStoreDateTime();
     const set = tool.setId ? sets.find(s => s.id === tool.setId) : undefined;
-    const why = `Φθορά μετά από ${tool.uses || 0} χρήσεις${note.trim() ? ` · ${note.trim()}` : ''}`;
+    const why = `Μετά από έλεγχο στις ${tool.uses || 0} χρήσεις${note.trim() ? ` · ${note.trim()}` : ''}`;
     setTools(list =>
       list.map(t =>
         t.id === toolId ? {...t, state: 'RETIRED' as const, retiredAt: at, retiredReason: why, setId: undefined} : t,
@@ -396,10 +396,10 @@ export function useAssetCatalogActions(
       assetKind: 'TOOL',
       from: set ? `Set ${set.barcode}` : tool.department || 'Απόθεμα',
       to: 'Εκτός χρήσης',
-      status: `Απόσυρση μετά από έλεγχο φθοράς · ${why}`,
+      status: `Απόσυρση · ${why}`,
       by: currentUser.name,
     });
-    notify(tr('{0}: αποσύρθηκε μετά από έλεγχο φθοράς ({1} χρήσεις).', tool.barcode, tool.uses || 0));
+    notify(tr('{0}: αποσύρθηκε μετά από έλεγχο ({1} χρήσεις).', tool.barcode, tool.uses || 0));
   };
   const addAssetPhotos = (kind: AssetKind, id: string, photos: AssetPhoto[]) => {
     if (!photos.length) return;

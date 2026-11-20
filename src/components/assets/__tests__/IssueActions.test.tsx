@@ -15,7 +15,7 @@ describe('An open report on the instrument’s «Εκκρεμότητες»', ()
     });
     fireEvent.click(screen.getByRole('button', {name: /^Εκκρεμότητες/}));
     expect(screen.getByRole('button', {name: 'Service, Απόθεμα…'})).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', {name: 'Ελέγχθηκε · σε χρήση'}));
+    fireEvent.click(screen.getByRole('button', {name: 'Επίλυση'}));
     const dialog = screen.getByRole('dialog');
     fireEvent.change(within(dialog).getByRole('textbox'), {target: {value: 'Ακονίστηκε'}});
     fireEvent.click(within(dialog).getByRole('button', {name: 'Επίλυση'}));
@@ -80,5 +80,25 @@ describe('Deleting a report', () => {
     });
     fireEvent.click(screen.getByRole('button', {name: /^Εκκρεμότητες/}));
     expect(screen.queryByRole('button', {name: 'Διαγραφή'})).not.toBeInTheDocument();
+  });
+});
+
+describe('Closing a report with retirement', () => {
+  it('«Επίλυση» can take the instrument out of use, with what the check found', () => {
+    const issue = issues.find(i => i.id === 'i9')!;
+    const tool = tools.find(t => issue.asset.startsWith(`${t.barcode} `))!;
+    renderPage(<ToolDetailPage />, {
+      path: `/tools/${tool.id}`,
+      route: '/tools/:id',
+      signedIn: {id: 'u-admin', name: 'Διαχειριστής', role: 'ADMIN', department: 'Κεντρική Αποστείρωση'},
+    });
+    fireEvent.click(screen.getByRole('button', {name: /^Εκκρεμότητες/}));
+    fireEvent.click(screen.getByRole('button', {name: 'Επίλυση'}));
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('radio', {name: /Απόσυρση/}));
+    fireEvent.change(within(dialog).getByRole('textbox'), {target: {value: 'Δεν κόβει'}});
+    fireEvent.click(within(dialog).getByRole('button', {name: 'Απόσυρση'}));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Δεν υπάρχουν ανοικτές εκκρεμότητες.')).toBeInTheDocument();
   });
 });

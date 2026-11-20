@@ -51,6 +51,7 @@ export default function ToolDetailPage() {
   const {
     sets,
     tools,
+    retiredTools,
     movements,
     issues,
     reportIssue,
@@ -73,7 +74,8 @@ export default function ToolDetailPage() {
   const {id} = useParams();
   const [searchParams] = useSearchParams();
   const scannedOldBarcode = searchParams.get('replaced');
-  const tool = tools.find(item => item.id === id);
+  // An instrument out of use keeps its page (its history, why and when it was retired).
+  const tool = tools.find(item => item.id === id) ?? retiredTools.find(item => item.id === id);
   // «Αναίρεση» and «Επιστροφή…» are items of the «Ενέργειες» menu, for who may use them.
   const undo = useUndoMovement('TOOL', id ?? '');
   const stageBack = useStageReturn('TOOL', id ?? '');
