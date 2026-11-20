@@ -2891,7 +2891,8 @@ html body .workflow-modal-delivery > .workflow-modal-actions {
   }
   html body .equipment-page .equipment-rows tr {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1.3fr);
+    /* The tests take the room of their lines (name, day and time); the failures are one figure. */
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 0.8fr) minmax(0, 1.1fr);
     align-content: start;
     gap: 12px 18px;
     padding: 16px 18px 14px;
@@ -2944,6 +2945,12 @@ html body .workflow-modal-delivery > .workflow-modal-actions {
   }
   html body .equipment-page .equipment-rows td:first-child::before {
     content: none;
+  }
+  /* The failures: one figure under its label, as large as the last cycle's number. */
+  html body .equipment-page .equipment-rows td.num {
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
   }
   html body .equipment-page .equipment-rows td:first-child .row-name {
     font-size: 16px;

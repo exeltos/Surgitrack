@@ -2583,7 +2583,7 @@ html body .replacements > section {
   flex-direction: column;
 }
 html body .replacements-fixed th.col-status {
-  width: 215px;
+  width: 190px;
 }
 html body .replacements-fixed .replacement-status {
   display: inline-block;

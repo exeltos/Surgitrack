@@ -356,11 +356,9 @@ html body .replacements-search > svg {
     display: none;
   }
 }
-@media (max-width: 1700px) {
-  /* Only the main action keeps its words; the others are icons with a tooltip. */
-  html body .replacements-table .row-actions button:not(.primary) .btn-label {
-    display: none;
-  }
+/* Only the main action keeps its words; the others are icons with a tooltip, so the instrument's name has room. */
+html body .replacements-table .row-actions button:not(.primary) .btn-label {
+  display: none;
 }
 @media (max-width: 700px) {
   html body .replacements-toolbar .replacements-search {
@@ -414,21 +412,39 @@ html body .replacements-fixed td.row-actions {
   width: auto;
   text-align: right;
 }
+/* Only the kinds of action the listed rows have take room (--slot-*: 1 or 0, set by the page), so the
+   instrument's name gets the rest instead of empty slots. --w-replace / --w-other: a slot's width. */
+html body .replacements-fixed {
+  --w-replace: 136px;
+  --w-other: 34px;
+}
 html body .replacements-fixed th.col-actions {
-  width: 410px;
+  width: max(
+    96px,
+    calc(
+      var(--slot-replace, 1) * (var(--w-replace) + 6px) + var(--slot-order, 1) * (var(--w-other) + 6px) +
+        var(--slot-return, 1) * (var(--w-other) + 6px) + 24px
+    )
+  );
   text-align: right;
 }
 html body .replacements-fixed .replacement-actions {
-  display: inline-grid;
-  grid-template-columns: 136px 120px 120px;
+  display: inline-flex;
   align-items: center;
-  justify-items: stretch;
   gap: 6px;
+}
+html body .replacements-fixed td.row-actions .replacement-actions > * {
+  flex: 0 0 var(--w-other);
+  width: var(--w-other);
+  min-width: 0;
+}
+html body .replacements-fixed td.row-actions .replacement-actions > .slot-replace {
+  flex-basis: var(--w-replace);
+  width: var(--w-replace);
 }
 html body .replacements-fixed .replacement-actions > button {
   display: inline-flex;
   justify-content: center;
-  width: 100%;
   min-width: 0;
   height: 34px;
   margin: 0;
@@ -437,23 +453,13 @@ html body .replacements-fixed .replacement-actions > button {
 html body .replacements-fixed .replacement-actions > span[aria-hidden] {
   height: 34px;
 }
-@media (max-width: 1700px) {
-  html body .replacements-fixed th.col-actions {
-    width: 240px;
-  }
-  html body .replacements-fixed .replacement-actions {
-    grid-template-columns: 136px 34px 34px;
-  }
-  html body .replacements-fixed .replacement-actions > button:not(.primary) {
-    padding: 0;
-  }
+html body .replacements-fixed .replacement-actions > button:not(.primary) {
+  padding: 0;
 }
 @media (min-width: 701px) and (max-width: 1280px) {
-  html body .replacements-fixed th.col-actions {
-    width: 140px;
-  }
-  html body .replacements-fixed .replacement-actions {
-    grid-template-columns: 34px 34px 34px;
+  html body .replacements-fixed {
+    --w-replace: 34px;
+    --w-other: 34px;
   }
   html body .replacements-fixed .replacement-actions > button {
     padding: 0;
@@ -476,4 +482,66 @@ html body .replacements-fixed .replacement-actions > span[aria-hidden] {
   html body .replacements-fixed .replacement-actions > span[aria-hidden] {
     display: none;
   }
+}
+
+/* Replacing an instrument from its report: where the same one is (tabs), a list to pick from, the step. */
+.replace-tool-modal header small {
+  display: block;
+  margin-top: 4px;
+  color: var(--st-muted);
+}
+.replace-tool-modal .replace-tool-sources {
+  margin: 12px 0 10px;
+}
+.replace-tool-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+}
+.replace-tool-search input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+}
+.replace-tool-search:focus-within {
+  border-color: var(--c-cyan-35);
+  box-shadow: 0 0 0 2px rgba(21, 90, 110, 0.15);
+}
+.replace-tool-list {
+  max-height: 300px;
+  margin: 10px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.replace-tool-list label {
+  display: grid;
+  grid-template-columns: auto 92px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--c-gray-95);
+  cursor: pointer;
+}
+.replace-tool-list label.active {
+  background: var(--c-gray-100-2);
+}
+.replace-tool-list small {
+  color: var(--st-muted);
+  white-space: nowrap;
+}
+.replace-tool-none {
+  padding: 14px 8px;
+  color: var(--st-muted);
+}
+.replace-tool-warning {
+  margin: 10px 0 0;
+  color: var(--c-orange-45-2);
+  font-size: 13px;
 }

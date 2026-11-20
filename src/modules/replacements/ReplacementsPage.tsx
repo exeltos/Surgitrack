@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import type {CSSProperties, ReactNode} from 'react';
 import {useMemo, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {CheckCircle2, ClipboardList, PackageCheck, RefreshCcw, Search, ShoppingCart, Undo2, X} from 'lucide-react';
@@ -119,6 +119,14 @@ export default function ReplacementsPage({
   const target = picked.length ? picked : shown;
   const fromStock = allocateStock(picked.filter(item => item.status !== 'REPLACED'));
   const needed = items.filter(i => i.status === 'NEEDED');
+  // The kinds of action any listed row has: only those take a column, so no row carries empty slots.
+  const canReplaceItem = (item: ReplacementItem) => item.status !== 'REPLACED' && !!item.set && item.stock.length > 0;
+  const canReturnItem = (item: ReplacementItem) => item.reason === 'SERVICE' && item.status !== 'REPLACED';
+  const slots = {
+    replace: shown.some(canReplaceItem),
+    order: shown.some(item => item.status === 'NEEDED'),
+    back: shown.some(canReturnItem),
+  };
 
   const filters: SelectFilter[] = [
     {
@@ -351,7 +359,16 @@ export default function ReplacementsPage({
               </div>
             )}
             <div className="replacements-table">
-              <table className="replacements-fixed">
+              <table
+                className="replacements-fixed"
+                style={
+                  {
+                    '--slot-replace': Number(slots.replace),
+                    '--slot-order': Number(slots.order),
+                    '--slot-return': Number(slots.back),
+                  } as CSSProperties
+                }
+              >
                 <thead>
                   <tr>
                     {editable && (
@@ -398,7 +415,7 @@ export default function ReplacementsPage({
                 </thead>
                 <tbody>
                   {rows.visible.map(item => {
-                    const canReplace = item.status !== 'REPLACED' && !!item.set && item.stock.length > 0;
+                    const canReplace = canReplaceItem(item);
                     return (
                       <tr key={item.tool.id} className={selected.has(item.tool.id) ? 'selected' : ''}>
                         {editable && (
@@ -464,7 +481,7 @@ export default function ReplacementsPage({
                                   <PackageCheck size={13} /> <span className="btn-label">{tr('Αντικατάσταση')}</span>
                                 </button>
                               ) : (
-                                <span className="slot-replace" aria-hidden="true" />
+                                slots.replace && <span className="slot-replace" aria-hidden="true" />
                               )}
                               {item.status === 'NEEDED' ? (
                                 <button
@@ -477,9 +494,9 @@ export default function ReplacementsPage({
                                   <ShoppingCart size={13} /> <span className="btn-label">{tr('Παραγγελία')}</span>
                                 </button>
                               ) : (
-                                <span className="slot-order" aria-hidden="true" />
+                                slots.order && <span className="slot-order" aria-hidden="true" />
                               )}
-                              {item.reason === 'SERVICE' && item.status !== 'REPLACED' ? (
+                              {canReturnItem(item) ? (
                                 <button
                                   type="button"
                                   className="slot-return"
@@ -500,7 +517,7 @@ export default function ReplacementsPage({
                                   <Undo2 size={13} /> <span className="btn-label">{tr('Επιστροφή')}</span>
                                 </button>
                               ) : (
-                                <span className="slot-return" aria-hidden="true" />
+                                slots.back && <span className="slot-return" aria-hidden="true" />
                               )}
                             </div>
                           </td>

@@ -1,3 +1,4 @@
+import {testWhen} from '../../../core/equipmentTests';
 import {useState} from 'react';
 import {Check, Circle, Clock3, TriangleAlert} from 'lucide-react';
 import {useLibraries} from '../../../core/LibraryStore';
@@ -104,7 +105,9 @@ export default function SterilizerTestRow({
                     ? inUse
                       ? L('εκκρεμεί', 'due')
                       : L('δεν έχει καταγραφεί', 'not recorded')
-                    : standing.last?.at.slice(-5) || ''}
+                    : standing.last
+                      ? testWhen(standing.last.at)
+                      : ''}
               </small>
             </button>
           );

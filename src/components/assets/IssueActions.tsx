@@ -1,11 +1,11 @@
-import type {ReactNode} from 'react';
-import {Link} from 'react-router-dom';
+import {useState, type ReactNode} from 'react';
 import {CheckCircle2, ShoppingCart, Wrench} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {useHasModule} from '../../data/cloud/modulesContext';
 import {tr, trData} from '../../i18n';
-import type {Issue} from '../../types/domain';
+import type {Issue, Tool} from '../../types/domain';
+import ReplaceToolModal from './ReplaceToolModal';
 
 type Ask = (ask: {
   title: string;
@@ -30,13 +30,14 @@ export default function IssueActions({
   issue: Issue;
   ask: Ask;
   onManage: () => void;
-  /** An instrument: it can be replaced with a new one. */
-  replaceable?: boolean;
+  /** The instrument of the report: it can be replaced, from Stock, another Set or a loose one. */
+  replaceable?: Tool;
   /** In an active reprocessing: Service, Stock and composition wait for it, as the item's «Διαχείριση» does. */
   locked?: boolean;
 }): ReactNode {
   const {resolveIssues, can} = useSurgi();
   const withReplacements = useHasModule('REPLACEMENTS');
+  const [replacing, setReplacing] = useState(false);
   if (issue.status !== 'OPEN' || !can('asset.composition.manage')) return null;
   return (
     <div className="asset-issue-actions">
@@ -67,11 +68,17 @@ export default function IssueActions({
         {tr('Service, Απόθεμα…')}
       </AppButton>
       {replaceable && withReplacements && can('stock.manage') && (
-        <Link className="app-button app-button-secondary app-button-sm" to="/issues?tab=replacements">
-          <ShoppingCart size={14} aria-hidden="true" />
+        <AppButton
+          size="sm"
+          icon={<ShoppingCart size={14} />}
+          onClick={() => setReplacing(true)}
+          disabled={locked}
+          title={locked ? tr('Η αντικατάσταση περιμένει το τέλος της ενεργής διαδικασίας αποστείρωσης.') : undefined}
+        >
           {tr('Αντικατάσταση')}
-        </Link>
+        </AppButton>
       )}
+      {replacing && replaceable && <ReplaceToolModal tool={replaceable} onClose={() => setReplacing(false)} />}
     </div>
   );
 }

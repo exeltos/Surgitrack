@@ -337,7 +337,10 @@ export default function ToolDetailPage() {
                         <TriangleAlert size={17} />
                         <div>
                           <strong>{trData(issue.type)}</strong>
-                          <span>{issue.created}</span>
+                          <span>
+                            {issue.created}
+                            {issue.reportedBy ? ` · ${issue.reportedBy}` : ''}
+                          </span>
                           <small>{issue.note}</small>
                           {issue.photos?.length ? (
                             <div className="asset-issue-photos">
@@ -351,7 +354,7 @@ export default function ToolDetailPage() {
                             ask={ask}
                             onManage={() => setManageOpen(true)}
                             locked={workflowLocked}
-                            replaceable
+                            replaceable={tool}
                           />
                         </div>
                       </div>

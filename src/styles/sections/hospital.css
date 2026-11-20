@@ -2174,13 +2174,18 @@ html body .department-home .dash-most-used > .dept-cols {
     width: 92px;
   }
   html body .issues-layout:not(.solo) .replacements-fixed th.col-status {
-    width: 124px;
+    width: 130px;
   }
-  html body .issues-layout:not(.solo) .replacements-fixed th.col-actions {
-    width: 140px;
+  /* The state in full, on two lines, instead of cut. */
+  html body .issues-layout:not(.solo) .replacements-fixed .replacement-status {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.25;
   }
-  html body .issues-layout:not(.solo) .replacements-fixed .replacement-actions {
-    grid-template-columns: 34px 34px 34px;
+  html body .issues-layout:not(.solo) .replacements-fixed {
+    --w-replace: 34px;
+    --w-other: 34px;
   }
   html body .issues-layout:not(.solo) .replacements-fixed .replacement-actions > button {
     padding: 0;

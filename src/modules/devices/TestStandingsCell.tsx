@@ -1,6 +1,5 @@
-import {itemTestStandings} from '../../core/equipmentTests';
+import {itemTestStandings, testWhen} from '../../core/equipmentTests';
 import type {EquipmentTest, EquipmentTestKind, TestedEquipment} from '../../core/libraries';
-import {parseDisplayDate} from '../../core/displayDate';
 import {tr} from '../../i18n';
 import {useAppPreferences} from '../../core/AppPreferences';
 
@@ -12,17 +11,6 @@ const SHORT: Record<EquipmentTestKind, {el: string; en: string}> = {
   PROTEIN: {el: 'Πρωτεΐνη', en: 'Protein'},
   SPRAY: {el: 'Ψεκαστήρες', en: 'Spray arms'},
 };
-
-/** When a test was done, short: its time when today («06:40»), else its day («16/11»). */
-function shortWhen(at: string) {
-  const date = parseDisplayDate(at);
-  if (!date) return at;
-  const today = new Date();
-  // Today: the time alone (any other day shows its date).
-  if (date.toDateString() === today.toDateString())
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-  return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
-}
 
 /**
  * Each test a sterilizer or washer is held to, on its own line: passed (✓), failed (✗, the equipment is not loaded)
@@ -49,7 +37,7 @@ export default function TestStandingsCell({
               {mark}
             </span>
             <span>{SHORT[s.kind][lang === 'el' ? 'el' : 'en']}</span>
-            <small>{s.last ? shortWhen(s.last.at) : tr('ποτέ')}</small>
+            <small>{s.last ? testWhen(s.last.at) : tr('ποτέ')}</small>
             <span className="visually-hidden">{state}</span>
           </li>
         );

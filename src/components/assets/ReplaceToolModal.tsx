@@ -1,0 +1,171 @@
+import {useMemo, useState, type ReactNode} from 'react';
+import {Link} from 'react-router-dom';
+import {Layers3, PackageOpen, Search, ShoppingCart, Wrench} from 'lucide-react';
+import AppButton from '../ui/AppButton';
+import {useSurgi} from '../../store/SurgiStore';
+import {kindKey} from '../../core/replacements';
+import {tr, trData} from '../../i18n';
+import {useSetColorQuestion} from './useSetColorQuestion';
+import type {Tool} from '../../types/domain';
+
+type Source = 'STOCK' | 'SET' | 'STANDALONE';
+
+/**
+ * Replacing one instrument right where its report is: the same instrument in Stock, in another Set or loose in a
+ * department, and which one goes into its Set. The instrument replaced goes to Service. With nothing to take it
+ * from, the purchase order is one step away.
+ */
+export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: () => void}) {
+  const {tools, sets, replaceFromStock, replaceToolInSet, applyColorPlan} = useSurgi();
+  const colorQuestion = useSetColorQuestion();
+  const target = tool.setId ? sets.find(s => s.id === tool.setId) : undefined;
+  const kind = kindKey(tool);
+  const setsById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
+  // Where each usable instrument is now; one in Service, lost or out of use replaces nothing.
+  const sourceOf = (t: Tool): Source | undefined =>
+    t.id === tool.id || t.state === 'SERVICE' || t.state === 'LOST' || t.state === 'RETIRED'
+      ? undefined
+      : t.mode === 'STOCK'
+        ? 'STOCK'
+        : t.mode === 'SET_MEMBER'
+          ? t.setId && t.setId !== tool.setId
+            ? 'SET'
+            : undefined
+          : 'STANDALONE';
+  const same = useMemo(() => tools.filter(t => kindKey(t) === kind && sourceOf(t)), [tools, kind]); // eslint-disable-line react-hooks/exhaustive-deps
+  const countOf = (source: Source) => same.filter(t => sourceOf(t) === source).length;
+  const [source, setSource] = useState<Source>(() =>
+    countOf('STOCK') ? 'STOCK' : countOf('SET') ? 'SET' : countOf('STANDALONE') ? 'STANDALONE' : 'STOCK',
+  );
+  const [query, setQuery] = useState('');
+  const [picked, setPicked] = useState('');
+  const q = query.trim().toLowerCase();
+  // The same instrument first; a search finds any other that can stand in for it.
+  const shown = (
+    q
+      ? tools.filter(
+          t =>
+            sourceOf(t) === source &&
+            `${t.barcode} ${t.name} ${t.code || ''} ${t.setId ? setsById.get(t.setId)?.barcode || '' : ''}`
+              .toLowerCase()
+              .includes(q),
+        )
+      : same.filter(t => sourceOf(t) === source)
+  ).slice(0, 60);
+  const choice = tools.find(t => t.id === picked);
+  const from = choice?.setId ? setsById.get(choice.setId) : undefined;
+
+  const confirm = async () => {
+    if (!target || !choice) return;
+    const plan = await colorQuestion.ask([choice.id], target.id);
+    if (!plan) return;
+    if (sourceOf(choice) === 'STOCK') replaceFromStock([{toolId: tool.id, stockToolId: choice.id, setId: target.id}]);
+    else replaceToolInSet(target.id, tool.id, choice.id, 'SERVICE');
+    applyColorPlan(plan, target.barcode);
+    onClose();
+  };
+
+  const tabs: Array<{id: Source; label: string; icon: ReactNode}> = [
+    {id: 'STOCK', label: tr('Απόθεμα'), icon: <PackageOpen size={15} />},
+    {id: 'SET', label: tr('Άλλο Σετ'), icon: <Layers3 size={15} />},
+    {id: 'STANDALONE', label: tr('Μεμονωμένο'), icon: <Wrench size={15} />},
+  ];
+
+  return (
+    <div className="modal-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
+      <div className="asset-manage-modal replace-tool-modal" role="dialog" aria-modal="true">
+        <header>
+          <div>
+            <span className="eyebrow">{tr('Αντικατάσταση')}</span>
+            <h2>
+              <span className="mono">{tool.barcode}</span> · {tool.name}
+            </h2>
+            <small>
+              {target
+                ? tr('Στο Σετ {0} · το εργαλείο που φεύγει πάει σε Service.', `${target.barcode} · ${target.name}`)
+                : tr('Δεν ανήκει σε Σετ· εδώ φαίνεται μόνο πού υπάρχει ίδιο εργαλείο.')}
+            </small>
+          </div>
+        </header>
+        <div className="name-check-tabs replace-tool-sources" role="tablist">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={source === tab.id}
+              className={source === tab.id ? 'active' : ''}
+              onClick={() => (setSource(tab.id), setPicked(''))}
+            >
+              {tab.icon} {tab.label} <b>{countOf(tab.id)}</b>
+            </button>
+          ))}
+        </div>
+        <label className="replace-tool-search">
+          <Search size={15} aria-hidden="true" />
+          <input
+            type="search"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder={tr('Άλλο εργαλείο: barcode, όνομα ή κωδικός…')}
+          />
+        </label>
+        <ul className="replace-tool-list">
+          {shown.map(t => {
+            const set = t.setId ? setsById.get(t.setId) : undefined;
+            return (
+              <li key={t.id}>
+                <label className={picked === t.id ? 'active' : ''}>
+                  <input
+                    type="radio"
+                    name="replacement"
+                    checked={picked === t.id}
+                    disabled={!target}
+                    onChange={() => setPicked(t.id)}
+                  />
+                  <span className="mono">{t.barcode}</span>
+                  <span>{t.name}</span>
+                  <small>
+                    {source === 'STOCK'
+                      ? tr('Απόθεμα')
+                      : source === 'SET'
+                        ? `${set?.barcode || ''} · ${trData(set?.department || '')}`
+                        : trData(t.department || '')}
+                  </small>
+                </label>
+              </li>
+            );
+          })}
+          {!shown.length && (
+            <li className="replace-tool-none">
+              {q
+                ? tr('Δεν βρέθηκε εργαλείο.')
+                : source === 'STOCK'
+                  ? tr('Δεν υπάρχει ίδιο εργαλείο στο Απόθεμα.')
+                  : source === 'SET'
+                    ? tr('Δεν υπάρχει ίδιο εργαλείο σε άλλο Σετ.')
+                    : tr('Δεν υπάρχει ίδιο μεμονωμένο εργαλείο.')}
+            </li>
+          )}
+        </ul>
+        {from && (
+          <p className="replace-tool-warning">
+            {tr('Θα αφαιρεθεί από το Σετ {0}, το οποίο θα μείνει με έλλειψη.', from.barcode)}
+          </p>
+        )}
+        <footer>
+          {!same.length && (
+            <Link className="app-button app-button-secondary" to="/issues?tab=replacements" onClick={onClose}>
+              <ShoppingCart size={15} aria-hidden="true" /> {tr('Παραγγελία αγοράς')}
+            </Link>
+          )}
+          <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
+          <AppButton variant="primary" disabled={!target || !choice} onClick={confirm}>
+            {tr('Αντικατάσταση')}
+          </AppButton>
+        </footer>
+      </div>
+      {colorQuestion.dialog}
+    </div>
+  );
+}

@@ -426,7 +426,10 @@ export default function SetDetailPage() {
                         <TriangleAlert size={17} />
                         <div>
                           <strong>{issue.asset}</strong>
-                          <span>{trData(issue.type)}</span>
+                          <span>
+                            {trData(issue.type)} · {issue.created}
+                            {issue.reportedBy ? ` · ${issue.reportedBy}` : ''}
+                          </span>
                           <small>{issue.note}</small>
                           {issue.photos?.length ? (
                             <div className="asset-issue-photos">
@@ -443,7 +446,7 @@ export default function SetDetailPage() {
                               <IssueActions
                                 issue={issue}
                                 ask={ask}
-                                replaceable={!!member}
+                                replaceable={member}
                                 // An instrument's own page keeps its own lock.
                                 locked={!member && workflowLocked}
                                 onManage={() => (member ? navigate(`/tools/${member.id}`) : setManageOpen(true))}

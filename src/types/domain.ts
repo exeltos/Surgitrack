@@ -148,6 +148,8 @@ export interface Issue {
   department: string;
   note: string;
   photos?: AssetPhoto[];
+  /** Who wrote the report (older reports have none). */
+  reportedBy?: string;
 }
 export type ReceiptCheckResult = 'OK' | 'MISSING' | 'DAMAGE' | 'OTHER';
 export type ReceiptItemCheckStatus = 'OK' | 'PROBLEM';

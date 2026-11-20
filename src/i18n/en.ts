@@ -1593,6 +1593,18 @@ export const en: Record<string, string> = {
   'Αναζήτηση barcode, ονομασίας, κωδικού ή Σετ…': 'Search barcode, name, code or Set…',
   'Αναμ.': 'Exp.',
   Αντικαθιστά: 'Replaces',
+  'Η αντικατάσταση περιμένει το τέλος της ενεργής διαδικασίας αποστείρωσης.':
+    'Replacing waits for the active sterilization process to end.',
+  'Στο Σετ {0} · το εργαλείο που φεύγει πάει σε Service.': 'In Set {0} · the instrument taken out goes to Service.',
+  'Δεν ανήκει σε Σετ· εδώ φαίνεται μόνο πού υπάρχει ίδιο εργαλείο.':
+    'Not in a Set; this only shows where the same instrument is.',
+  'Άλλο εργαλείο: barcode, όνομα ή κωδικός…': 'Another instrument: barcode, name or code…',
+  'Δεν βρέθηκε εργαλείο.': 'No instrument found.',
+  'Δεν υπάρχει ίδιο εργαλείο στο Απόθεμα.': 'No such instrument in Stock.',
+  'Δεν υπάρχει ίδιο εργαλείο σε άλλο Σετ.': 'No such instrument in another Set.',
+  'Δεν υπάρχει ίδιο μεμονωμένο εργαλείο.': 'No such loose instrument.',
+  'Θα αφαιρεθεί από το Σετ {0}, το οποίο θα μείνει με έλλειψη.':
+    'It will be taken out of Set {0}, which will then be short.',
   'Αντικατάσταση από Απόθεμα ({0})': 'Replace from Stock ({0})',
   Αντικαταστάθηκε: 'Replaced',
   'Αντικαταστάθηκε από {0}': 'Replaced by {0}',
