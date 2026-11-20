@@ -2519,4 +2519,13 @@ export const en: Record<string, string> = {
   Προτεραιότητα: 'Priority',
   'Με σημείωση τμήματος': "With the department's note",
   'Περιμένουν πάνω από {0} ώρες': 'Waiting over {0} hours',
+  'Δελτίο παραλαβής': 'Receipt slip',
+  'Δελτίο παράδοσης': 'Delivery slip',
+  '{0} → Κεντρική Αποστείρωση': '{0} → Central Sterilization',
+  'Το άλλο μέρος επιβεβαίωσε την παράδοση με τον δικό του κωδικό.':
+    'The other party confirmed the handover with their own password.',
+  'Η παράδοση δεν επιβεβαιώθηκε με κωδικό του άλλου μέρους.':
+    "The handover was not confirmed with the other party's password.",
+  Δελτίο: 'Slip',
+  'Κεντρική Αποστείρωση → {0}': 'Central Sterilization → {0}',
 };

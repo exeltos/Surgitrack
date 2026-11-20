@@ -361,6 +361,9 @@ export function buildReport(
         deliveredBy: h.record.deliveredByName || '—',
         receivedBy: h.record.receivedByName || '—',
         signature: signatureText(h.verified),
+        // On screen only: the handover the row was part of, for its printed slip.
+        slipKind: h.type === 'Παραλαβή' ? 'RECEIPT' : 'DELIVERY',
+        slipKey: h.record.batchId || h.record.id,
       }));
     return {
       columns: [

@@ -4862,3 +4862,25 @@ html body .hospital-tabs > button .hospital-count.attention {
 html body .studio-tabs {
   background: transparent;
 }
+
+/* Reports › Handovers: the printed slip of a row's handover, a small printer beside its kind. */
+html body .report-slip-button {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 8px;
+  padding: 0;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 6px;
+  background: var(--c-white);
+  color: var(--c-cyan-35);
+  vertical-align: middle;
+}
+html body .report-slip-button:hover {
+  border-color: var(--c-cyan-45);
+}
+html body .report-slip-button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}

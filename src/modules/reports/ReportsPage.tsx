@@ -1,7 +1,7 @@
 import {Fragment, useEffect, useMemo, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useFitWidth} from '../../components/ui/useFitWidth';
-import {AlertTriangle, FileText} from 'lucide-react';
+import {AlertTriangle, FileText, Printer} from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
 import type {ExportTable} from '../../core/exportTable';
@@ -28,6 +28,7 @@ import {
   type Row,
 } from './reportsMeta';
 import {buildReport} from './buildReport';
+import {handoverKey, handoverSlipHtml, type HandoverKind} from '../sterilization/printHandover';
 import {parseDisplayDate} from '../../core/displayDate';
 
 /** The reports of things that happened on a day, and the column with that day: they can be cut to a period. */
@@ -196,6 +197,15 @@ export default function ReportsPage() {
     };
   };
   const openPreview = () => setPreview(buildPreview());
+  // A handover's printed slip: every record of the same handover (one batch, one signature).
+  const printSlip = (kind: HandoverKind, key: string) => {
+    const records = (kind === 'RECEIPT' ? receipts : deliveries).filter(r => handoverKey(r) === key);
+    if (records.length)
+      setPreview({
+        title: kind === 'RECEIPT' ? tr('Δελτίο παραλαβής') : tr('Δελτίο παράδοσης'),
+        html: handoverSlipHtml(kind, records),
+      });
+  };
   // Filters of the chosen report, in one "Filters" button; "ALL" is the empty choice.
   const choice = (value: string, set: (value: string) => void) => ({
     value: value === 'ALL' ? '' : value,
@@ -616,6 +626,17 @@ export default function ReportsPage() {
                                 ) : (
                                   cellText(c.key, row[c.key])
                                 )}
+                                {active === 'handovers' && c.key === 'type' && row.slipKey ? (
+                                  <button
+                                    type="button"
+                                    className="report-slip-button"
+                                    title={tr('Δελτίο')}
+                                    aria-label={`${tr('Δελτίο')} ${String(row.barcode)}`}
+                                    onClick={() => printSlip(row.slipKind as HandoverKind, String(row.slipKey))}
+                                  >
+                                    <Printer size={13} aria-hidden="true" />
+                                  </button>
+                                ) : null}
                                 {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
                                   <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
                                 ) : null}
