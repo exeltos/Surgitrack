@@ -1,21 +1,14 @@
 import {useState, type ReactNode} from 'react';
-import {CheckCircle2, Pencil, ShoppingCart, Trash2, Wrench} from 'lucide-react';
+import {CheckCircle2, ShoppingCart, Trash2, Wrench} from 'lucide-react';
 import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import {useHasModule} from '../../data/cloud/modulesContext';
-import {tr, trData} from '../../i18n';
+import {tr} from '../../i18n';
 import type {Issue, Tool} from '../../types/domain';
 import ReplaceToolModal from './ReplaceToolModal';
+import {askDeleteIssue, type Ask} from './issueDialogs';
 import ResolveIssueDialog from './ResolveIssueDialog';
 import {inActiveProcess} from '../../core/replacements';
-
-type Ask = (ask: {
-  title: string;
-  message: string;
-  confirmLabel?: string;
-  note?: {label: string; placeholder?: string; initial?: string; required?: boolean};
-  onConfirm: (note: string) => void;
-}) => void;
 
 /**
  * What can be done about an open report, right under it on the item's «Εκκρεμότητες»: checked and kept in use (it
@@ -83,74 +76,18 @@ export default function IssueActions({
 }
 
 /** Deletes a report (a duplicate, a mistake) with a required reason; it goes to the recycle bin. */
-export function DeleteIssueButton({
+function DeleteIssueButton({
   issue,
   ask,
   onDelete,
-  compact,
 }: {
   issue: Issue;
   ask: Ask;
   onDelete: (id: string, reason: string) => void;
-  /** An icon alone, as in the rows of a list. */
-  compact?: boolean;
-}) {
-  const open = () =>
-    ask({
-      title: tr('Διαγραφή αναφοράς;'),
-      message: tr(
-        'Η αναφορά «{0}» για {1} θα πάει στον Κάδο, απ’ όπου μπορεί να επανέλθει.',
-        trData(issue.type),
-        issue.asset,
-      ),
-      confirmLabel: tr('Διαγραφή'),
-      note: {label: tr('Αιτία διαγραφής'), placeholder: tr('π.χ. Διπλή αναφορά'), required: true},
-      onConfirm: reason => onDelete(issue.id, reason),
-    });
-  return compact ? (
-    <button
-      type="button"
-      className="issue-action slot-delete"
-      title={tr('Διαγραφή αναφοράς')}
-      aria-label={tr('Διαγραφή αναφοράς')}
-      onClick={open}
-    >
-      <Trash2 size={14} />
-    </button>
-  ) : (
-    <AppButton size="sm" icon={<Trash2 size={14} />} onClick={open}>
-      {tr('Διαγραφή')}
-    </AppButton>
-  );
-}
-
-/** Corrects the text of a report (a typo in it or in how it was closed): the hospital admin only. */
-export function EditIssueNoteButton({
-  issue,
-  ask,
-  onEdit,
-}: {
-  issue: Issue;
-  ask: Ask;
-  onEdit: (id: string, note: string) => void;
 }) {
   return (
-    <button
-      type="button"
-      className="issue-action slot-edit"
-      title={tr('Διόρθωση σημείωσης')}
-      aria-label={tr('Διόρθωση σημείωσης')}
-      onClick={() =>
-        ask({
-          title: tr('Διόρθωση σημείωσης'),
-          message: tr('«{0}» για {1}. Η διόρθωση καταγράφεται με το όνομά σας.', trData(issue.type), issue.asset),
-          confirmLabel: tr('Αποθήκευση'),
-          note: {label: tr('Σημείωση'), initial: issue.note, required: true},
-          onConfirm: note => onEdit(issue.id, note),
-        })
-      }
-    >
-      <Pencil size={14} />
-    </button>
+    <AppButton size="sm" icon={<Trash2 size={14} />} onClick={() => askDeleteIssue(issue, ask, onDelete)}>
+      {tr('Διαγραφή')}
+    </AppButton>
   );
 }

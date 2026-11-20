@@ -1,5 +1,16 @@
-import {CheckCircle2, ClipboardList, ExternalLink, Images, PackageX, ShoppingCart, Truck} from 'lucide-react';
-import {Link, useSearchParams} from 'react-router-dom';
+import {
+  CheckCircle2,
+  ClipboardList,
+  ExternalLink,
+  Images,
+  MoreHorizontal,
+  PackageX,
+  Pencil,
+  ShoppingCart,
+  Trash2,
+  Truck,
+} from 'lucide-react';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {lazy, Suspense, useMemo, useState} from 'react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
@@ -44,7 +55,8 @@ const issueAge = (created: string) => {
 
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
 import EquipmentProblems from './EquipmentProblems';
-import {DeleteIssueButton, EditIssueNoteButton} from '../../components/assets/IssueActions';
+import {askDeleteIssue, askEditIssueNote} from '../../components/assets/issueDialogs';
+import ActionMenu from '../../components/ui/ActionMenu';
 import ResolveIssueDialog from '../../components/assets/ResolveIssueDialog';
 
 export default function IssuesPage() {
@@ -68,6 +80,7 @@ export default function IssuesPage() {
   const [figureOpened, setFigureOpened] = useState(0);
   const [confirm, ask] = useConfirm();
   const [resolving, setResolving] = useState<Issue | null>(null);
+  const navigate = useNavigate();
   // Sterilization and admins also see the instruments to replace, as a second tab (in a hospital the platform
   // owner gave the Replacements & Orders module).
   const hasReplacements = useHasModule('REPLACEMENTS');
@@ -372,29 +385,55 @@ export default function IssuesPage() {
                                     {tr('Επίλυση')}
                                   </button>
                                 )}
-                                {withReplacements && subject(i).tool && (
-                                  <button
-                                    type="button"
-                                    className="issue-action slot-order"
-                                    title={tr('Παραγγελία αγοράς')}
-                                    aria-label={tr('Παραγγελία')}
-                                    onClick={() => setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))])}
-                                  >
-                                    <ShoppingCart size={14} />
-                                  </button>
-                                )}
-                                {subject(i).to && (
-                                  <Link
-                                    className="issue-action slot-open"
-                                    to={subject(i).to!}
-                                    title={tr('Άνοιγμα καρτέλας')}
-                                    aria-label={tr('Άνοιγμα καρτέλας')}
-                                  >
-                                    <ExternalLink size={14} />
-                                  </Link>
-                                )}
-                                {canDelete && <EditIssueNoteButton issue={i} ask={ask} onEdit={editIssueNote} />}
-                                {canDelete && <DeleteIssueButton issue={i} ask={ask} onDelete={deleteIssue} compact />}
+                                {/* The other actions of the row in one ⋯ menu, so the row keeps one button in view. */}
+                                <span className="slot-more">
+                                  <ActionMenu
+                                    compact
+                                    align="right"
+                                    icon={<MoreHorizontal size={16} />}
+                                    label={tr('Περισσότερα')}
+                                    items={[
+                                      ...(subject(i).to
+                                        ? [
+                                            {
+                                              key: 'open',
+                                              icon: <ExternalLink size={15} />,
+                                              label: tr('Άνοιγμα καρτέλας'),
+                                              onSelect: () => navigate(subject(i).to!),
+                                            },
+                                          ]
+                                        : []),
+                                      ...(withReplacements && subject(i).tool
+                                        ? [
+                                            {
+                                              key: 'order',
+                                              icon: <ShoppingCart size={15} />,
+                                              label: tr('Παραγγελία αγοράς'),
+                                              onSelect: () =>
+                                                setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))]),
+                                            },
+                                          ]
+                                        : []),
+                                      ...(canDelete
+                                        ? [
+                                            {
+                                              key: 'edit',
+                                              icon: <Pencil size={15} />,
+                                              label: tr('Διόρθωση σημείωσης'),
+                                              onSelect: () => askEditIssueNote(i, ask, editIssueNote),
+                                            },
+                                            {
+                                              key: 'delete',
+                                              icon: <Trash2 size={15} />,
+                                              label: tr('Διαγραφή αναφοράς'),
+                                              danger: true,
+                                              onSelect: () => askDeleteIssue(i, ask, deleteIssue),
+                                            },
+                                          ]
+                                        : []),
+                                    ]}
+                                  />
+                                </span>
                               </div>
                             </td>
                           )}

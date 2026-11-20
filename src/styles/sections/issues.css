@@ -67,10 +67,10 @@ html body .issues-fixed .issue-note-inline {
   }
 }
 @media (min-width: 701px) {
-  /* Row actions in fixed slots, so they line up down the list: «Επίλυση», the order cart, open. */
+  /* Row actions in two fixed slots, so they line up down the list: «Επίλυση», then ⋯ with the rest. */
   html body .issues-fixed .issue-actions-row {
     display: grid;
-    grid-template-columns: auto 32px 32px 32px 32px;
+    grid-template-columns: auto 32px;
     justify-content: end;
     align-items: center;
     gap: 6px;
@@ -79,22 +79,19 @@ html body .issues-fixed .issue-note-inline {
     grid-column: 1;
     grid-row: 1;
   }
-  html body .issues-fixed .issue-actions-row > .slot-order {
+  html body .issues-fixed .issue-actions-row > .slot-more {
     grid-column: 2;
     grid-row: 1;
   }
-  html body .issues-fixed .issue-actions-row > .slot-open {
-    grid-column: 3;
-    grid-row: 1;
-  }
-  html body .issues-fixed .issue-actions-row > .slot-edit {
-    grid-column: 4;
-    grid-row: 1;
-  }
-  html body .issues-fixed .issue-actions-row > .slot-delete {
-    grid-column: 5;
-    grid-row: 1;
-  }
+}
+/* The ⋯ of a row: the size of the other small row buttons. */
+html body .issue-actions-row .action-menu-toggle.compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
 }
 /* Small figures above a list that filter it (QuickFilters): one slim row of equal tiles, label and count on one
    line, the active one a light frosted glass. */
