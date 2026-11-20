@@ -265,7 +265,13 @@ export default function DepartmentPage() {
                       )}
                     </div>
                     {/* The expiry in its own column (the date of sterilization on hover), so the lists line up. */}
-                    <div className="department-asset-expiry">
+                    <div
+                      className={`department-asset-expiry${
+                        asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state)
+                          ? ''
+                          : ' no-expiry'
+                      }`}
+                    >
                       {asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state)
                         ? (() => {
                             const status = expiryStatus(asset.sterileUntil, asset.shelfLifeMonths);
