@@ -28,7 +28,7 @@ import {tr, trData} from '../../i18n';
 import {useRememberedState} from '../../core/listMemory';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {effectiveToolMarker} from '../../core/colorTapes';
-import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
+import {STERILE_STATES, expiryStatus, formatExpiry, expiryFilterOptions, matchesExpiry} from '../../core/sterileExpiry';
 import type {Tool} from '../../types/domain';
 
 export default function StandaloneToolsPage() {
@@ -44,6 +44,7 @@ export default function StandaloneToolsPage() {
   const [state, setState] = useRememberedState('state', '');
   const [limit, setLimit] = useRememberedState('limit', '');
   const [usage, setUsage] = useRememberedState('usage', '');
+  const [expiry, setExpiry] = useRememberedState('expiry', '');
   const {systemSettings} = useLibraries();
   const values = (key: 'department' | 'specialty' | 'manufacturer' | 'state') =>
     [...new Set(standalone.map(t => String(t[key] || '')).filter(Boolean))].sort();
@@ -55,6 +56,7 @@ export default function StandaloneToolsPage() {
     state: [state, setState],
     limit: [limit, setLimit],
     usage: [usage, setUsage],
+    expiry: [expiry, setExpiry],
   });
   // The usage filters judge the instrument as it is, or as it was on the day chosen for a download.
   const matchesList = (t: Tool, view: Tool = t) =>
@@ -64,6 +66,7 @@ export default function StandaloneToolsPage() {
     matchesUsage(limit, [view], systemSettings.usageWarningThreshold) &&
     matchesUsage(usage, [view], systemSettings.usageWarningThreshold) &&
     (!state || t.state === state) &&
+    matchesExpiry(expiry, t) &&
     `${t.name} ${t.code} ${t.barcode} ${t.department || ''} ${t.manufacturer} ${t.specialty}`
       .toLowerCase()
       .includes(q.toLowerCase());
@@ -82,7 +85,7 @@ export default function StandaloneToolsPage() {
         .toLowerCase()
         .includes(q.toLowerCase()),
   );
-  const filterKey = [q, department, specialty, manufacturer, state, limit, usage, grouped].join('|');
+  const filterKey = [q, department, specialty, manufacturer, state, limit, usage, expiry, grouped].join('|');
   const groupKey = (t: Tool) => toolKind(t);
   const order = useTableSort(filtered, {
     name: t => t.name,
@@ -267,6 +270,13 @@ export default function StandaloneToolsPage() {
             placeholder: tr('Όλοι οι τύποι χρήσης'),
             options: usageFilterOptions(),
             onChange: setUsage,
+          },
+          {
+            key: 'expiry',
+            value: expiry,
+            placeholder: tr('Κάθε λήξη'),
+            options: expiryFilterOptions(tr),
+            onChange: setExpiry,
           },
         ]}
         extra={

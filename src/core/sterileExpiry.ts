@@ -116,3 +116,18 @@ export function sterileExpiryList(
 
 /** The ones that need attention: expired or in their warning window. */
 export const expiryAlerts = (list: readonly ExpiryEntry[]) => list.filter(item => item.state !== 'OK');
+
+/** The expiry filter of a list («Λήγουν σύντομα», «Έληξαν»): its value and whether a Set or instrument matches it. */
+export const expiryFilterOptions = (label: (text: string) => string) => [
+  {value: 'EXPIRING', label: label('Λήγουν σύντομα')},
+  {value: 'EXPIRED', label: label('Έληξαν')},
+];
+export const matchesExpiry = (
+  filter: string,
+  asset: {state: string; sterileUntil?: string; shelfLifeMonths?: number},
+  today: Date = new Date(),
+) => {
+  if (!filter) return true;
+  if (!asset.sterileUntil || !(STERILE_STATES as readonly string[]).includes(asset.state)) return false;
+  return expiryStatus(asset.sterileUntil, asset.shelfLifeMonths, today).state === filter;
+};

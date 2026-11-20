@@ -114,7 +114,7 @@ export function buildReport(
         asset: i.asset,
         type: i.type,
         department: i.department,
-        status: i.status === 'OPEN' ? 'Ανοιχτή' : 'Ολοκληρωμένη',
+        status: i.status === 'OPEN' ? 'Ανοικτή' : 'Επιλυμένη',
         created: i.created,
         reportedBy: i.reportedBy || '—',
         note: i.note,

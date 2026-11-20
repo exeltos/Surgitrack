@@ -2,13 +2,20 @@ import {useMemo} from 'react';
 import {tr} from '../../../i18n';
 import {effectiveState} from '../../../core/workflow';
 import {matchesUsage} from '../../../core/usageFilter';
+import {latestDispatches} from '../../../core/electronicDispatch';
+import {movementStamp} from '../../../core/movementTime';
+
+/** «Περιμένουν πολύ»: in the same stage for longer than this. */
+export const LONG_WAIT_HOURS = 4;
 import type {AssetState} from '../../../types/domain';
 import type {Kind, SterilizationRow, AssetDraft} from '../sterilizationTypes';
 import type {useSterilizationState} from './useSterilizationState';
 
 export function useSterilizationQueues(p: ReturnType<typeof useSterilizationState>) {
   const {
+    attentionFilter,
     departmentFilter,
+    movements,
     kindFilter,
     processLoads,
     query,
@@ -78,11 +85,33 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
     }
     return bySet;
   }, [tools, usageFilter]);
+  // The attention filter reads the history once: each item's dispatch note and its last movement (when it got here).
+  const attention = useMemo(() => {
+    if (!attentionFilter) return undefined;
+    const lastAt = new Map<string, number>();
+    for (const m of movements) {
+      const barcode = m.asset.split(' · ')[0];
+      const at = movementStamp(m.at) || 0;
+      if (at > (lastAt.get(barcode) || 0)) lastAt.set(barcode, at);
+    }
+    return {notes: latestDispatches(movements), lastAt};
+  }, [attentionFilter, movements]);
+  const needsAttention = (x: SterilizationRow) => {
+    if (!attention) return true;
+    if (attentionFilter === 'NOTE') return !!attention.notes.get(x.barcode)?.note;
+    if (attentionFilter === 'SHORT') return x.kind === 'SET' && 'expected' in x && x.actual < x.expected;
+    if (attentionFilter === 'WAITING') {
+      const at = attention.lastAt.get(x.barcode);
+      return !!at && Date.now() - at > LONG_WAIT_HOURS * 3600_000;
+    }
+    return true;
+  };
   const rows = source.filter(
     x =>
       (!departmentFilter || x.department === departmentFilter) &&
       (!specialtyFilter || x.specialty === specialtyFilter) &&
       (!kindFilter || x.kind === kindFilter) &&
+      needsAttention(x) &&
       // A Set by its own limit and its instruments' (as in the Sets list), an instrument by its own.
       (!usageFilter ||
         matchesUsage(

@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {useFloatingPanel} from '../ui/useFloatingPanel';
 import {SlidersHorizontal} from 'lucide-react';
 import {useAppPreferences} from '../../core/AppPreferences';
-import {trData} from '../../i18n';
+import {tr, trData} from '../../i18n';
 
 type Option = {value: string; label: string};
 export type SelectFilter = {
@@ -13,7 +13,32 @@ export type SelectFilter = {
   onChange: (value: string) => void;
   /** A date filter shows a date field labelled with the placeholder instead of a list. */
   type?: 'select' | 'date';
+  /** The list's title over it («Τμήμα»); the usual filters have theirs by key. */
+  label?: string;
 };
+
+/** The title over each usual list, so a choice made («Γενική Χειρουργική») still says which filter it is. */
+const TITLE_OF: Record<string, string> = {
+  department: 'Τμήμα',
+  specialty: 'Ειδικότητα',
+  manufacturer: 'Εταιρεία',
+  state: 'Κατάσταση',
+  status: 'Κατάσταση',
+  limit: 'Όριο χρήσεων',
+  usage: 'Τύπος χρήσης',
+  kind: 'Σετ / εργαλεία',
+  completeness: 'Πληρότητα',
+  expiry: 'Λήξη',
+  attention: 'Προτεραιότητα',
+  from: 'Από',
+  to: 'Προς',
+  reason: 'Αιτία',
+  stock: 'Απόθεμα',
+  type: 'Τύπος',
+  group: 'Ομαδοποίηση',
+  signature: 'Υπογραφή',
+};
+const titleOf = (filter: SelectFilter) => filter.label ?? (TITLE_OF[filter.key] ? tr(TITLE_OF[filter.key]) : '');
 
 /** One "Filters" button that opens every filter choice, with a count of the active ones. */
 export default function FilterMenu({filters, align = 'right'}: {filters: SelectFilter[]; align?: 'left' | 'right'}) {
@@ -52,20 +77,22 @@ export default function FilterMenu({filters, align = 'right'}: {filters: SelectF
                 <input type="date" value={filter.value} onChange={e => filter.onChange(e.target.value)} />
               </label>
             ) : (
-              <select
-                key={filter.key}
-                value={filter.value}
-                onChange={e => filter.onChange(e.target.value)}
-                aria-label={filter.placeholder}
-                className={filter.value ? 'selected' : ''}
-              >
-                <option value="">{filter.placeholder}</option>
-                {filter.options.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {trData(option.label)}
-                  </option>
-                ))}
-              </select>
+              <label key={filter.key} className="asset-filter-field">
+                {titleOf(filter) && <span>{titleOf(filter)}</span>}
+                <select
+                  value={filter.value}
+                  onChange={e => filter.onChange(e.target.value)}
+                  aria-label={filter.placeholder}
+                  className={filter.value ? 'selected' : ''}
+                >
+                  <option value="">{filter.placeholder}</option>
+                  {filter.options.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {trData(option.label)}
+                    </option>
+                  ))}
+                </select>
+              </label>
             ),
           )}
           <footer>

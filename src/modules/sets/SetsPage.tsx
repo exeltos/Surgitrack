@@ -1,5 +1,5 @@
 import {useBrowseList} from '../../core/browseList';
-import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
+import {STERILE_STATES, expiryStatus, formatExpiry, expiryFilterOptions, matchesExpiry} from '../../core/sterileExpiry';
 import {ListEmpty} from '../../components/ui/EmptyState';
 import {useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
@@ -35,6 +35,7 @@ export default function SetsPage() {
   const [state, setState] = useRememberedState('state', '');
   const [limit, setLimit] = useRememberedState('limit', '');
   const [usage, setUsage] = useRememberedState('usage', '');
+  const [expiry, setExpiry] = useRememberedState('expiry', '');
   const [completeness, setCompleteness] = useRememberedState('completeness', '');
   // Limited-use and counted-use instruments per Set, for the usage filters.
   const limitedBySet = useMemo(() => {
@@ -58,6 +59,7 @@ export default function SetsPage() {
     state: [state, setState],
     limit: [limit, setLimit],
     usage: [usage, setUsage],
+    expiry: [expiry, setExpiry],
     completeness: [completeness, setCompleteness],
   });
   const filtered = sets.filter(
@@ -68,6 +70,7 @@ export default function SetsPage() {
       matchesUsage(limit, [s, ...(limitedBySet.get(s.id) || [])], systemSettings.usageWarningThreshold) &&
       matchesUsage(usage, [s, ...(limitedBySet.get(s.id) || [])], systemSettings.usageWarningThreshold) &&
       (!state || s.state === state) &&
+      matchesExpiry(expiry, s) &&
       (!completeness || (completeness === 'SHORT' ? s.actual < s.expected : s.actual >= s.expected)) &&
       `${s.barcode} ${s.name} ${s.code} ${s.manufacturer || ''} ${s.specialty} ${s.department} ${s.ownerName || ''}`
         .toLowerCase()
@@ -92,9 +95,19 @@ export default function SetsPage() {
   useBrowseList('/sets', order.rows);
   const rows = useProgressiveList(
     order.rows,
-    [q, department, specialty, manufacturer, state, limit, usage, completeness, order.sort?.key, order.sort?.dir].join(
-      '|',
-    ),
+    [
+      q,
+      department,
+      specialty,
+      manufacturer,
+      state,
+      limit,
+      usage,
+      completeness,
+      expiry,
+      order.sort?.key,
+      order.sort?.dir,
+    ].join('|'),
   );
   return (
     <div className="tools-list-workspace">
@@ -184,6 +197,13 @@ export default function SetsPage() {
             placeholder: tr('Όλοι οι τύποι χρήσης'),
             options: usageFilterOptions(),
             onChange: setUsage,
+          },
+          {
+            key: 'expiry',
+            value: expiry,
+            placeholder: tr('Κάθε λήξη'),
+            options: expiryFilterOptions(tr),
+            onChange: setExpiry,
           },
           {
             key: 'completeness',

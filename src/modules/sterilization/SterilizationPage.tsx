@@ -4,6 +4,7 @@ import CameraCaptureModal from '../../components/assets/CameraCaptureModal';
 import {tr} from '../../i18n';
 import {limitFilterOptions, usageFilterOptions} from '../../core/usageFilter';
 import {useSterilizationPage} from './useSterilizationPage';
+import {LONG_WAIT_HOURS} from './hooks/useSterilizationQueues';
 import QueueTabs from './parts/QueueTabs';
 import WorkPanel from './parts/WorkPanel';
 import LoadModal from './parts/LoadModal';
@@ -26,6 +27,8 @@ export default function SterilizationPage() {
   const s = useSterilizationPage();
   const {
     addIssuePhotos,
+    attentionFilter,
+    setAttentionFilter,
     colorQuestion,
     departmentFilter,
     issueCameraOpen,
@@ -97,6 +100,17 @@ export default function SterilizationPage() {
         <div className="ster-scan-filters">
           <FilterMenu
             filters={[
+              {
+                key: 'attention',
+                value: attentionFilter,
+                placeholder: tr('Όλα'),
+                options: [
+                  {value: 'NOTE', label: tr('Με σημείωση τμήματος')},
+                  {value: 'SHORT', label: tr('Σετ με έλλειψη')},
+                  {value: 'WAITING', label: tr('Περιμένουν πάνω από {0} ώρες', LONG_WAIT_HOURS)},
+                ],
+                onChange: setAttentionFilter,
+              },
               {
                 key: 'department',
                 value: departmentFilter,

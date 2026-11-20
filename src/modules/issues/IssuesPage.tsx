@@ -224,6 +224,7 @@ export default function IssuesPage() {
               {tabs}
               <QuickFilters
                 items={[
+                  {key: 'all', label: tr('Όλες'), count: counted.length, ...card('')},
                   {
                     key: 'open',
                     label: tr('Ανοικτές'),
@@ -244,7 +245,6 @@ export default function IssuesPage() {
                     count: counted.filter(i => i.status === 'RESOLVED').length,
                     ...card('RESOLVED'),
                   },
-                  {key: 'all', label: tr('Όλες'), count: counted.length, ...card('')},
                 ]}
               />
               <AssetFilterBar

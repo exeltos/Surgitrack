@@ -4764,3 +4764,22 @@ html body .replacements-fixed .replacement-stock {
     white-space: nowrap;
   }
 }
+
+/* The Filters panel: a small grey title over each list, and the choices in the regular weight. */
+html body .asset-filter-panel .asset-filter-field {
+  display: grid;
+  gap: 3px;
+}
+html body .asset-filter-panel .asset-filter-field > span,
+html body .asset-filter-panel .asset-filter-date > span {
+  color: var(--c-gray-45);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+html body .asset-filter-panel select {
+  height: 34px;
+  font-weight: 400;
+}
+html body .asset-filter-panel select.selected {
+  font-weight: 600;
+}
