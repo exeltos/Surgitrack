@@ -1,6 +1,7 @@
 import {useMemo, useState} from 'react';
 import {Clock, Flame, ShieldCheck, Users} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
+import PageHeader from '../../components/ui/PageHeader';
 import {useAppPreferences} from '../../core/AppPreferences';
 import {sterileExpiryList} from '../../core/sterileExpiry';
 import {movementStamp} from '../../core/movementTime';
@@ -110,7 +111,7 @@ export default function IndicatorsPage() {
 
   return (
     <div className="indicators">
-      <h1 className="visually-hidden">{L('Δείκτες', 'Indicators')}</h1>
+      <PageHeader eyebrow={L('Ανάλυση', 'Analysis')} title={L('Δείκτες', 'Indicators')} />
       <div className="ind-head">
         <div className="name-check-tabs trace-tabs" role="tablist" aria-label={L('Δείκτες', 'Indicators')}>
           {tabs.map(t => (

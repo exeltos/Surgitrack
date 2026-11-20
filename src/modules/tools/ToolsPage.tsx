@@ -2,7 +2,7 @@ import {ListEmpty} from '../../components/ui/EmptyState';
 import {useBrowseList} from '../../core/browseList';
 import {useDeferredValue, useMemo} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2} from 'lucide-react';
+import {Plus, ChevronRight, FileSpreadsheet, SpellCheck2, MoreHorizontal} from 'lucide-react';
 import {limitFilterOptions, matchesUsage, usageFilterOptions} from '../../core/usageFilter';
 import type {Tool} from '../../types/domain';
 import {usesOnDay, type UsesOnDay} from '../../core/usageHistory';
@@ -20,6 +20,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import StatusBadge from '../../components/ui/StatusBadge';
 import AssetTypeIcon from '../../components/assets/AssetTypeIcon';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
+import ActionMenu from '../../components/ui/ActionMenu';
 import AppButton from '../../components/ui/AppButton';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import PageHeader from '../../components/ui/PageHeader';
@@ -115,16 +116,34 @@ export default function ToolsPage() {
         actions={
           can('asset.create') ? (
             <div className="page-head-actions">
-              {can('asset.edit') && (
-                <AppButton icon={<SpellCheck2 size={17} />} onClick={() => navigate('/tools/names')}>
-                  {tr('Έλεγχος ονομασιών')}
-                </AppButton>
-              )}
-              {organizationId && (
-                <AppButton icon={<FileSpreadsheet size={17} />} onClick={() => navigate('/import')}>
-                  {tr('Μαζική εισαγωγή')}
-                </AppButton>
-              )}
+              {/* The occasional tools in one menu: the new instrument is the page's one button. */}
+              <ActionMenu
+                icon={<MoreHorizontal size={17} />}
+                label={tr('Ενέργειες')}
+                align="right"
+                items={[
+                  ...(can('asset.edit')
+                    ? [
+                        {
+                          key: 'names',
+                          icon: <SpellCheck2 size={15} />,
+                          label: tr('Έλεγχος ονομασιών'),
+                          onSelect: () => navigate('/tools/names'),
+                        },
+                      ]
+                    : []),
+                  ...(organizationId
+                    ? [
+                        {
+                          key: 'import',
+                          icon: <FileSpreadsheet size={15} />,
+                          label: tr('Μαζική εισαγωγή'),
+                          onSelect: () => navigate('/import'),
+                        },
+                      ]
+                    : []),
+                ]}
+              />
               <AppButton variant="primary" icon={<Plus size={17} />} onClick={() => navigate('/tools/new')}>
                 {tr('Νέο Εργαλείο')}
               </AppButton>

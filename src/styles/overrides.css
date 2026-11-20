@@ -4560,13 +4560,31 @@ html body .network-log td {
 
 /* Every row of tabs the same way: words only, the others grey and plain, the chosen one near-black and a little
    bolder, with a thin rounded bar under its words that turns up at its ends; a thin line under the whole row. */
-html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories) {
+html
+  body
+  :is(
+    .name-check-tabs,
+    .asset-detail-tabs,
+    .hospital-tabs,
+    .department-category-tabs,
+    .reports-categories,
+    .studio-tabs,
+    .settings-categories
+  ) {
   gap: 8px;
   border-bottom: 1px solid var(--c-gray-90);
 }
 html
   body
-  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  :is(
+    .name-check-tabs,
+    .asset-detail-tabs,
+    .hospital-tabs,
+    .department-category-tabs,
+    .reports-categories,
+    .studio-tabs,
+    .settings-categories
+  )
   > :is(button, a) {
   position: relative;
   padding-right: 18px;
@@ -4580,14 +4598,30 @@ html
 }
 html
   body
-  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  :is(
+    .name-check-tabs,
+    .asset-detail-tabs,
+    .hospital-tabs,
+    .department-category-tabs,
+    .reports-categories,
+    .studio-tabs,
+    .settings-categories
+  )
   > :is(button, a)
   > svg {
   display: none;
 }
 html
   body
-  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  :is(
+    .name-check-tabs,
+    .asset-detail-tabs,
+    .hospital-tabs,
+    .department-category-tabs,
+    .reports-categories,
+    .studio-tabs,
+    .settings-categories
+  )
   > :is(button, a)
   > b {
   padding: 0;
@@ -4598,14 +4632,30 @@ html
 }
 html
   body
-  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  :is(
+    .name-check-tabs,
+    .asset-detail-tabs,
+    .hospital-tabs,
+    .department-category-tabs,
+    .reports-categories,
+    .studio-tabs,
+    .settings-categories
+  )
   > :is(button, a):hover {
   color: var(--c-cyan-20-3);
   background: transparent;
 }
 html
   body
-  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  :is(
+    .name-check-tabs,
+    .asset-detail-tabs,
+    .hospital-tabs,
+    .department-category-tabs,
+    .reports-categories,
+    .studio-tabs,
+    .settings-categories
+  )
   > :is(button.active, a.active, [aria-selected='true']) {
   color: var(--c-cyan-20-3);
   font-weight: 600;
@@ -4613,7 +4663,15 @@ html
 }
 html
   body
-  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  :is(
+    .name-check-tabs,
+    .asset-detail-tabs,
+    .hospital-tabs,
+    .department-category-tabs,
+    .reports-categories,
+    .studio-tabs,
+    .settings-categories
+  )
   > :is(button.active, a.active, [aria-selected='true'])::after {
   content: '';
   position: absolute;
@@ -4782,4 +4840,25 @@ html body .asset-filter-panel select {
 }
 html body .asset-filter-panel select.selected {
   font-weight: 600;
+}
+
+/* Organization: the counts beside a tab's name as on every other tab, a plain grey figure (a request waiting in amber). */
+html body .hospital-tabs > button .hospital-count {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+html body .hospital-tabs > button .hospital-count.attention {
+  color: var(--c-orange-40);
+  font-weight: 600;
+  opacity: 1;
+}
+/* Settings: its tabs on the page's line, not on a grey strip. */
+html body .studio-tabs {
+  background: transparent;
 }
