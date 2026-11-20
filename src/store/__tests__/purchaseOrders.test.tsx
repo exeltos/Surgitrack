@@ -92,4 +92,17 @@ describe('purchase orders', () => {
     expect(new Set(all).size).toBe(all.length);
     expect(result.current.tools.filter(t => t.state === 'IN_STOCK').length).toBe(stockBefore + 5);
   });
+
+  it('an instrument replaced from another Set and sent to Service counts as replaced', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const [out, donor] = (() => {
+      const members = result.current.tools.filter(t => t.mode === 'SET_MEMBER' && t.setId);
+      const a = members[0];
+      return [a, members.find(t => t.setId !== a.setId)!];
+    })();
+    act(() => result.current.replaceToolInSet(out.setId!, out.id, donor.id, 'SERVICE'));
+    const after = result.current.tools.find(t => t.id === out.id)!;
+    expect(after.state).toBe('SERVICE');
+    expect(after.replacedBy).toBe(donor.barcode);
+  });
 });

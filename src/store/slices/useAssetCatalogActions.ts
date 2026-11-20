@@ -232,8 +232,16 @@ export function useAssetCatalogActions(
         if (tool.id !== outgoing.id) return tool;
         if (outgoingDestination === 'STOCK')
           return {...tool, mode: 'STOCK', setId: undefined, department: undefined, state: 'IN_STOCK'};
+        // Its place is filled: the replacements list counts it as replaced, whichever instrument took it.
         if (outgoingDestination === 'SERVICE')
-          return {...tool, mode: 'STANDALONE', setId: undefined, department: 'Service', state: 'SERVICE'};
+          return {
+            ...tool,
+            mode: 'STANDALONE',
+            setId: undefined,
+            department: 'Service',
+            state: 'SERVICE',
+            replacedBy: replacement.barcode,
+          };
         return {
           ...tool,
           mode: 'SET_MEMBER',
