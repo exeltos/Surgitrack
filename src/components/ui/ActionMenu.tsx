@@ -22,6 +22,7 @@ export default function ActionMenu({
   variant = 'secondary',
   disabled,
   title,
+  compact,
 }: {
   icon: ReactNode;
   label: string;
@@ -31,6 +32,8 @@ export default function ActionMenu({
   disabled?: boolean;
   /** The button's tooltip (e.g. why it is disabled). */
   title?: string;
+  /** An icon alone (e.g. ⋯ on a row of a list), its label read out and shown on hover. */
+  compact?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [place, setPlace] = useState<CSSProperties>();
@@ -91,16 +94,21 @@ export default function ActionMenu({
     <div className="action-menu" ref={wrap}>
       <button
         type="button"
-        className={`app-button app-button-${variant} app-button-md action-menu-toggle ${open ? 'open' : ''}`}
+        className={
+          compact
+            ? `issue-action action-menu-toggle compact ${open ? 'open' : ''}`
+            : `app-button app-button-${variant} app-button-md action-menu-toggle ${open ? 'open' : ''}`
+        }
         disabled={disabled}
-        title={title}
+        title={title ?? (compact ? label : undefined)}
+        aria-label={compact ? label : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}
       >
         {icon}
-        <span>{label}</span>
-        <ChevronDown size={15} className="action-menu-caret" />
+        {!compact && <span>{label}</span>}
+        {!compact && <ChevronDown size={15} className="action-menu-caret" />}
       </button>
       {open && (
         <div

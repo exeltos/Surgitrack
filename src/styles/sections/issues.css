@@ -48,11 +48,29 @@ html body .issues-fixed .issue-note-inline {
     width: 104px;
   }
 }
+/* Beside the column of problems by reason, the list has less room than the window up to a wide screen: the note
+   goes under the item there too, instead of a column a few letters wide. */
+@media (min-width: 1281px) and (max-width: 1699px) {
+  html body .issues-layout:not(.solo) .issues-fixed th:nth-child(2),
+  html body .issues-layout:not(.solo) .issues-fixed td.issue-note {
+    display: none;
+  }
+  html body .issues-layout:not(.solo) .issues-fixed .issue-note-inline {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 2px;
+    color: var(--c-blue-35);
+    font-size: 12px;
+    font-style: italic;
+  }
+}
 @media (min-width: 701px) {
-  /* Row actions in fixed slots, so they line up down the list: «Επίλυση», the order cart, open. */
+  /* Row actions in two fixed slots, so they line up down the list: «Επίλυση», then ⋯ with the rest. */
   html body .issues-fixed .issue-actions-row {
     display: grid;
-    grid-template-columns: auto 32px 32px 32px;
+    grid-template-columns: auto 32px;
     justify-content: end;
     align-items: center;
     gap: 6px;
@@ -61,18 +79,19 @@ html body .issues-fixed .issue-note-inline {
     grid-column: 1;
     grid-row: 1;
   }
-  html body .issues-fixed .issue-actions-row > .slot-order {
+  html body .issues-fixed .issue-actions-row > .slot-more {
     grid-column: 2;
     grid-row: 1;
   }
-  html body .issues-fixed .issue-actions-row > .slot-open {
-    grid-column: 3;
-    grid-row: 1;
-  }
-  html body .issues-fixed .issue-actions-row > .slot-delete {
-    grid-column: 4;
-    grid-row: 1;
-  }
+}
+/* The ⋯ of a row: the size of the other small row buttons. */
+html body .issue-actions-row .action-menu-toggle.compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
 }
 /* Small figures above a list that filter it (QuickFilters): one slim row of equal tiles, label and count on one
    line, the active one a light frosted glass. */
@@ -85,20 +104,22 @@ html body .issues-fixed .issue-note-inline {
   display: flex;
   flex: 1 1 0;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
   min-height: 40px;
-  padding: 6px 14px;
+  padding: 7px 14px 6px;
   border: 1px solid var(--c-gray-90);
+  border-bottom-width: 2px;
   border-radius: 10px;
   background: var(--c-white);
-  color: var(--c-blue-35);
+  color: var(--st-muted);
   font: inherit;
   font-size: 13px;
-  font-weight: 600;
   text-align: left;
   cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 .quick-filters button span {
   overflow: hidden;
@@ -106,14 +127,18 @@ html body .issues-fixed .issue-note-inline {
   white-space: nowrap;
 }
 .quick-filters button:hover {
-  border-color: var(--c-cyan-45);
+  border-color: var(--c-cyan-65);
 }
+/* The chosen figure: underlined like the tab it filters, on a light tint. */
 .quick-filters button.active {
-  border-color: rgba(21, 90, 110, 0.55);
-  background: rgba(21, 90, 110, 0.08);
+  border-color: var(--c-gray-90);
+  border-bottom-color: var(--c-cyan-35);
+  background: var(--c-gray-100-2);
   color: var(--c-cyan-20);
-  font-weight: 650;
-  box-shadow: inset 0 0 0 1px rgba(21, 90, 110, 0.35);
+  font-weight: 600;
+}
+.quick-filters button.zero b {
+  color: var(--c-gray-65);
 }
 /* On a phone the tiles keep their whole label and the row scrolls sideways, instead of four tiles cut to "Ό…". */
 @media (max-width: 700px) {
@@ -138,10 +163,14 @@ html body .issues-fixed .issue-note-inline {
   }
 }
 .quick-filters b {
+  /* The figure first on screen; read after its label. */
+  order: -1;
   flex: 0 0 auto;
   color: var(--c-blue-15-2);
-  font-size: 17px;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
   font-weight: 650;
+  line-height: 1;
 }
 .quick-filters b.warn {
   color: var(--c-orange-45-3);
@@ -191,4 +220,50 @@ html body .issue-age {
 }
 html body .issue-age.old {
   color: var(--c-orange-40);
+}
+
+/* Closing a report: the decision, kept in use or retired, as two choices with what each means. */
+.resolve-issue-outcomes {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0 20px 12px 68px;
+  border: 0;
+}
+.resolve-issue-outcomes legend {
+  float: left;
+  width: 100%;
+  margin-bottom: 6px;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.resolve-issue-outcomes b {
+  font-size: 13.5px;
+}
+.resolve-issue-outcomes small {
+  font-size: 12px;
+}
+.resolve-issue-outcomes label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.resolve-issue-outcomes label:has(input:checked) {
+  border-color: var(--c-cyan-35);
+  background: var(--c-gray-100-2);
+}
+.resolve-issue-outcomes label.disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.resolve-issue-outcomes span {
+  display: grid;
+  gap: 2px;
+}
+.resolve-issue-outcomes small {
+  color: var(--st-muted);
 }

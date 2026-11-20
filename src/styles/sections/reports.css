@@ -461,3 +461,120 @@ html body .reports-table tr.report-group-row th span {
   font-size: 12px;
   line-height: 1.5;
 }
+
+/* The reports of a group as a row of tabs under the group's tab (text, underlined when chosen), and the totals as
+   the same figures as above every other list: the figure, then what it counts, the chosen one underlined. */
+html body .reports-page-workspace .reports-stage-head {
+  align-items: flex-end;
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body .reports-page-workspace .reports-catalog-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+html body .reports-page-workspace .reports-catalog-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 0;
+  padding: 9px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--c-cyan-40-2);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+html body .reports-page-workspace .reports-catalog-item:hover {
+  background: transparent;
+  color: var(--c-cyan-35);
+}
+html body .reports-page-workspace .reports-catalog-item.active {
+  border-bottom-color: var(--c-cyan-35);
+  background: transparent;
+  color: var(--c-cyan-35);
+}
+html body .reports-page-workspace .reports-catalog-item small {
+  display: none;
+}
+html body .reports-page-workspace .reports-catalog-item strong {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+html body .reports-page-workspace .reports-catalog-icon,
+html body .reports-page-workspace .reports-catalog-item.active .reports-catalog-icon {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+html body .reports-page-workspace .reports-overview {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding-top: 12px;
+}
+html body .reports-page-workspace .reports-overview .reports-summary {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .reports-page-workspace .reports-summary li {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+}
+html body .reports-page-workspace .reports-summary button {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 7px 14px 6px;
+  border: 1px solid var(--c-gray-90);
+  border-bottom-width: 2px;
+  border-radius: 10px;
+  background: var(--c-white);
+  color: var(--st-muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+html body .reports-page-workspace .reports-summary button b {
+  color: var(--c-blue-15-2);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  line-height: 1;
+}
+html body .reports-page-workspace .reports-summary button.warn b {
+  color: var(--c-orange-45-3);
+}
+html body .reports-page-workspace .reports-summary button.bad b {
+  color: var(--c-red-40-2);
+}
+html body .reports-page-workspace .reports-summary button.active {
+  border-color: var(--c-gray-90);
+  border-bottom-color: var(--c-cyan-35);
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-20);
+  font-weight: 600;
+}
+html body .reports-page-workspace .reports-summary button:disabled {
+  opacity: 1;
+  cursor: default;
+}
+html body .reports-page-workspace .reports-summary button:disabled b {
+  color: var(--c-gray-65);
+}

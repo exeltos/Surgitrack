@@ -116,6 +116,7 @@ export function buildReport(
         department: i.department,
         status: i.status === 'OPEN' ? 'Ανοιχτή' : 'Ολοκληρωμένη',
         created: i.created,
+        reportedBy: i.reportedBy || '—',
         note: i.note,
       }));
     return {
@@ -125,6 +126,7 @@ export function buildReport(
         {key: 'department', label: tr('Τμήμα')},
         {key: 'status', label: tr('Κατάσταση')},
         {key: 'created', label: tr('Ημερομηνία')},
+        {key: 'reportedBy', label: tr('Δήλωσε')},
         {key: 'note', label: tr('Παρατήρηση')},
       ],
       rows: rows as Row[],

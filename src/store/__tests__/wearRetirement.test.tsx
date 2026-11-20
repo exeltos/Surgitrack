@@ -50,3 +50,61 @@ describe('a deleted report put back from the bin', () => {
     expect(result.current.issues.find(i => i.id === old.id)?.reportedBy).toBeUndefined();
   });
 });
+
+describe('correcting a report', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    localStorage.clear();
+  });
+
+  it('the hospital admin corrects its text, and the correction is signed', () => {
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const issue = result.current.issues[0];
+    act(() => result.current.editIssueNote(issue.id, 'Ελέγχθηκε και τέθηκε σε χρήση ξανά.'));
+    const after = result.current.issues.find(i => i.id === issue.id)!;
+    expect(after.note).toBe('Ελέγχθηκε και τέθηκε σε χρήση ξανά.');
+    expect(after.editedBy).toBeTruthy();
+  });
+
+  it('Sterilization staff cannot', () => {
+    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const issue = result.current.issues[0];
+    act(() => result.current.editIssueNote(issue.id, 'Άλλο'));
+    expect(result.current.issues.find(i => i.id === issue.id)!.note).toBe(issue.note);
+  });
+});
+
+describe('retiring during a process', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    localStorage.clear();
+    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
+  });
+
+  it('is refused while awaiting release, so a release cannot put it back into use', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const busy = result.current.tools.find(t =>
+      ['AWAITING_RELEASE', 'IN_STERILIZATION', 'IN_PACKAGING', 'IN_STORAGE'].includes(t.state),
+    )!;
+    act(() => result.current.retireForWear(busy.id, 'Δεν κόβει'));
+    expect(result.current.tools.find(t => t.id === busy.id)!.state).toBe(busy.state);
+  });
+});
+
+describe('editing an instrument', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    localStorage.clear();
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+  });
+
+  it('writes what changed, from what to what, in its history', () => {
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const tool = result.current.tools.find(t => t.state === 'IN_DEPARTMENT' || t.state === 'IN_STOCK')!;
+    act(() => result.current.updateTool(tool.id, {name: `${tool.name} ΔΙΟΡΘΩΣΗ`}));
+    const entry = result.current.movements.find(m => m.asset.startsWith(tool.barcode))!;
+    expect(entry.status).toContain(`Ονομασία: «${tool.name}» → «${tool.name} ΔΙΟΡΘΩΣΗ»`);
+  });
+});

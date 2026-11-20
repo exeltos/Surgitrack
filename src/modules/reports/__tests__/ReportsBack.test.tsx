@@ -22,8 +22,8 @@ describe('Αναφορές and the browser’s «Πίσω»', () => {
       </>,
       {path: '/reports'},
     );
-    fireEvent.click(screen.getByRole('button', {name: /Service & βλάβες/}));
-    expect(screen.getByRole('button', {name: /Service & βλάβες/})).toHaveClass('active');
+    fireEvent.click(screen.getByRole('button', {name: /Ιστορικό βλαβών & απωλειών/}));
+    expect(screen.getByRole('button', {name: /Ιστορικό βλαβών & απωλειών/})).toHaveClass('active');
     fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
     expect(await screen.findByRole('button', {name: /Απογραφή εξοπλισμού/})).toHaveClass('active');
   });
@@ -36,7 +36,7 @@ describe('Αναφορές and the browser’s «Πίσω»', () => {
       </>,
       {path: '/reports'},
     );
-    fireEvent.click(screen.getByRole('button', {name: /Service & βλάβες/}));
+    fireEvent.click(screen.getByRole('button', {name: /Ιστορικό βλαβών & απωλειών/}));
     const summary = screen.getByRole('list', {name: 'Σύνολα'});
     const chip = within(summary)
       .getAllByRole('button')
@@ -50,6 +50,6 @@ describe('Αναφορές and the browser’s «Πίσω»', () => {
 
   it('opens the report the address names', () => {
     renderPage(<ReportsPage />, {path: '/reports?report=issues'});
-    expect(screen.getByRole('button', {name: /Service & βλάβες/})).toHaveClass('active');
+    expect(screen.getByRole('button', {name: /Ιστορικό βλαβών & απωλειών/})).toHaveClass('active');
   });
 });

@@ -58,6 +58,7 @@ export const ACTIONS = new Set([
   'reportSetIssue',
   'resolveIssues',
   'deleteIssue',
+  'editIssueNote',
   'retireForWear',
   'addAssetPhotos',
   'removeAssetPhoto',

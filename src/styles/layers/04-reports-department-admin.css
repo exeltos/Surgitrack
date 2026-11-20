@@ -1321,14 +1321,16 @@
   text-align: center;
 }
 @media (max-width: 1180px) {
+  /* Name, state, expiry, uses, chevron. */
   .department-asset-open {
-    grid-template-columns: 40px minmax(260px, 1.4fr) minmax(220px, 0.85fr) 110px 24px;
+    grid-template-columns: 40px minmax(220px, 1.4fr) minmax(170px, 0.85fr) 96px 80px 24px;
     gap: 12px;
   }
 }
 @media (max-width: 900px) {
+  /* The uses go; the expiry keeps its column. */
   .department-asset-open {
-    grid-template-columns: 38px minmax(220px, 1fr) minmax(190px, 0.8fr) 24px;
+    grid-template-columns: 38px minmax(190px, 1fr) minmax(160px, 0.8fr) 92px 24px;
   }
   .department-asset-uses {
     display: none;
@@ -1376,6 +1378,19 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
+  }
+  /* The expiry under the state, and nothing when there is none. */
+  .department-asset-expiry {
+    grid-column: 2;
+    grid-row: 3;
+    font-size: 12px;
+  }
+  .department-asset-expiry.no-expiry {
+    display: none;
+  }
+  .department-asset-open > .department-asset-icon,
+  .department-asset-open > svg:last-child {
+    grid-row: 1 / span 3;
   }
 }
 

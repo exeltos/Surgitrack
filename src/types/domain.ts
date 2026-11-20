@@ -150,6 +150,9 @@ export interface Issue {
   photos?: AssetPhoto[];
   /** Who wrote the report (older reports have none). */
   reportedBy?: string;
+  /** The admin who last corrected its text, and when. */
+  editedBy?: string;
+  editedAt?: string;
 }
 export type ReceiptCheckResult = 'OK' | 'MISSING' | 'DAMAGE' | 'OTHER';
 export type ReceiptItemCheckStatus = 'OK' | 'PROBLEM';
