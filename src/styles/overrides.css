@@ -3480,7 +3480,7 @@ html body .sets-registry .set-count-short .muted {
   html body .registry-fixed tbody td[data-label]::before {
     content: attr(data-label) ' ';
     color: var(--c-blue-45);
-    font-family: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--app-font);
     font-weight: 600;
   }
 }
@@ -4556,4 +4556,60 @@ html body .network-log td {
 .staff-add .staff-add-done p {
   margin: 0;
   color: var(--st-ink, inherit);
+}
+
+/* Every row of tabs the same way: the others grey and plain, the chosen one dark and a little bolder, with a short
+   rounded bar under its words; a thin line under the whole row. */
+html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs) {
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs) > :is(button, a) {
+  position: relative;
+  border: 0;
+  border-bottom: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--c-gray-45);
+  font-weight: 500;
+}
+html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs) > :is(button, a):hover {
+  color: var(--c-blue-10);
+  background: transparent;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs)
+  > :is(button.active, a.active, [aria-selected='true']) {
+  color: var(--c-blue-10);
+  font-weight: 650;
+  background: transparent;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs)
+  > :is(button.active, a.active, [aria-selected='true'])::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  bottom: -1px;
+  left: 10px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--c-cyan-35);
+}
+/* The tabs of a Set's or an instrument's page: as wide as their words, left, as every other row of tabs (they were
+   five equal columns, the chosen one's bar as wide as a fifth of the card). */
+@media (min-width: 701px) {
+  html body .asset-workbench-main > .asset-detail-tabs {
+    display: flex;
+    justify-content: flex-start;
+    min-height: 46px;
+  }
+  html body .asset-workbench-main > .asset-detail-tabs > button {
+    flex: none;
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
 }
