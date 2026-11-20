@@ -10,9 +10,6 @@ import CloudWorkspaceGate from './data/cloud/CloudWorkspaceGate';
 import RouteErrorBoundary from './components/layout/RouteErrorBoundary';
 import EmailLinkPage from './modules/auth/EmailLinkPage';
 import {emailLink} from './modules/auth/emailLink';
-// Inter ships with the app (Greek and Latin, one variable file per script), so every computer shows the same
-// typeface instead of falling back to a heavier system font where Inter is not installed.
-import '@fontsource-variable/inter/wght.css';
 import './styles/global.css';
 import {installChunkRecovery, installEscapeClosesDialogs, installPageStaysPut} from './core/resilience';
 import {registerServiceWorker} from './core/registerServiceWorker';

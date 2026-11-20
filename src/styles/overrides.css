@@ -3480,7 +3480,7 @@ html body .sets-registry .set-count-short .muted {
   html body .registry-fixed tbody td[data-label]::before {
     content: attr(data-label) ' ';
     color: var(--c-blue-45);
-    font-family: 'Inter Variable', Inter, ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--app-font);
     font-weight: 600;
   }
 }
@@ -4556,4 +4556,112 @@ html body .network-log td {
 .staff-add .staff-add-done p {
   margin: 0;
   color: var(--st-ink, inherit);
+}
+
+/* Every row of tabs the same way: words only, the others grey and plain, the chosen one near-black and a little
+   bolder, with a thin rounded bar under its words that turns up at its ends; a thin line under the whole row. */
+html body :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories) {
+  gap: 8px;
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button, a) {
+  position: relative;
+  padding-right: 18px;
+  padding-left: 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--c-gray-45);
+  font-weight: 400;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button, a)
+  > svg {
+  display: none;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button, a)
+  > b {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-weight: inherit;
+  opacity: 0.7;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button, a):hover {
+  color: var(--c-cyan-20-3);
+  background: transparent;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button.active, a.active, [aria-selected='true']) {
+  color: var(--c-cyan-20-3);
+  font-weight: 600;
+  background: transparent;
+}
+html
+  body
+  :is(.name-check-tabs, .asset-detail-tabs, .hospital-tabs, .department-category-tabs, .reports-categories)
+  > :is(button.active, a.active, [aria-selected='true'])::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  bottom: -1px;
+  left: 4px;
+  height: 5px;
+  border: 2px solid var(--c-cyan-35);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: transparent;
+}
+/* The tabs of a Set's or an instrument's page: as wide as their words, left, as every other row of tabs (they were
+   five equal columns, the chosen one's bar as wide as a fifth of the card). */
+@media (min-width: 701px) {
+  html body .asset-workbench-main > .asset-detail-tabs {
+    display: flex;
+    justify-content: flex-start;
+    min-height: 46px;
+  }
+  html body .asset-workbench-main > .asset-detail-tabs > button {
+    flex: none;
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+}
+
+/* Everything that can be pressed shows the hand; what is switched off does not. */
+html
+  body
+  :is(
+    button,
+    a[href],
+    summary,
+    select,
+    label:has(> input:is([type='checkbox'], [type='radio'])),
+    input:is([type='checkbox'], [type='radio'], [type='file'], [type='submit'], [type='button'], [type='color']),
+    [role='button'],
+    [role='tab'],
+    [role='menuitem'],
+    [role='option'],
+    [role='switch'],
+    [onclick]
+  ):not(:disabled, [aria-disabled='true'], .disabled, .self) {
+  cursor: pointer;
+}
+html body :is(button, select, input):disabled,
+html body [aria-disabled='true'] {
+  cursor: not-allowed;
 }
