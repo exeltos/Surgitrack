@@ -23,6 +23,6 @@ describe('the daily test sheet', () => {
     expect(html).toContain('Πλάσμα STERRAD 100NX');
     expect(html).toContain('Καμία δοκιμή σήμερα');
     // The header counts the two in use, and both have their lines.
-    expect(html).toMatch(/<b>Κλίβανοι<\/b><span>2<\/span>/);
+    expect(html).toContain('Κλίβανοι: 2');
   });
 });

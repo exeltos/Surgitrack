@@ -582,7 +582,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                   </button>
                   {load.cycleData && (
                     <button onClick={() => s.printCycle(load.id)}>
-                      <Activity size={14} /> {tr('Report κύκλου')}
+                      <Activity size={14} /> {tr('Αναφορά κύκλου')}
                     </button>
                   )}
                   <button onClick={() => recallLoad(load.id)}>

@@ -1,7 +1,7 @@
 import {Fragment, useEffect, useMemo, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useFitWidth} from '../../components/ui/useFitWidth';
-import {AlertTriangle, FileText} from 'lucide-react';
+import {AlertTriangle, FileText, Printer} from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
 import type {ExportTable} from '../../core/exportTable';
@@ -28,6 +28,15 @@ import {
   type Row,
 } from './reportsMeta';
 import {buildReport} from './buildReport';
+import {handoverKey, handoverSlipHtml, type HandoverKind} from '../sterilization/printHandover';
+import {parseDisplayDate} from '../../core/displayDate';
+
+/** The reports of things that happened on a day, and the column with that day: they can be cut to a period. */
+const DATE_OF: Partial<Record<ReportId, string>> = {issues: 'created', loads: 'loaded', handovers: 'at'};
+/** A day as the date fields hold it (YYYY-MM-DD), for comparing. */
+const dayKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const showDay = (key: string) => key.split('-').reverse().join('/');
 import {reportSummary} from './reportSummary';
 import LoadCell from './loadCells';
 
@@ -58,6 +67,9 @@ export default function ReportsPage() {
   const [sterilizerName, setSterilizerName] = useState('ALL');
   const [expiryState, setExpiryState] = useState('ALL');
   const [signature, setSignature] = useState('ALL');
+  // The period (from, to), for the reports of things that happened on a day.
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const sterilizerNames = useMemo(
     () =>
       Array.from(new Set(processLoads.filter(l => l.kind === 'STERILIZATION').map(l => l.equipment))).sort((a, b) =>
@@ -90,7 +102,7 @@ export default function ReportsPage() {
   );
   const activeMeta = reports.find(r => r.id === active)!;
 
-  const reportData = useMemo(
+  const built = useMemo(
     () =>
       buildReport(
         active,
@@ -146,6 +158,24 @@ export default function ReportsPage() {
     ],
   );
 
+  // The period cuts the dated reports to the days in it (a record without a readable day stays).
+  const dateKey = DATE_OF[active];
+  const reportData = useMemo(() => {
+    if (!dateKey || (!dateFrom && !dateTo)) return built;
+    return {
+      ...built,
+      rows: built.rows.filter(row => {
+        const at = parseDisplayDate(String(row[dateKey] ?? ''));
+        if (!at) return true;
+        const day = dayKey(at);
+        return (!dateFrom || day >= dateFrom) && (!dateTo || day <= dateTo);
+      }),
+    };
+  }, [built, dateKey, dateFrom, dateTo]);
+  const period =
+    dateKey && (dateFrom || dateTo)
+      ? [dateFrom ? showDay(dateFrom) : '…', dateTo ? showDay(dateTo) : '…'].join(' – ')
+      : '';
   const summary = reportSummary(active, reportData.rows, warningThreshold);
   // The whole report is listed until a card or a group narrows it.
   const viewRows = useMemo(() => (view ? reportData.rows.filter(view.test) : reportData.rows), [view, reportData.rows]);
@@ -158,10 +188,24 @@ export default function ReportsPage() {
         : tr(activeMeta.description);
     return {
       title: tr(activeMeta.title),
-      html: genericReportHtml(tr(activeMeta.title), subtitle, reportData.columns, reportData.rows),
+      html: genericReportHtml(
+        tr(activeMeta.title),
+        period ? `${subtitle} · ${tr('Περίοδος')} ${period}` : subtitle,
+        reportData.columns,
+        reportData.rows,
+      ),
     };
   };
   const openPreview = () => setPreview(buildPreview());
+  // A handover's printed slip: every record of the same handover (one batch, one signature).
+  const printSlip = (kind: HandoverKind, key: string) => {
+    const records = (kind === 'RECEIPT' ? receipts : deliveries).filter(r => handoverKey(r) === key);
+    if (records.length)
+      setPreview({
+        title: kind === 'RECEIPT' ? tr('Δελτίο παραλαβής') : tr('Δελτίο παράδοσης'),
+        html: handoverSlipHtml(kind, records),
+      });
+  };
   // Filters of the chosen report, in one "Filters" button; "ALL" is the empty choice.
   const choice = (value: string, set: (value: string) => void) => ({
     value: value === 'ALL' ? '' : value,
@@ -238,8 +282,8 @@ export default function ReportsPage() {
             key: 'issueStatus',
             placeholder: tr('Όλες οι καταστάσεις'),
             options: [
-              {value: 'OPEN', label: tr('Ανοιχτές')},
-              {value: 'RESOLVED', label: tr('Ολοκληρωμένες')},
+              {value: 'OPEN', label: tr('Ανοικτές')},
+              {value: 'RESOLVED', label: tr('Επιλυμένες')},
             ],
             ...choice(issueStatus, setIssueStatus),
           },
@@ -301,6 +345,26 @@ export default function ReportsPage() {
               {value: 'RETIRED', label: tr('Εκτός χρήσης')},
             ],
             ...choice(usageFilter, setUsageFilter),
+          },
+        ]
+      : []),
+    ...(dateKey
+      ? [
+          {
+            key: 'dateFrom',
+            type: 'date' as const,
+            placeholder: tr('Από ημερομηνία'),
+            options: [],
+            value: dateFrom,
+            onChange: setDateFrom,
+          },
+          {
+            key: 'dateTo',
+            type: 'date' as const,
+            placeholder: tr('Έως ημερομηνία'),
+            options: [],
+            value: dateTo,
+            onChange: setDateTo,
           },
         ]
       : []),
@@ -376,12 +440,16 @@ export default function ReportsPage() {
       sterilizerName,
       expiryState,
       signature,
+      dateFrom,
+      dateTo,
     ].join('|'),
   );
   const resultBody = useFitWidth<HTMLDivElement>([reportData, shownRows.visible.length]);
   const reportTable = (): ExportTable => ({
     title: tr(activeMeta.title),
-    subtitle: `${reportData.rows.length} ${tr('εγγραφές')}`,
+    subtitle: [`${reportData.rows.length} ${tr('εγγραφές')}`, period && `${tr('Περίοδος')} ${period}`]
+      .filter(Boolean)
+      .join(' · '),
     headers: reportData.columns.map(c => c.label),
     rows: reportData.rows.map(row => reportData.columns.map(c => cellText(c.key, row[c.key]))),
   });
@@ -558,6 +626,17 @@ export default function ReportsPage() {
                                 ) : (
                                   cellText(c.key, row[c.key])
                                 )}
+                                {active === 'handovers' && c.key === 'type' && row.slipKey ? (
+                                  <button
+                                    type="button"
+                                    className="report-slip-button"
+                                    title={tr('Δελτίο')}
+                                    aria-label={`${tr('Δελτίο')} ${String(row.barcode)}`}
+                                    onClick={() => printSlip(row.slipKind as HandoverKind, String(row.slipKey))}
+                                  >
+                                    <Printer size={13} aria-hidden="true" />
+                                  </button>
+                                ) : null}
                                 {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
                                   <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
                                 ) : null}

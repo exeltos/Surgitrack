@@ -59,6 +59,7 @@ export default function SterileExpiryPage() {
       />
       <QuickFilters
         items={[
+          {key: 'all', label: tr('Όλα'), count: all.length, ...quick('ALL')},
           {
             key: 'alert',
             label: tr('Χρειάζονται προσοχή'),
@@ -73,7 +74,6 @@ export default function SterileExpiryPage() {
             ...quick('EXPIRING'),
           },
           {key: 'expired', label: tr('Έληξαν'), count: counts.EXPIRED, tone: 'bad', ...quick('EXPIRED')},
-          {key: 'all', label: tr('Όλα'), count: all.length, ...quick('ALL')},
         ]}
       />
       <div className="asset-list-controls">

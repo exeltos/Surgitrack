@@ -440,7 +440,11 @@ export default function ReplacementsPage({
                         </td>
                         <td>
                           {item.set ? (
-                            <Link to={`/sets/${item.set.id}`}>
+                            <Link
+                              className="replacement-set"
+                              to={`/sets/${item.set.id}`}
+                              title={`${item.set.barcode} · ${item.set.name}`}
+                            >
                               <b className="mono">{item.set.barcode}</b> {item.set.name}
                             </Link>
                           ) : (
@@ -630,4 +634,4 @@ const statusText = (item: ReplacementItem) =>
       : tr('Παραλήφθηκε με {0}', item.order?.number || '')
     : item.status === 'IN_ORDER'
       ? tr('Σε παραγγελία {0}', item.order?.number || '')
-      : tr('Χρειάζεται αντικατάσταση');
+      : tr('Προς αντικατάσταση');

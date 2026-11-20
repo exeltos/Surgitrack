@@ -6,6 +6,7 @@ import StatusBadge from '../../components/ui/StatusBadge';
 import AppButton from '../../components/ui/AppButton';
 import IconToggleButton from '../../components/ui/IconToggleButton';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
+import {statusLabel} from '../../components/ui/statusLabel';
 import ColorMarker from '../../components/assets/ColorMarker';
 import {sameMarker} from '../../core/colorTapes';
 import {useRememberedState} from '../../core/listMemory';
@@ -133,7 +134,7 @@ export default function SetContents({
             key: 'state',
             value: toolState,
             placeholder: tr('Όλες οι καταστάσεις'),
-            options: memberValues('state').map(value => ({value, label: value})),
+            options: memberValues('state').map(value => ({value, label: statusLabel(value)})),
             onChange: setToolState,
           },
         ]}

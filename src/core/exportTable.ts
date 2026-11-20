@@ -4,8 +4,8 @@
  * a picture of the screen.
  */
 import {escapeHtml as html} from './escapeHtml';
-import {formatDateTime} from './displayDate';
 import {markPrintHtml, markTable} from './sampleDataMark';
+import {printHospital, printedLine} from './printStamp';
 
 export type ExportTable = {
   /** Document title, e.g. "Ιστορικό κινήσεων". */
@@ -297,28 +297,30 @@ export function downloadCsv(table: ExportTable) {
 /** A printable report page (A4 landscape) of the table, for "Print / PDF". */
 export function tableReportHtml(source: ExportTable, lang: string) {
   const table = markTable(source);
-  const printed = formatDateTime();
   return markPrintHtml(`<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><title>${html(table.title)}</title>
 <style>
 @page { size: A4 landscape; margin: 14mm 12mm; }
 * { box-sizing: border-box; }
-body { font-family: "Segoe UI", Arial, sans-serif; color: #1c2b33; margin: 0; padding: 18px; font-size: 11px; }
+body { font-family: "Segoe UI", Arial, sans-serif; color: #1c2b33; margin: 0; padding: 0; font-size: 10px; }
 header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #1d6b7a; padding-bottom: 8px; margin-bottom: 12px; }
 h1 { margin: 0; font-size: 19px; }
 header p { margin: 4px 0 0; color: #5b6b75; }
 header small { color: #5b6b75; text-align: right; }
 table { width: 100%; border-collapse: collapse; }
 thead { display: table-header-group; }
-th { background: #1d6b7a; color: #fff; text-align: left; padding: 6px 7px; font-size: 10.5px; }
-td { padding: 5px 7px; border-bottom: 1px solid #dde5ea; vertical-align: top; }
+/* The totals once, after the last row (a table's foot would repeat on every page with a page's part of them). */
+tfoot { display: table-row-group; }
+th { background: #1d6b7a; color: #fff; text-align: left; padding: 4px 6px; font-size: 9.5px; }
+td { padding: 3px 6px; border-bottom: 1px solid #dde5ea; vertical-align: top; }
 tr:nth-child(even) td { background: #f5f8fa; }
 tr { page-break-inside: avoid; }
 tr.band th { background: #eef4f6; color: #15232b; border-top: 2px solid #1d6b7a; font-size: 11px; }
 tfoot th.total { background: #eef4f6; color: #15232b; border-top: 2px solid #1d6b7a; }
 footer { margin-top: 10px; color: #5b6b75; font-size: 10px; }
+@media screen { body { padding: 18px; } }
 </style></head><body>
 <header><div><h1>${html(table.title)}</h1>${table.subtitle ? `<p>${html(table.subtitle)}</p>` : ''}</div>
-<small>SurgiTrack<br>${html(printed)}</small></header>
+<small><b>${html(printHospital())}</b><br>${html(printedLine())}</small></header>
 <table><thead><tr>${table.headers.map(h => `<th>${html(h)}</th>`).join('')}</tr></thead>
 <tbody>${table.rows
     .map((row, r) => {

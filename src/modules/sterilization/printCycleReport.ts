@@ -5,7 +5,7 @@ import {DEFAULT_LABEL_SETTINGS, type LabelSettings} from '../../core/libraryType
 import {MIN_HOLD_PRESSURE, planFor, type CycleData, type CycleProblem} from '../../core/cycleSimulator';
 import {code128Svg, openPrintWindow} from './printUtils';
 import {escapeHtml} from '../../core/escapeHtml';
-import {formatDateTime} from '../../core/displayDate';
+import {printHospital} from '../../core/printStamp';
 
 export type CycleReportData = {
   load: ProcessLoadRecord & {cycleData: CycleData};
@@ -66,7 +66,7 @@ export function cycleReportBody({load, hospital, release, label: labelSettings}:
       ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
       : label.header === 'TEXT' && label.text?.trim()
         ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
-        : '<div class="brand">SurgiTrack</div>';
+        : `<div class="brand">${escapeHtml(printHospital(hospital))}</div>`;
   const meta = [
     [tr('Κλίβανος'), trData(load.equipment)],
     [tr('Κύκλος'), shortCycleNumber(load.cycleNumber)],
@@ -123,7 +123,7 @@ export function cycleReportBody({load, hospital, release, label: labelSettings}:
   .sim{margin-top:3mm;padding:2mm 3mm;border:.3mm dashed #d97706;border-radius:2mm;background:#fff7e8;color:#8a4b00;font-size:8pt;font-weight:700}
   .meta{display:grid;grid-template-columns:repeat(3,1fr);margin:4mm 0;border:.25mm solid #d7e0e5;border-radius:2mm;overflow:hidden}.meta div{padding:1.8mm 3mm;border-right:.25mm solid #e3e9ec;border-bottom:.25mm solid #e3e9ec}.meta div:nth-child(3n){border-right:0}.meta div:nth-last-child(-n+3){border-bottom:0}.meta b{display:block;font-size:6.5pt;letter-spacing:.06em;color:#6a7a84;text-transform:uppercase;margin-bottom:.5mm}.meta span{font-size:9pt;font-weight:700}
   h2{font-size:8pt;letter-spacing:.08em;text-transform:uppercase;color:#4b5d68;margin:4mm 0 2mm}
-  .chart{width:100%;height:auto;border:.25mm solid #d7e0e5;border-radius:2mm;display:block}
+  .chart{width:100%;height:auto;max-height:62mm;border:.25mm solid #d7e0e5;border-radius:2mm;display:block}
   .legend{display:flex;gap:6mm;margin-top:1.5mm;font-size:7.5pt;color:#5f707b}.legend i{display:inline-block;width:6mm;border-top:.7mm solid;vertical-align:middle;margin-right:1.5mm}
   table{width:100%;border-collapse:collapse;table-layout:auto}thead{display:table-header-group}
   th{font-size:7pt;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68;text-align:left;padding:1.8mm 1.6mm;background:#eef4f6;border-bottom:.35mm solid #9fb3bd}
@@ -131,11 +131,10 @@ export function cycleReportBody({load, hospital, release, label: labelSettings}:
   td.v{font-weight:700}td.ok{color:#1d7a4d;font-weight:700}td.bad{color:#b44747;font-weight:700}td.mono{font-family:monospace;font-weight:700}td.name{font-weight:700}.num{width:6%;color:#6a7a84;text-align:right}
   .verdict{margin-top:3mm;padding:2.5mm 3mm;border-radius:2mm;font-weight:700;border:.3mm solid}.verdict.ok{background:#e7f4ec;border-color:#7fbf9b;color:#1d7a4d}.verdict.bad{background:#fbeaea;border-color:#e0a3a3;color:#b44747}.verdict small{display:block;margin-top:1mm;font-weight:400;color:#333}
   .sign{margin-top:4mm;border:.3mm solid #b9c8cf;border-radius:2mm;padding:3mm;display:grid;gap:1.2mm;font-size:8.5pt;break-inside:avoid}.sign b{font-size:7pt;letter-spacing:.06em;text-transform:uppercase;color:#4b5d68}.sign .line{margin-top:9mm;border-top:.3mm solid #8a9aa3;padding-top:1mm;font-size:7pt;color:#6a7a84}
-  .footer{margin-top:4mm;padding-top:2mm;border-top:.2mm solid #d7e0e5;display:flex;justify-content:space-between;font-size:7pt;color:#6a7a84}
   @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:11mm;background:#fff;min-height:297mm}}
   @media print{tr{break-inside:avoid}}
   </style></head><body><div class="sheet">
-  <div class="top"><div>${header}<div class="doc">${escapeHtml(tr('Report κύκλου αποστείρωσης'))}</div><h1>${escapeHtml(trData(load.equipment))} · ${escapeHtml(tr('Κύκλος'))} ${escapeHtml(shortCycleNumber(load.cycleNumber))}</h1></div><div class="barcode">${code128Svg(load.cycleNumber, 40)}<div class="barcode-code">${escapeHtml(load.cycleNumber)}</div></div></div>
+  <div class="top"><div>${header}<div class="doc">${escapeHtml(tr('Αναφορά κύκλου αποστείρωσης'))}</div><h1>${escapeHtml(trData(load.equipment))} · ${escapeHtml(tr('Κύκλος'))} ${escapeHtml(shortCycleNumber(load.cycleNumber))}</h1></div><div class="barcode">${code128Svg(load.cycleNumber, 40)}<div class="barcode-code">${escapeHtml(load.cycleNumber)}</div></div></div>
   ${simulated ? `<div class="sim">${escapeHtml(tr('Προσομοίωση: οι τιμές είναι δοκιμαστικές και δεν προέρχονται από πραγματικό κλίβανο.'))}</div>` : ''}
   <div class="meta">${meta}</div>
   <h2>${escapeHtml(tr('Καμπύλη κύκλου'))}</h2>
@@ -147,10 +146,9 @@ export function cycleReportBody({load, hospital, release, label: labelSettings}:
   <h2>${escapeHtml(tr('Περιεχόμενο φορτίου'))} · ${load.items.length}</h2>
   <table><thead><tr><th class="num">#</th><th>Barcode</th><th>${escapeHtml(tr('Ονομασία'))}</th><th>${escapeHtml(tr('Τύπος'))}</th><th>${escapeHtml(tr('Τμήμα'))}</th></tr></thead><tbody>${items}</tbody></table>
   <div class="sign"><b>${escapeHtml(tr('Αποδέσμευση'))}</b><span>${escapeHtml(release ? `${release.decision === 'RELEASED' ? tr('Αποδεσμεύτηκε') : tr('Μη αποδέσμευση')} · ${release.at} · ${trData(release.by)}` : tr('Δεν έχει αποδεσμευτεί ακόμα'))}</span><div class="line">${escapeHtml(tr('Υπογραφή υπευθύνου'))}</div></div>
-  <div class="footer"><span>SurgiTrack · ${escapeHtml(load.id)}</span><span>${escapeHtml(tr('Εκτυπώθηκε {0}', formatDateTime()))}</span></div>
   </div>`;
 }
 
 export function printCycleReport(data: CycleReportData) {
-  return openPrintWindow(tr('Report κύκλου {0}', data.load.cycleNumber), cycleReportBody(data));
+  return openPrintWindow(tr('Αναφορά κύκλου {0}', data.load.cycleNumber), cycleReportBody(data));
 }

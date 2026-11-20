@@ -7,6 +7,7 @@ import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/st
 import {STERILE_STATES, formatExpiry, isoDate, sterileUntil, sterilizedOnOf} from '../../core/sterileExpiry';
 import {DEFAULT_LABEL_SETTINGS, type LabelSettings, type LabelSize} from '../../core/libraryTypes';
 import {labelToPdf} from '../../core/labelPdf';
+import {printHospital} from '../../core/printStamp';
 
 // Code 128 B: same symbology used by the legacy FileMaker Barcode_Code128 webview.
 const CODE128_PATTERNS = [
@@ -234,7 +235,7 @@ const labelHeaderHtml = (settings: LabelSettings) => {
     return `<img class="logo" src="${escapeHtml(settings.logo)}" alt="">`;
   if (settings.header === 'TEXT' && settings.text?.trim())
     return `<div class="brand">${escapeHtml(settings.text.trim())}</div>`;
-  return '<div class="brand">SurgiTrack</div>';
+  return `<div class="brand">${escapeHtml(printHospital())}</div>`;
 };
 
 /** One label cell: name + header on top, barcode, code and (optionally) the details line. */
@@ -297,15 +298,15 @@ function barcodeLabelBody(
   .label{position:relative;width:100%;height:100%;display:flex;flex-direction:column;padding:1.4mm ${(2 + right).toFixed(1)}mm 1.1mm 2mm;overflow:hidden}
   .head{display:flex;justify-content:space-between;align-items:flex-start;gap:1.5mm;min-height:0}
   .dept{flex:none;font-size:${pt(5.4)};line-height:1.15;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .name{font-size:${pt(6.6)};font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-  .brand{margin-top:${(1.1 * k).toFixed(2)}mm;margin-right:-${Math.min(right, 1.5).toFixed(1)}mm;font-size:${pt(6.2)};font-weight:800;letter-spacing:.02em;white-space:nowrap;flex:none;max-width:45%;overflow:hidden;text-overflow:ellipsis}
+  .name{flex:1 1 0;font-size:${pt(6.6)};font-weight:700;line-height:1.1;overflow:hidden;min-width:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere}
+  .brand{margin-top:${(1.1 * k).toFixed(2)}mm;margin-right:-${Math.min(right, 1.5).toFixed(1)}mm;font-size:${pt(5.4)};font-weight:700;white-space:nowrap;flex:none;max-width:38%;overflow:hidden;text-overflow:ellipsis}
   .logo{height:${(3.6 * k).toFixed(2)}mm;max-width:40%;object-fit:contain;flex:none}
   .head,.foot{flex:none}.bc{flex:1 1 0;display:flex;align-items:stretch;justify-content:center;min-height:0;overflow:hidden;padding:.7mm 0 .3mm}.bc svg{width:88%;height:100%;display:block}
   .foot{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:1.5mm}.foot .code{grid-column:2;text-align:center}.foot .detail{grid-column:3;justify-self:end}
   .code{font-size:${pt(6.4)};font-weight:700;letter-spacing:.04em}.detail{font-size:${pt(5.2)};color:#222;white-space:nowrap}.sym-date{display:inline-flex;align-items:center;gap:.6mm}.foot.dated{display:flex;flex-wrap:wrap;row-gap:.2mm;justify-content:center}.foot.dated{position:relative}.foot.dated .count{position:absolute;right:0;top:.1mm;font-size:${pt(5.2)};color:#222;white-space:nowrap}.foot.dated .code{flex:1 1 100%;text-align:center}.foot.dated .detail{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:1.5mm}.foot.dated .dates{display:inline-flex;align-items:center;gap:1.6mm;margin-left:auto}
   .sheet-grid{width:${w}mm;height:${h}mm;display:grid;grid-template-rows:${mainH}mm ${miniH}mm}.sheet-grid .main{}
   .pair{display:grid;grid-template-columns:${(w / 2).toFixed(2)}mm ${(w / 2).toFixed(2)}mm}
-  .pair .mini .brand,.pair .mini .logo{display:none}.sheet-grid .main .name{font-size:7pt}.sheet-grid .main .brand{font-size:7pt}.sheet-grid .main .code{font-size:6.4pt}.sheet-grid .main .detail{font-size:5.6pt}.sheet-grid .main .logo{height:4mm}.sheet-grid .main{padding-top:5.2mm;padding-bottom:2.8mm}.sheet-grid .main .count{font-size:5.8pt}.pair .mini{padding-top:2.2mm;padding-bottom:3.4mm}.pair .mini:last-child{padding-left:4.5mm}.sheet-grid .main .head{display:block}.sheet-grid .main .brand,.sheet-grid .main .logo{position:absolute;top:9.5mm;right:${right.toFixed(1)}mm;margin:0}.sheet-grid .main .bc{padding:1.4mm 0 1mm}.sheet-grid .main .bc svg{width:54%}.pair .mini .name{font-size:5.4pt}.pair .mini .code{font-size:5.6pt}.pair .mini .detail{font-size:4.8pt}.pair .mini .bc{padding:.5mm 0 .6mm}.pair .mini .bc svg{width:72%}.pair .mini .foot.dated{row-gap:.5mm}.pair .mini .count{font-size:4.8pt}.pair .mini .sym-date,.pair .mini .left{font-size:4.5pt}
+  .pair .mini .brand,.pair .mini .logo{display:none}.sheet-grid .main .name{font-size:7pt}.sheet-grid .main .brand{font-size:7pt}.sheet-grid .main .code{font-size:6.4pt}.sheet-grid .main .detail{font-size:5.6pt}.sheet-grid .main .logo{height:4mm}.sheet-grid .main{padding-top:5.2mm;padding-bottom:2.8mm}.sheet-grid .main .count{font-size:5.8pt}.pair .mini{padding-top:2.2mm;padding-bottom:3.4mm}.pair .mini:last-child{padding-left:3mm}.sheet-grid .main .head{display:block}.sheet-grid .main .brand,.sheet-grid .main .logo{position:absolute;top:9.5mm;right:${right.toFixed(1)}mm;margin:0}.sheet-grid .main .bc{padding:1.4mm 0 1mm}.sheet-grid .main .bc svg{width:54%}.pair .mini .name{font-size:5.4pt;-webkit-line-clamp:1}.pair .mini .code{font-size:5.6pt}.pair .mini .detail{font-size:5.6pt}.pair .mini .bc{padding:.5mm 0 .6mm}.pair .mini .bc svg{width:94%}.pair .mini .foot.dated{row-gap:.5mm}.pair .mini .count{font-size:5.4pt}.pair .mini .sym-date,.pair .mini .left{font-size:5.6pt}
   @media screen{html{background:#eef2f5;zoom:${screenZoom}}body{margin:4mm;background:#fff;box-shadow:0 0 0 .2mm #c8d2d9,0 1mm 3mm rgba(0,0,0,.08)}}
   </style></head><body>${cells}`;
 }
@@ -444,7 +445,7 @@ function compositionBody(
       ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
       : label.header === 'TEXT' && label.text?.trim()
         ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
-        : '<div class="brand">SurgiTrack</div>';
+        : `<div class="brand">${escapeHtml(printHospital())}</div>`;
   const marker = markerChips(options.marker);
   const meta =
     [
@@ -496,7 +497,7 @@ function compositionBody(
   .alert{display:flex;flex-wrap:wrap;gap:2mm;align-items:center;margin:-2mm 0 4mm;padding:2.2mm 3mm;border:.3mm solid #e8a59e;border-left:1.2mm solid #b3261e;border-radius:1.5mm;background:#fdf3f2;color:#8f1f17;font-size:8.5pt}.alert span{color:#c98a84}
   tfoot td{border-bottom:0;border-top:.35mm solid #9fb3bd;font-weight:800;background:#fff!important}
   .notes{margin-top:4mm;font-size:7.5pt;color:#5f707b}
-  .signs{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:8mm;break-inside:avoid}.signs div{border-top:.3mm solid #8a9aa3;padding-top:1.5mm;font-size:7pt;color:#4b5d68}.signs b{display:block;font-size:7.5pt;color:#15232b;margin-bottom:5mm}
+  .signs{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm;margin-top:16mm;break-inside:avoid}.signs div{border-top:.3mm solid #8a9aa3;padding-top:1.5mm;font-size:7pt;color:#4b5d68}.signs b{display:block;font-size:7.5pt;color:#15232b;margin-bottom:5mm}
   .footer{margin-top:5mm;padding-top:2mm;border-top:.2mm solid #d7e0e5;display:flex;justify-content:space-between;font-size:7pt;color:#6a7a84}
   @media screen{html{background:#e9eef1}body{max-width:210mm;margin:0 auto;padding:12mm 11mm;background:#fff;min-height:297mm}}
   @media print{tr{break-inside:avoid}}

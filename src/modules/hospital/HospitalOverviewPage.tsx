@@ -46,7 +46,7 @@ const QUEUE_OF: Partial<Record<AssetState, string>> = {
  * The hospital admin's home: the whole hospital at a glance — where the sets and instruments
  * are, what each department holds, what is stuck, and the latest movements.
  */
-const DEPARTMENTS_SHOWN = 8;
+const DEPARTMENTS_SHOWN = 5;
 
 /** A movement's text without the load's inner id (L1794482016773-t8wvpx): it tells a person nothing. */
 const plainStatus = (text: string) =>

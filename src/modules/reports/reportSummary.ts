@@ -21,15 +21,15 @@ export function reportSummary(active: ReportId, rows: Row[], warningThreshold: n
     return [
       {label: tr('Σύνολο'), value: rows.length, test: all},
       {
-        label: tr('Ανοιχτές'),
-        value: count(rows, r => r.status === 'Ανοιχτή'),
+        label: tr('Ανοικτές'),
+        value: count(rows, r => r.status === 'Ανοικτή'),
         tone: 'warn',
-        test: r => r.status === 'Ανοιχτή',
+        test: r => r.status === 'Ανοικτή',
       },
       {
-        label: tr('Ολοκληρωμένες'),
-        value: count(rows, r => r.status === 'Ολοκληρωμένη'),
-        test: r => r.status === 'Ολοκληρωμένη',
+        label: tr('Επιλυμένες'),
+        value: count(rows, r => r.status === 'Επιλυμένη'),
+        test: r => r.status === 'Επιλυμένη',
       },
     ];
   if (active === 'usage')

@@ -7,6 +7,7 @@ import {expirySymbolSvg, sterileDatesHtml, sterileSymbolSvg} from '../../core/st
 import {code128Svg, openPrintWindow} from './printUtils';
 import {escapeHtml} from '../../core/escapeHtml';
 import {formatDateTime} from '../../core/displayDate';
+import {printHospital} from '../../core/printStamp';
 
 /** One item of the load as the form lists it; `sterileUntil` once released. */
 export type ReleaseFormItem = {
@@ -76,7 +77,7 @@ export function releaseFormBody({
       ? `<img class="logo" src="${escapeHtml(label.logo)}" alt="">`
       : label.header === 'TEXT' && label.text?.trim()
         ? `<div class="brand">${escapeHtml(label.text.trim())}</div>`
-        : '<div class="brand">SurgiTrack</div>';
+        : `<div class="brand">${escapeHtml(printHospital(hospital))}</div>`;
   const meta = [
     [tr('Τύπος φορτίου'), loadType || '—'],
     [tr('Κλίβανος'), trData(load.equipment)],

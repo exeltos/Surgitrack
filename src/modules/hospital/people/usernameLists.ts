@@ -1,6 +1,7 @@
 import {escapeHtml} from '../../../core/escapeHtml';
 import type {ExportTable} from '../../../core/exportTable';
 import {markPrintHtml} from '../../../core/sampleDataMark';
+import {printHospital} from '../../../core/printStamp';
 
 export type UsernameRow = {department: string; name: string; userCode: string};
 
@@ -27,7 +28,7 @@ export const usernameSheetsHtml = (rows: UsernameRow[], el: boolean, lang: strin
   const sections = [...groups.entries()]
     .map(
       ([department, people]) => `<section>
-<header><div><h1>${escapeHtml(department)}</h1><p>${t('Ονόματα χρήστη SurgiTrack', 'SurgiTrack usernames')}${hospital ? ` · ${escapeHtml(hospital)}` : ''}</p></div><small>${people.length} ${t('άτομα', 'people')}</small></header>
+<header><div><h1>${escapeHtml(department)}</h1><p>${escapeHtml(printHospital(hospital))} · ${t('Ονόματα χρήστη SurgiTrack', 'SurgiTrack usernames')}</p></div><small>${people.length} ${t('άτομα', 'people')}</small></header>
 <table><thead><tr><th class="n">#</th><th>${t('Ονοματεπώνυμο', 'Full name')}</th><th>${t('Όνομα χρήστη', 'Username')}</th></tr></thead>
 <tbody>${people.map((p, i) => `<tr><td class="n">${i + 1}</td><td>${escapeHtml(p.name)}</td><td class="u">${escapeHtml(p.userCode)}</td></tr>`).join('')}</tbody></table>
 <p class="how">${t(

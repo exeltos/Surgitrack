@@ -36,7 +36,8 @@ import LedgerAsset from './LedgerAsset';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {parseDisplayDate} from '../../core/displayDate';
-import {movementText} from '../../core/movementText';
+import {MOVEMENT_KINDS, movementKindOf, movementText} from '../../core/movementText';
+import {useLibraries} from '../../core/LibraryStore';
 
 function dateKey(value: string) {
   const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -95,8 +96,7 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
   const [dateTo, setDateTo] = useRememberedState('dateTo', '');
   const [report, setReport] = useState<string | null>(null);
   const [selected, setSelected] = useState<Movement | null>(null);
-  const values = (key: 'from' | 'to' | 'status') =>
-    [...new Set(scopedMovements.map(m => m[key]).filter(Boolean))].sort();
+  const values = (key: 'from' | 'to') => [...new Set(scopedMovements.map(m => m[key]).filter(Boolean))].sort();
   const filtered = useMemo(
     () =>
       scopedMovements.filter(m => {
@@ -105,7 +105,7 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
         return (
           (!from || m.from === from) &&
           (!to || m.to === to) &&
-          (!status || m.status === status) &&
+          (!status || !MOVEMENT_KINDS.some(k => k.key === status) || movementKindOf(m.status) === status) &&
           (!kind || m.assetKind === kind) &&
           (!dateFrom || !d || d >= dateFrom) &&
           (!dateTo || !d || d <= dateTo) &&
@@ -114,7 +114,18 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
       }),
     [scopedMovements, q, from, to, status, kind, dateFrom, dateTo],
   );
-  const valuesOf = (key: 'from' | 'to' | 'status') => values(key).map(v => ({value: v, label: v}));
+  // «Από / Προς» list the hospital's departments only (a movement also names stages, Sets and states there).
+  const {departments} = useLibraries();
+  const departmentNames = useMemo(() => new Set(departments.map(d => d.el)), [departments]);
+  const valuesOf = (key: 'from' | 'to') =>
+    values(key)
+      .filter(v => departmentNames.has(v))
+      .map(v => ({value: v, label: trData(v)}));
+  // The kinds of movement in the list, in the order of the cycle.
+  const kindOptions = useMemo(() => {
+    const present = new Set(scopedMovements.map(m => movementKindOf(m.status)));
+    return MOVEMENT_KINDS.filter(k => present.has(k.key)).map(k => ({value: k.key, label: tr(k.label)}));
+  }, [scopedMovements]);
   // What the export contains: the filtered list, with the filters in use written under the title.
   const exportTable = (): ExportTable => {
     const used = [
@@ -122,7 +133,7 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
       kind && (kind === 'SET' ? tr('Σετ') : tr('Εργαλεία')),
       from && `${tr('Από')}: ${trData(from)}`,
       to && `${tr('Προς')}: ${trData(to)}`,
-      status && trData(status),
+      status && tr(MOVEMENT_KINDS.find(k => k.key === status)?.label || ''),
       dateFrom && `${tr('Από')} ${dateFrom}`,
       dateTo && `${tr('Έως')} ${dateTo}`,
     ].filter(Boolean);
@@ -261,7 +272,7 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
             key: 'status',
             value: status,
             placeholder: tr('Όλες οι κινήσεις'),
-            options: valuesOf('status'),
+            options: kindOptions,
             onChange: setStatus,
           },
           {

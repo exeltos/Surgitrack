@@ -41,7 +41,7 @@ export default function LoadDetailsDialog({
         <footer>
           {onReport && data && (
             <AppButton icon={<Activity size={15} />} onClick={() => onReport(load.id)}>
-              {tr('Report κύκλου')}
+              {tr('Αναφορά κύκλου')}
             </AppButton>
           )}
           <AppButton variant="primary" onClick={onClose}>

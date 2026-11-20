@@ -114,7 +114,7 @@ export function buildReport(
         asset: i.asset,
         type: i.type,
         department: i.department,
-        status: i.status === 'OPEN' ? 'Ανοιχτή' : 'Ολοκληρωμένη',
+        status: i.status === 'OPEN' ? 'Ανοικτή' : 'Επιλυμένη',
         created: i.created,
         reportedBy: i.reportedBy || '—',
         note: i.note,
@@ -361,6 +361,9 @@ export function buildReport(
         deliveredBy: h.record.deliveredByName || '—',
         receivedBy: h.record.receivedByName || '—',
         signature: signatureText(h.verified),
+        // On screen only: the handover the row was part of, for its printed slip.
+        slipKind: h.type === 'Παραλαβή' ? 'RECEIPT' : 'DELIVERY',
+        slipKey: h.record.batchId || h.record.id,
       }));
     return {
       columns: [

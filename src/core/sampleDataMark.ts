@@ -5,6 +5,7 @@
  */
 import {tr} from '../i18n';
 import type {ExportTable} from './exportTable';
+import {printFrameCss} from './printStamp';
 
 let marked = false;
 
@@ -30,9 +31,21 @@ const MARK = () =>
   `<div class="st-demo-mark" aria-hidden="true"><span>DEMO</span></div>` +
   `<div class="st-demo-note">DEMO · ${tr('Δοκιμαστικά δεδομένα')}</div>`;
 
-/** A print page with the DEMO mark (before its closing body tag, or at its end). */
-export const markPrintHtml = (html: string) => {
-  if (!marked || html.includes('st-demo-mark')) return html;
+const FRAMED = '<!--st-print-frame-->';
+const beforeBody = (html: string, extra: string) => {
   const at = html.lastIndexOf('</body>');
-  return at >= 0 ? html.slice(0, at) + MARK() + html.slice(at) : html + MARK();
+  return at >= 0 ? html.slice(0, at) + extra + html.slice(at) : html + extra;
+};
+
+/**
+ * A print page as it goes to paper: an A4 page gets the common foot (hospital, printed when and by whom, page X / Y;
+ * see printStamp), and sample data the DEMO mark. A label, and an A4 form with no page margin, keep their page as it is.
+ */
+export const markPrintHtml = (html: string) => {
+  let out = html;
+  // An A4 page with no margin (the count form lays out its own head and foot) has nowhere to put the foot.
+  const a4 = /@page\s*\{[^}]*size:\s*A4/i.test(out) && !/@page\s*\{[^}]*margin:\s*0\s*[;}]/i.test(out);
+  if (a4 && !out.includes(FRAMED)) out = beforeBody(out, FRAMED + printFrameCss());
+  if (marked && !out.includes('st-demo-mark')) out = beforeBody(out, MARK());
+  return out;
 };

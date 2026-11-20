@@ -104,6 +104,8 @@ export function useSterilizationState() {
   const [specialtyFilter, setSpecialtyFilter] = useState('');
   const [kindFilter, setKindFilter] = useState('');
   const [usageFilter, setUsageFilter] = useState('');
+  // What needs attention first: a department's note, a Set short of instruments, waiting long in the stage.
+  const [attentionFilter, setAttentionFilter] = useState('');
   const [receiptDraft, setReceiptDraft] = useState<AssetDraft | null>(null);
   const [receiptView, setReceiptView] = useState<ReceiptRecord | null>(null);
   const [receiptBatchOpen, setReceiptBatchOpen] = useState(false);
@@ -273,6 +275,8 @@ export function useSterilizationState() {
     issues,
     kindFilter,
     usageFilter,
+    attentionFilter,
+    setAttentionFilter,
     loadChemical,
     loadChemicalOn,
     loadBiologicalOn,
