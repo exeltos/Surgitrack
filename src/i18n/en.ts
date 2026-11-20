@@ -1626,6 +1626,7 @@ export const en: Record<string, string> = {
   '«{0}» για {1}. Η διόρθωση καταγράφεται με το όνομά σας.':
     '«{0}» for {1}. The correction is recorded under your name.',
   'Η σημείωση διορθώθηκε.': 'Note corrected.',
+  'Αποστείρωση {0}': 'Sterilized {0}',
   'Αντικατάσταση από Απόθεμα ({0})': 'Replace from Stock ({0})',
   Αντικαταστάθηκε: 'Replaced',
   'Αντικαταστάθηκε από {0}': 'Replaced by {0}',
@@ -1849,7 +1850,6 @@ export const en: Record<string, string> = {
   'Όλοι οι κλίβανοι': 'All sterilizers',
   Αντικείμενα: 'Items',
   Αποδέσμευσε: 'Released by',
-  'Αποστειρωμένο έως {0}': 'Sterile until {0}',
   'Αφαίρεση γραμμής': 'Remove line',
   'Κωδικός ή ονομασία (από το κατάλογο ή ελεύθερο κείμενο)': 'Code or name (from the catalogue or free text)',
   'Μία γραμμή ανά είδος εργαλείου. Αλλάξτε την ποσότητα ή προσθέστε οποιοδήποτε άλλο εργαλείο.':
@@ -1941,7 +1941,6 @@ export const en: Record<string, string> = {
   'Οριστική διαγραφή {0} εγγραφών από το ιστορικό; Ο καθαρισμός θα καταγραφεί ως νέα εγγραφή.':
     'Permanently delete {0} history entries? The clean-up will be recorded as a new entry.',
   '{0} χρήσεις': '{0} uses',
-  '{0} / {1} χρήσεις': '{0} / {1} uses',
   'Χρωματική σήμανση: {0}': 'Colour marking: {0}',
   'Κάτω από το ελάχιστο': 'Below minimum',
   'Πρόσφατες αναζητήσεις': 'Recent searches',

@@ -1,5 +1,4 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
-import SterileDates from '../../components/ui/SterileDates';
 import ExpiryBadge from '../../components/ui/ExpiryBadge';
 import {STERILE_STATES, expiryStatus, formatExpiry} from '../../core/sterileExpiry';
 import {Link, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
@@ -187,6 +186,14 @@ export default function DepartmentPage() {
             />
           </label>
         </div>
+        <div className="department-list-head" aria-hidden="true">
+          <span />
+          <span>{tr('Ονομασία')}</span>
+          <span>{tr('Κατάσταση')}</span>
+          <span>{tr('Λήξη')}</span>
+          <span>{tr('Χρήσεις')}</span>
+          <span />
+        </div>
         <div
           className="department-asset-list"
           role="region"
@@ -256,34 +263,32 @@ export default function DepartmentPage() {
                           {tr(departmentStateLabel[asset.state] || asset.state)}
                         </span>
                       )}
-                      {asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state) && (
-                        <span
-                          className="department-expiry"
-                          title={tr('Αποστειρωμένο έως {0}', formatExpiry(asset.sterileUntil))}
-                        >
-                          {(() => {
+                    </div>
+                    {/* The expiry in its own column (the date of sterilization on hover), so the lists line up. */}
+                    <div className="department-asset-expiry">
+                      {asset.sterileUntil && (STERILE_STATES as readonly string[]).includes(asset.state)
+                        ? (() => {
                             const status = expiryStatus(asset.sterileUntil, asset.shelfLifeMonths);
                             return status.state === 'OK' ? (
-                              <small>
-                                <SterileDates
-                                  sterilizedOn={asset.sterilizedOn}
-                                  sterileUntil={asset.sterileUntil}
-                                  shelfLifeMonths={asset.shelfLifeMonths}
-                                />
-                              </small>
+                              <span
+                                title={
+                                  asset.sterilizedOn
+                                    ? tr('Αποστείρωση {0}', formatExpiry(asset.sterilizedOn))
+                                    : undefined
+                                }
+                              >
+                                {formatExpiry(asset.sterileUntil)}
+                              </span>
                             ) : (
                               <ExpiryBadge entry={status} />
                             );
-                          })()}
-                        </span>
-                      )}
+                          })()
+                        : '—'}
                     </div>
                     <div className="department-asset-uses">
                       <small>{tr('Χρήσεις')}</small>
                       <strong>
-                        {asset.maxUses !== undefined
-                          ? tr('{0} / {1} χρήσεις', asset.uses || 0, asset.maxUses)
-                          : tr('{0} χρήσεις', asset.uses || 0)}
+                        {asset.maxUses !== undefined ? `${asset.uses || 0} / ${asset.maxUses}` : asset.uses || 0}
                       </strong>
                     </div>
                     <ChevronRight size={19} />
