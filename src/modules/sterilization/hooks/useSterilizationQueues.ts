@@ -4,7 +4,6 @@ import {effectiveState} from '../../../core/workflow';
 import {matchesUsage} from '../../../core/usageFilter';
 import {latestDispatches} from '../../../core/electronicDispatch';
 import {movementStamp} from '../../../core/movementTime';
-import {movementKindOf} from '../../../core/movementText';
 
 /** Entries that change a record but move nothing (details, names, uses, a piece added to a composition). */
 const EDIT = /^(Επεξεργασία στοιχείων|Έλεγχος ονομασιών|Προσθήκη εργαλείου|Διόρθωση χρήσεων|Συμπλήρωση ορίου)/;
@@ -92,10 +91,11 @@ export function useSterilizationQueues(p: ReturnType<typeof useSterilizationStat
   // The attention filter reads the history once: each item's dispatch note and its last movement (when it got here).
   const attention = useMemo(() => {
     if (!attentionFilter) return undefined;
-    // When it got to where it is: the last step of the process, not an edit of its details, a correction or an undo.
+    // When it got to where it is: its last entry that moved it (a step, a stage check), not an edit of its details,
+    // a correction or an undo.
     const lastAt = new Map<string, number>();
     for (const m of movements) {
-      if (m.undoes || EDIT.test(m.status) || movementKindOf(m.status) === 'OTHER') continue;
+      if (m.undoes || EDIT.test(m.status)) continue;
       const barcode = m.asset.split(' · ')[0];
       const at = movementStamp(m.at) || 0;
       if (at > (lastAt.get(barcode) || 0)) lastAt.set(barcode, at);

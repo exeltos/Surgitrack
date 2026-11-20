@@ -40,6 +40,8 @@ export const movementKindOf = (status: string): MovementKind => {
   // A load's own entries name the load first: «Φορτίο πλυντηρίου L… · …» is washing, «Φορτίο L… · …» a cycle.
   if (/^(φορτίο πλυντηρίου|washer load)\s/i.test(status)) return 'WASH';
   if (/^(φορτίο|load)\s/i.test(status)) return 'CYCLE';
+  // A stage's check done (packaging and labelling, …): the preparation of the item.
+  if (/^(ολοκλήρωση ελέγχου|check completed)/i.test(status)) return 'PREP';
   const head = status.split(' · ')[0];
   return KIND_RULES.find(([, rule]) => rule.test(head))?.[0] || 'OTHER';
 };
