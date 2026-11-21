@@ -5,37 +5,29 @@ import TraceabilityPage from '../TraceabilityPage';
 
 const field = () => screen.getByRole('searchbox', {name: 'Barcode (S..., T...) ή όνομα Σετ/εργαλείου'});
 
-describe('Ιχνηλάτηση and its «Πίσω»', () => {
-  it('opens a Set on a screen of its own (no tabs, no search), and «Πίσω» returns to the tab’s list', async () => {
+describe('Ιχνηλάτηση › Σετ / εργαλείο: the list beside the card', () => {
+  it('opens a Set in the card beside the list, which stays with its search and tabs', async () => {
     renderPage(<TraceabilityPage />, {path: '/traceability'});
     expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: 'Πίσω'})).toBeNull();
     fireEvent.change(field(), {target: {value: 'S000321'}});
     fireEvent.submit(field().closest('form')!);
     expect(await screen.findByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
-    expect(screen.queryByRole('tablist', {name: 'Τι ψάχνετε'})).toBeNull();
-    expect(screen.queryByRole('searchbox')).toBeNull();
-    // Into a patient of that Set, then back to the Set, then back to the empty search.
-    const patientLink = screen.queryAllByRole('button', {name: /^PT-|^Ασθενής /})[0];
-    if (patientLink) {
-      fireEvent.click(patientLink);
-      expect(await screen.findByText('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')).toBeInTheDocument();
-      fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
-      expect(await screen.findByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
-    }
-    fireEvent.click(screen.getByRole('button', {name: 'Πίσω'}));
-    await screen.findByRole('region', {name: 'Κινήθηκαν πρόσφατα'});
-    expect(field()).toHaveValue('');
+    // The list and the search stay; no «Πίσω» is needed to pick another.
     expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
+    expect(field()).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Πίσω'})).toBeNull();
+    const list = screen.getByRole('region', {name: 'Κινήθηκαν πρόσφατα'});
+    expect(list.querySelector('[aria-current="true"]')?.textContent).toContain('S000321');
   });
 
-  it('a recent search picked again opens its item again', async () => {
-    renderPage(<TraceabilityPage />, {path: '/traceability'});
-    fireEvent.change(field(), {target: {value: 'S000321'}});
-    fireEvent.submit(field().closest('form')!);
-    fireEvent.click(await screen.findByRole('button', {name: 'Πίσω'}));
-    fireEvent.click(await screen.findByRole('button', {name: 'S000321'}));
+  it('picks another item from the list, changing only the card', async () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?q=S000321'});
+    const list = screen.getByRole('region', {name: 'Κινήθηκαν πρόσφατα'});
+    const other = [...list.querySelectorAll('button')].find(b => !b.textContent?.includes('S000321'))!;
+    const code = other.querySelector('.trace-code')!.textContent!.trim();
+    fireEvent.click(other);
     expect(await screen.findByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
+    expect(document.querySelector('.trace-item-head .mono')?.textContent).toBe(code);
+    expect(screen.getByRole('region', {name: 'Κινήθηκαν πρόσφατα'})).toBeInTheDocument();
   });
 });

@@ -2521,6 +2521,9 @@ export const en: Record<string, string> = {
   'Αναζήτηση στην αναφορά…': 'Search the report…',
   'Σάρωση ή αναζήτηση: barcode, ονομασία, κωδικός ή τμήμα…': 'Scan or search: barcode, name, code or department…',
   'Όλες οι ημερομηνίες': 'All dates',
+  'Σετ και εργαλεία': 'Sets and instruments',
+  'Διαλέξτε ένα Σετ ή εργαλείο από τη λίστα, ή γράψτε το barcode του.':
+    'Pick a Set or instrument from the list, or type its barcode.',
   'Προβολή ιστορικού': 'History view',
   'Όλοι οι γύροι': 'All rounds',
   Ημερομηνίες: 'Dates',

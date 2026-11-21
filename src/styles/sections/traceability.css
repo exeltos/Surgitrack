@@ -706,3 +706,100 @@ html body .trace-dates .trace-link {
 html body .asset-detail-full-panel .trace-history-block {
   padding: 4px 2px;
 }
+
+/* «Σετ / εργαλείο»: the page at the window's height, the list on the left and the open item's card on the right, each
+   scrolling inside itself — nothing cut, the page stays put. */
+html body .trace-page:has(> .trace-split) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+html body .trace-split {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
+  gap: 14px;
+  min-height: 0;
+}
+html body .trace-split-card {
+  min-height: 0;
+  overflow-y: auto;
+}
+/* The search stays on top; only the list under it scrolls. */
+html body .trace-split-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+html body .trace-split-list > .trace-recent-list {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+html body .trace-split-list > .trace-recent-list > ul {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+html body .trace-split-list .trace-search-bar {
+  margin-bottom: 0;
+}
+html body .trace-split-card {
+  padding: 14px 18px 18px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgb(16 42 52 / 5%);
+}
+html body .trace-split-card .trace-item-head {
+  margin-top: 0;
+}
+html body .trace-split-empty {
+  margin: 40px auto;
+  max-width: 320px;
+  color: var(--c-gray-45);
+  text-align: center;
+}
+/* In the narrow list: the barcode with the date, the name, then what happened — on lines of their own. */
+html body .trace-split-list .trace-recent-list button {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  padding: 9px 14px;
+}
+html body .trace-split-list .trace-recent-list button > span:nth-child(2) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  color: var(--c-blue-15-2);
+  white-space: normal;
+}
+html body .trace-split-list .trace-recent-list button > span:nth-child(3) {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  font-size: 12px;
+}
+html body .trace-split-list .trace-recent-list button > span:nth-child(4) {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 12px;
+}
+/* The item open in the card, marked in the list. */
+html body .trace-split-list .trace-recent-list button.selected {
+  background: var(--c-gray-100-2);
+  box-shadow: inset 3px 0 0 var(--c-cyan-35);
+}
+/* A narrow window: the list, then the card, one under the other; the page scrolls. */
+@media (max-width: 1000px) {
+  html body .trace-page:has(> .trace-split) {
+    overflow-y: auto;
+  }
+  html body .trace-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html body .trace-split-card,
+  html body .trace-split-list > .trace-recent-list > ul {
+    overflow: visible;
+  }
+}
