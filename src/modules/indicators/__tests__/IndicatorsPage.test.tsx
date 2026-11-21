@@ -8,7 +8,7 @@ describe('Indicators', () => {
     renderPage(<IndicatorsPage />, {path: '/indicators'});
     fireEvent.click(screen.getByRole('tab', {name: /Χρήση/}));
     // Patients, Sets and instruments repeat the uses in the sample (every use a Set, one patient each): a list of uses.
-    expect(document.querySelector('.ind-table')).toBeNull();
+    expect(document.querySelector('table')).toBeNull();
     expect(screen.getByRole('list', {name: 'Ανά τμήμα'})).toBeInTheDocument();
     expect(screen.queryByText('Εργαλεία', {selector: '.ind-fact-label'})).toBeNull();
     expect(screen.queryByRole('heading', {name: 'Εργαλεία που χρησιμοποιήθηκαν περισσότερο'})).toBeNull();

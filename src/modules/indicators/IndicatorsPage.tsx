@@ -260,91 +260,98 @@ export default function IndicatorsPage() {
             />
           </div>
 
-          <section className="ind-section" aria-labelledby="ind-heat">
-            <h2 id="ind-heat">{L('Φόρτος ανά ημέρα και ώρα', 'Load by day and hour')}</h2>
-            <p className="ind-note">
-              {L(
-                'Οι κινήσεις κάθε ώρας της εβδομάδας· όσο πιο σκούρο, τόσο περισσότερη δουλειά.',
-                'The movements of each hour of the week; the darker, the busier.',
-              )}
-            </p>
-            <div className="ind-heat-wrap" tabIndex={0} role="region" aria-label={L('Φόρτος ανά ώρα', 'Load by hour')}>
-              <table className="ind-heat">
-                <thead>
-                  <tr>
-                    <th>
-                      <span className="visually-hidden">{L('Ημέρα', 'Day')}</span>
-                    </th>
-                    {load.byHour.map((_, h) => (
-                      <th key={h} scope="col">
-                        {h % 3 === 0 ? String(h).padStart(2, '0') : <span className="visually-hidden">{h}</span>}
+          <div className="ind-board ind-board-load">
+            <section className="ind-section ind-panel ind-panel-wide" aria-labelledby="ind-heat">
+              <h2 id="ind-heat">{L('Φόρτος ανά ημέρα και ώρα', 'Load by day and hour')}</h2>
+              <p className="ind-note">
+                {L(
+                  'Οι κινήσεις κάθε ώρας της εβδομάδας· όσο πιο σκούρο, τόσο περισσότερη δουλειά.',
+                  'The movements of each hour of the week; the darker, the busier.',
+                )}
+              </p>
+              <div
+                className="ind-heat-wrap"
+                tabIndex={0}
+                role="region"
+                aria-label={L('Φόρτος ανά ώρα', 'Load by hour')}
+              >
+                <table className="ind-heat">
+                  <thead>
+                    <tr>
+                      <th>
+                        <span className="visually-hidden">{L('Ημέρα', 'Day')}</span>
                       </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {load.grid.map((row, d) => (
-                    <tr key={d}>
-                      <th scope="row" className="ind-cap">
-                        {weekday(d, 'short')}
-                      </th>
-                      {row.map((n, h) => (
-                        <td
-                          key={h}
-                          title={`${weekday(d, 'long')} ${hourSpan(h)}: ${n}`}
-                          style={{opacity: n ? 0.15 + 0.85 * (n / Math.max(1, load.max)) : undefined}}
-                          className={n ? 'on' : undefined}
-                        >
-                          <span className="visually-hidden">{n}</span>
-                        </td>
+                      {load.byHour.map((_, h) => (
+                        <th key={h} scope="col">
+                          {h % 3 === 0 ? String(h).padStart(2, '0') : <span className="visually-hidden">{h}</span>}
+                        </th>
                       ))}
                     </tr>
+                  </thead>
+                  <tbody>
+                    {load.grid.map((row, d) => (
+                      <tr key={d}>
+                        <th scope="row" className="ind-cap">
+                          {weekday(d, 'short')}
+                        </th>
+                        {row.map((n, h) => (
+                          <td
+                            key={h}
+                            title={`${weekday(d, 'long')} ${hourSpan(h)}: ${n}`}
+                            style={{opacity: n ? 0.15 + 0.85 * (n / Math.max(1, load.max)) : undefined}}
+                            className={n ? 'on' : undefined}
+                          >
+                            <span className="visually-hidden">{n}</span>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {load.max > 0 && (
+                <p className="ind-legend" aria-hidden="true">
+                  <span>{L('Λιγότερο', 'Less')}</span>
+                  {[0.15, 0.36, 0.58, 0.79, 1].map(o => (
+                    <i key={o} style={{opacity: o}} />
                   ))}
-                </tbody>
-              </table>
-            </div>
-            {load.max > 0 && (
-              <p className="ind-legend" aria-hidden="true">
-                <span>{L('Λιγότερο', 'Less')}</span>
-                {[0.15, 0.36, 0.58, 0.79, 1].map(o => (
-                  <i key={o} style={{opacity: o}} />
-                ))}
-                <span>{L('Περισσότερο', 'More')}</span>
-                <span className="ind-legend-max">
-                  · {L(`έως ${load.max} κινήσεις την ώρα`, `up to ${load.max} movements an hour`)}
-                </span>
-              </p>
-            )}
-          </section>
-
-          <section className="ind-section" aria-labelledby="ind-eq">
-            <h2 id="ind-eq">{L('Κλίβανοι και πλυντήρια', 'Sterilizers and washers')}</h2>
-            <ul className="ind-rows" aria-labelledby="ind-eq">
-              {equipment.map(e => (
-                <li key={e.name}>
-                  <b>{e.name}</b>
-                  <Bar value={e.cycles} max={equipment[0]?.cycles || 1} />
-                  <strong>
-                    {e.cycles} <small>{e.cycles === 1 ? L('κύκλος', 'cycle') : L('κύκλοι', 'cycles')}</small>
-                  </strong>
-                  <small>
-                    {L('Συχνότερα', 'Most often')} {onDay(e.peakDay)}
-                    {e.failed > 0 && (
-                      <em className="ind-bad">
-                        {' · '}
-                        {e.failed === 1
-                          ? L('1 ανεπιτυχής', '1 failed')
-                          : L(`${e.failed} ανεπιτυχείς`, `${e.failed} failed`)}
-                      </em>
-                    )}
-                  </small>
-                </li>
-              ))}
-              {equipment.length === 0 && (
-                <li className="ind-empty">{L('Κανένας κύκλος στην περίοδο.', 'No cycles in the period.')}</li>
+                  <span>{L('Περισσότερο', 'More')}</span>
+                  <span className="ind-legend-max">
+                    · {L(`έως ${load.max} κινήσεις την ώρα`, `up to ${load.max} movements an hour`)}
+                  </span>
+                </p>
               )}
-            </ul>
-          </section>
+            </section>
+
+            <section className="ind-section ind-panel" aria-labelledby="ind-eq">
+              <h2 id="ind-eq">{L('Κλίβανοι και πλυντήρια', 'Sterilizers and washers')}</h2>
+              <ul className="ind-rows" aria-labelledby="ind-eq">
+                {equipment.map(e => (
+                  <li key={e.name}>
+                    <b>{e.name}</b>
+                    <Bar value={e.cycles} max={equipment[0]?.cycles || 1} />
+                    <strong>
+                      {e.cycles} <small>{e.cycles === 1 ? L('κύκλος', 'cycle') : L('κύκλοι', 'cycles')}</small>
+                    </strong>
+                    <small>
+                      {L('Συχνότερα', 'Most often')} {onDay(e.peakDay)}
+                      {e.failed > 0 && (
+                        <em className="ind-bad">
+                          {' · '}
+                          {e.failed === 1
+                            ? L('1 ανεπιτυχής', '1 failed')
+                            : L(`${e.failed} ανεπιτυχείς`, `${e.failed} failed`)}
+                        </em>
+                      )}
+                    </small>
+                  </li>
+                ))}
+                {equipment.length === 0 && (
+                  <li className="ind-empty">{L('Κανένας κύκλος στην περίοδο.', 'No cycles in the period.')}</li>
+                )}
+              </ul>
+            </section>
+          </div>
         </>
       )}
 
@@ -366,39 +373,45 @@ export default function IndicatorsPage() {
               sub={trend(rounds.overall.rounds, before.rounds)}
             />
           </div>
-          <section className="ind-section" aria-labelledby="ind-turn">
-            <h2 id="ind-turn">{L('Ανά τμήμα', 'By department')}</h2>
-            <p className="ind-note">
-              {L(
-                'Από την αποστολή του τμήματος στην Αποστείρωση ως την επιστροφή στο τμήμα· πρώτα τα πιο αργά, με τη διαφορά από τον συνήθη χρόνο.',
-                'From the department’s dispatch to Sterilization until it is back; the slowest first, with the difference from the usual time.',
-              )}
-            </p>
-            <ul className="ind-rows" aria-labelledby="ind-turn">
-              {rounds.departments.map(d => (
-                <li key={d.department}>
-                  <b>{trData(d.department)}</b>
-                  <Bar value={d.median} max={rounds.departments[0]?.median || 1} />
-                  <strong>
-                    {hoursText(d.median)}{' '}
-                    <em
-                      className={`ind-diff ${d.median - rounds.overall.median >= 1 ? 'up' : d.median - rounds.overall.median <= -1 ? 'down' : ''}`}
-                    >
-                      {diffText(d.median - rounds.overall.median)}
-                    </em>
-                  </strong>
-                  <small>
-                    {L('το 90% σε', '90% within')} {hoursText(d.p90)} · {L(`${d.rounds} κύκλοι`, `${d.rounds} cycles`)}
-                  </small>
-                </li>
-              ))}
-              {rounds.departments.length === 0 && (
-                <li className="ind-empty">
-                  {L('Κανένας ολοκληρωμένος κύκλος στην περίοδο.', 'No completed cycle in the period.')}
-                </li>
-              )}
-            </ul>
-          </section>
+          <div className="ind-board">
+            <section className="ind-section ind-panel" aria-labelledby="ind-turn">
+              <h2 id="ind-turn">{L('Ανά τμήμα', 'By department')}</h2>
+              <p className="ind-note">
+                {L(
+                  'Από την αποστολή του τμήματος στην Αποστείρωση ως την επιστροφή στο τμήμα· πρώτα τα πιο αργά, με τη διαφορά από τον συνήθη χρόνο.',
+                  'From the department’s dispatch to Sterilization until it is back; the slowest first, with the difference from the usual time.',
+                )}
+              </p>
+              <ul
+                className={`ind-rows${rounds.departments.length > 6 ? ' ind-rows-two' : ''}`}
+                aria-labelledby="ind-turn"
+              >
+                {rounds.departments.map(d => (
+                  <li key={d.department}>
+                    <b>{trData(d.department)}</b>
+                    <Bar value={d.median} max={rounds.departments[0]?.median || 1} />
+                    <strong>
+                      {hoursText(d.median)}{' '}
+                      <em
+                        className={`ind-diff ${d.median - rounds.overall.median >= 1 ? 'up' : d.median - rounds.overall.median <= -1 ? 'down' : ''}`}
+                      >
+                        {diffText(d.median - rounds.overall.median)}
+                      </em>
+                    </strong>
+                    <small>
+                      {L('το 90% σε', '90% within')} {hoursText(d.p90)} ·{' '}
+                      {L(`${d.rounds} κύκλοι`, `${d.rounds} cycles`)}
+                    </small>
+                  </li>
+                ))}
+                {rounds.departments.length === 0 && (
+                  <li className="ind-empty">
+                    {L('Κανένας ολοκληρωμένος κύκλος στην περίοδο.', 'No completed cycle in the period.')}
+                  </li>
+                )}
+              </ul>
+            </section>
+          </div>
         </>
       )}
 
@@ -419,10 +432,9 @@ export default function IndicatorsPage() {
               <Fact label={L('Εργαλεία', 'Instruments')} value={use.departments.reduce((n, d) => n + d.tools, 0)} />
             )}
           </div>
-          <section className="ind-section" aria-labelledby="ind-use">
-            <h2 id="ind-use">{L('Ανά τμήμα', 'By department')}</h2>
-            {use.departments.length && !showPatients && !showSets && !showTools ? (
-              // Only the uses to say: a list as the others.
+          <div className="ind-board">
+            <section className="ind-section ind-panel" aria-labelledby="ind-use">
+              <h2 id="ind-use">{L('Ανά τμήμα', 'By department')}</h2>
               <ul className="ind-rows" aria-labelledby="ind-use">
                 {use.departments.map(d => (
                   <li key={d.department}>
@@ -431,46 +443,27 @@ export default function IndicatorsPage() {
                     <strong>
                       {d.uses} <small>{d.uses === 1 ? L('χρήση', 'use') : L('χρήσεις', 'uses')}</small>
                     </strong>
+                    {/* Only what differs from the uses: patients, Sets, instruments. */}
+                    {(showPatients || showSets || showTools) && (
+                      <small>
+                        {[
+                          showPatients && L(`${d.patients} ασθενείς`, `${d.patients} patients`),
+                          showSets && L(`${d.sets} Σετ`, `${d.sets} Sets`),
+                          showTools && L(`${d.tools} εργαλεία`, `${d.tools} instruments`),
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </small>
+                    )}
                   </li>
                 ))}
+                {use.departments.length === 0 && (
+                  <li className="ind-empty">
+                    {L('Καμία χρήση σε ασθενή στην περίοδο.', 'No use on a patient in the period.')}
+                  </li>
+                )}
               </ul>
-            ) : use.departments.length ? (
-              <div className="ind-table-wrap" role="region" tabIndex={0} aria-labelledby="ind-use">
-                <table className="ind-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">{L('Τμήμα', 'Department')}</th>
-                      <th scope="col">{L('Χρήσεις', 'Uses')}</th>
-                      {showPatients && <th scope="col">{L('Ασθενείς', 'Patients')}</th>}
-                      {showSets && <th scope="col">{L('Σετ', 'Sets')}</th>}
-                      {showTools && <th scope="col">{L('Εργαλεία', 'Instruments')}</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {use.departments.map(d => (
-                      <tr key={d.department}>
-                        <th scope="row">{trData(d.department)}</th>
-                        <td>
-                          <span className="ind-cell-bar">
-                            <strong>{d.uses}</strong>
-                            <Bar value={d.uses} max={use.departments[0]?.uses || 1} />
-                          </span>
-                        </td>
-                        {showPatients && <td>{d.patients}</td>}
-                        {showSets && <td>{d.sets}</td>}
-                        {showTools && <td>{d.tools}</td>}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="ind-note">
-                {L('Καμία χρήση σε ασθενή στην περίοδο.', 'No use on a patient in the period.')}
-              </p>
-            )}
-          </section>
-          <div className={showTools ? 'ind-columns' : undefined}>
+            </section>
             {(
               [
                 ['sets', L('Σετ που χρησιμοποιήθηκαν περισσότερο', 'Most used Sets'), use.sets],
@@ -481,7 +474,11 @@ export default function IndicatorsPage() {
                   : []),
               ] as const
             ).map(([key, title, list]) => (
-              <section key={key} className="ind-section" aria-labelledby={`ind-${key}`}>
+              <section
+                key={key}
+                className={`ind-section ind-panel${showTools ? '' : ' ind-panel-wide'}`}
+                aria-labelledby={`ind-${key}`}
+              >
                 <h2 id={`ind-${key}`}>{title}</h2>
                 <ol className={`ind-rows${showTools ? '' : ' ind-rows-two'}`} aria-labelledby={`ind-${key}`}>
                   {list.map(k => (
@@ -544,8 +541,8 @@ export default function IndicatorsPage() {
               to={can('issue.view') ? '/issues' : undefined}
             />
           </div>
-          <div className="ind-columns ind-columns-three">
-            <section className="ind-section" aria-labelledby="ind-types">
+          <div className="ind-board">
+            <section className="ind-section ind-panel" aria-labelledby="ind-types">
               <h2 id="ind-types">{L('Εκκρεμότητες ανά είδος', 'Issues by kind')}</h2>
               <ul className="ind-rows" aria-labelledby="ind-types">
                 {problems.byType.map(t => (
@@ -560,7 +557,7 @@ export default function IndicatorsPage() {
                 )}
               </ul>
             </section>
-            <section className="ind-section" aria-labelledby="ind-depts">
+            <section className="ind-section ind-panel" aria-labelledby="ind-depts">
               <h2 id="ind-depts">{L('Εκκρεμότητες ανά τμήμα', 'Issues by department')}</h2>
               <ul className="ind-rows" aria-labelledby="ind-depts">
                 {problems.byDepartment.map(t => (
@@ -573,7 +570,7 @@ export default function IndicatorsPage() {
                 {problems.total === 0 && <li className="ind-empty">—</li>}
               </ul>
             </section>
-            <section className="ind-section" aria-labelledby="ind-loss">
+            <section className="ind-section ind-panel" aria-labelledby="ind-loss">
               <h2 id="ind-loss">{L('Απώλειες και λήξεις τώρα', 'Losses and expiries now')}</h2>
               <p className="ind-note">
                 {L(
