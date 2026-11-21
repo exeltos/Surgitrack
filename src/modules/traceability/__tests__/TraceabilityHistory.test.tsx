@@ -24,10 +24,10 @@ describe('Traceability › All movements', () => {
     const row = document.querySelector('.ledger-row') as HTMLElement;
     fireEvent.click(row);
     fireEvent.click(screen.getByRole('link', {name: /^Ιχνηλάτηση$/}));
-    // The item's card: «Πίσω» in place of the tabs.
-    expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
+    // The item on a screen of its own: its barcode and name, «Πίσω», no tabs.
+    expect(screen.queryByRole('tablist', {name: 'Τι ψάχνετε'})).toBeNull();
+    expect(screen.getByRole('button', {name: 'Πίσω'})).toBeInTheDocument();
     expect(screen.getByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
-    const box = screen.getByPlaceholderText('Barcode (S..., T...) ή όνομα Σετ/εργαλείου') as HTMLInputElement;
-    expect(box.value).toMatch(/^[ST]\d+/);
+    expect(document.querySelector('.trace-item-head .mono')?.textContent).toMatch(/^[ST]\d+/);
   });
 });

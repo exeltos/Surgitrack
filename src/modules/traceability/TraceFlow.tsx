@@ -212,7 +212,10 @@ function CycleStep({
 function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean; onPatient?: (code: string) => void}) {
   const stage = stageOf(m);
   const back = stage === 'send' || stage === 'receive' || stage === 'patient';
-  const place = back ? m.from : m.to;
+  // Only a department is a place worth saying (where it came from, where it was delivered): the steps inside
+  // Sterilization (→ Σύνθεση, → Φόρτωση) are the stages themselves.
+  const sayPlace = back || stage === 'delivery' || !stage;
+  const place = sayPlace ? (back ? m.from : m.to) : undefined;
   return (
     <div className={`trace-flow-event${undone ? ' undone' : ''}`} title={movementText(m.status)}>
       <span className="trace-when">{m.at}</span>

@@ -6,14 +6,15 @@ import TraceabilityPage from '../TraceabilityPage';
 const field = () => screen.getByRole('searchbox', {name: 'Barcode (S..., T...) ή όνομα Σετ/εργαλείου'});
 
 describe('Ιχνηλάτηση and its «Πίσω»', () => {
-  it('inside a card shows «Πίσω» beside the tabs, and «Πίσω» returns to the tab’s list with its tabs', async () => {
+  it('opens a Set on a screen of its own (no tabs, no search), and «Πίσω» returns to the tab’s list', async () => {
     renderPage(<TraceabilityPage />, {path: '/traceability'});
     expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Πίσω'})).toBeNull();
     fireEvent.change(field(), {target: {value: 'S000321'}});
     fireEvent.submit(field().closest('form')!);
     expect(await screen.findByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
-    expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
+    expect(screen.queryByRole('tablist', {name: 'Τι ψάχνετε'})).toBeNull();
+    expect(screen.queryByRole('searchbox')).toBeNull();
     // Into a patient of that Set, then back to the Set, then back to the empty search.
     const patientLink = screen.queryAllByRole('button', {name: /^PT-|^Ασθενής /})[0];
     if (patientLink) {
@@ -29,12 +30,12 @@ describe('Ιχνηλάτηση and its «Πίσω»', () => {
     expect(screen.queryByRole('button', {name: 'Πίσω'})).toBeNull();
   });
 
-  it('a recent search picked again fills the field, even when it is the one in the address', () => {
+  it('a recent search picked again opens its item again', async () => {
     renderPage(<TraceabilityPage />, {path: '/traceability'});
     fireEvent.change(field(), {target: {value: 'S000321'}});
     fireEvent.submit(field().closest('form')!);
-    fireEvent.change(field(), {target: {value: ''}});
-    fireEvent.click(screen.getByRole('button', {name: 'S000321'}));
-    expect(field()).toHaveValue('S000321');
+    fireEvent.click(await screen.findByRole('button', {name: 'Πίσω'}));
+    fireEvent.click(await screen.findByRole('button', {name: 'S000321'}));
+    expect(await screen.findByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
   });
 });

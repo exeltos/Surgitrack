@@ -13,9 +13,9 @@ describe('TraceabilityPage search', () => {
     const first = within(list).getAllByRole('option')[0];
     const barcode = first.querySelector('b')!.textContent!;
     fireEvent.click(within(first).getByRole('button'));
-    expect(field()).toHaveValue(barcode);
     expect(screen.queryByRole('listbox', {name: 'Προτάσεις'})).not.toBeInTheDocument();
     expect(screen.getByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
+    expect(document.querySelector('.trace-item-head .mono')?.textContent).toBe(barcode);
   });
 
   it('offers the items that moved last, as a list, before anything is typed', () => {

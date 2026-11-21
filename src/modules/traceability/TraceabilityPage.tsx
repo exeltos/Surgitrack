@@ -94,6 +94,8 @@ export default function TraceabilityPage() {
   const suggest = useAssetSuggest(q, picked => commit(picked), all);
   const asset = exact || (nameMatches.length === 1 ? nameMatches[0] : undefined);
   const choosing = !asset && nameMatches.length > 1;
+  // Its own screen once opened (Enter, «Αναζήτηση», a pick): not while a barcode is still being typed.
+  const itemOpen = tab === 'SEARCH' && !!asset && (urlQuery || '').trim().toLowerCase() === needle;
   // A member instrument travels inside its Set: the Set's moves belong to its trail too.
   const {carrierSet, moves, cycles, rounds} = asset
     ? traceOf(asset, sets, movements, processLoads, sterilizationCycles)
@@ -155,30 +157,42 @@ export default function TraceabilityPage() {
       {/* The page's title, as on every other page; under it the tabs, or inside one of its cards (a Set or
           instrument found, a patient, a load) only «Πίσω» in their place, as «Πίσω στη λίστα» on the Set and
           instrument pages: to the previous step, or with nothing before it, to the tab's list. */}
-      <PageHeader title={tr('Ιχνηλάτηση')} />
+      {/* A Set or instrument opened: a screen of its own — no tabs, no search, only «Πίσω» by the title. */}
+      <PageHeader
+        title={tr('Ιχνηλάτηση')}
+        actions={
+          itemOpen && (
+            <AppButton icon={<ArrowLeft size={16} />} onClick={goBack} className="trace-page-back">
+              {tr('Πίσω')}
+            </AppButton>
+          )
+        }
+      />
       {/* The tabs stay on every step; inside a found card (a Set or instrument, a patient, a load) «Πίσω» on their
           right goes to the previous step, or with nothing before it, to the tab's list. */}
-      <div className="trace-tabs-row">
-        <div className="name-check-tabs trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              type="button"
-              role="tab"
-              aria-selected={tab === t.id}
-              className={tab === t.id ? 'active' : ''}
-              onClick={() => openTab(t.id)}
-            >
-              <t.icon size={16} aria-hidden="true" /> {tr(t.label)}
-            </button>
-          ))}
+      {!itemOpen && (
+        <div className="trace-tabs-row">
+          <div className="name-check-tabs trace-tabs" role="tablist" aria-label={tr('Τι ψάχνετε')}>
+            {tabs.map(t => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.id}
+                className={tab === t.id ? 'active' : ''}
+                onClick={() => openTab(t.id)}
+              >
+                <t.icon size={16} aria-hidden="true" /> {tr(t.label)}
+              </button>
+            ))}
+          </div>
+          {detailOpen && (
+            <AppButton icon={<ArrowLeft size={16} />} onClick={goBack} className="trace-page-back">
+              {tr('Πίσω')}
+            </AppButton>
+          )}
         </div>
-        {detailOpen && (
-          <AppButton icon={<ArrowLeft size={16} />} onClick={goBack} className="trace-page-back">
-            {tr('Πίσω')}
-          </AppButton>
-        )}
-      </div>
+      )}
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}
       {tab === 'HISTORY' ? (
@@ -192,31 +206,33 @@ export default function TraceabilityPage() {
       ) : (
         <>
           {/* The same search bar as above every other list; Enter or «Αναζήτηση» opens what was typed. */}
-          <form
-            className="asset-filter-bar trace-search-bar"
-            onSubmit={e => {
-              e.preventDefault();
-              commit(q);
-            }}
-          >
-            <div className="asset-filter-search">
-              <Search size={17} />
-              <input
-                type="search"
-                value={q}
-                onChange={e => setQ(e.target.value)}
-                onKeyDown={suggest.onKeyDown}
-                onBlur={() => needle && commit(q)}
-                placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
-                aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
-              />
-            </div>
-            <button className="asset-filter-toggle" type="submit">
-              {tr('Αναζήτηση')}
-            </button>
-            {suggest.listbox}
-          </form>
-          {!needle && recent.length > 0 && (
+          {!itemOpen && (
+            <form
+              className="asset-filter-bar trace-search-bar"
+              onSubmit={e => {
+                e.preventDefault();
+                commit(q);
+              }}
+            >
+              <div className="asset-filter-search">
+                <Search size={17} />
+                <input
+                  type="search"
+                  value={q}
+                  onChange={e => setQ(e.target.value)}
+                  onKeyDown={suggest.onKeyDown}
+                  onBlur={() => needle && commit(q)}
+                  placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+                  aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+                />
+              </div>
+              <button className="asset-filter-toggle" type="submit">
+                {tr('Αναζήτηση')}
+              </button>
+              {suggest.listbox}
+            </form>
+          )}
+          {!itemOpen && !needle && recent.length > 0 && (
             <div className="trace-recent">
               <History size={15} />
               <span>{tr('Πρόσφατες αναζητήσεις')}</span>

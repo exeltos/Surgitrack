@@ -42,6 +42,8 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
   const daysLeft = daysUntil(sterileUntil);
   const uses = tool ? tool.uses : (asset as SetAsset).uses;
   const maxUses = tool?.maxUses;
+  const currentCycle = rounds[0]?.cycle;
+  const currentPatient = rounds[0]?.moves.some(m => m.patientCode && !undone.has(m.id));
 
   return (
     <>
@@ -75,7 +77,8 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               </>
             ),
           },
-          {
+          // What the current round already shows (its cycle, its patient) is not said again here.
+          !currentCycle && {
             label: tr('Τελευταίος κύκλος'),
             value: lastCycle ? (
               <>
@@ -94,7 +97,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               '—'
             ),
           },
-          {
+          !currentPatient && {
             label: tr('Τελευταίος ασθενής'),
             value: lastPatient ? (
               <>
@@ -109,7 +112,8 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               '—'
             ),
           },
-          {
+          // Uses and expiry only when there is something to say.
+          (!!maxUses || !!uses) && {
             label: tr('Χρήσεις'),
             value: maxUses ? (
               <>
@@ -122,7 +126,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               <b>{uses ?? '—'}</b>
             ),
           },
-          {
+          !!sterileUntil && {
             label: tr('Αποστειρωμένο έως'),
             value: sterileUntil ? (
               <>
@@ -137,7 +141,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               '—'
             ),
           },
-        ]}
+        ].filter(<T,>(row: T | false): row is T => row !== false)}
       />
 
       <ItemHistory key={asset.id} rounds={rounds} onPatient={onPatient} onLoad={onLoad} />
