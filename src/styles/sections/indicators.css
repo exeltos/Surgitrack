@@ -199,7 +199,7 @@ a.ind-fact:hover .ind-fact-go {
 .ind-rows li {
   display: grid;
   /* The name, a bar of a reading width, the figure right after it (not across the page). */
-  grid-template-columns: minmax(140px, 280px) minmax(80px, 360px) minmax(0, 1fr);
+  grid-template-columns: minmax(120px, 280px) minmax(60px, 360px) auto;
   align-items: center;
   gap: 2px 12px;
   padding: 6px 0;
@@ -251,6 +251,10 @@ a.ind-fact:hover .ind-fact-go {
 .ind-rows.ind-rows-two li {
   break-inside: avoid;
   grid-template-columns: minmax(140px, 1fr) minmax(80px, 1fr) auto;
+}
+/* Two or three lists side by side: the name and the bar share what is left, the figure keeps its width. */
+.ind-columns .ind-rows li {
+  grid-template-columns: minmax(0, 1.3fr) minmax(60px, 1fr) auto;
 }
 /* The quality: three lists side by side. */
 .ind-columns.ind-columns-three {
