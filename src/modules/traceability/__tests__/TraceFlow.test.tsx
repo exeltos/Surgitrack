@@ -29,6 +29,7 @@ const round: Round = {
     tone: 'ok',
     by: 'Νίκος',
     releasedAt: '12/11/2026 08:30',
+    status: 'RELEASED',
   },
   moves: [
     move('m1', 'Παραλαβή στην Αποστείρωση', '11/11/2026 11:40'),
@@ -44,6 +45,7 @@ describe('TraceFlow', () => {
     render(<TraceFlow rounds={[round]} undone={new Set()} onPatient={onPatient} onLoad={onLoad} />);
     const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
     expect(steps.map(s => s.querySelector('strong')?.textContent)).toEqual([
+      'Αποστολή',
       'Παραλαβή',
       'Καθαρισμός',
       'Σύνθεση',
@@ -52,15 +54,19 @@ describe('TraceFlow', () => {
       'Παράδοση',
       'Ασθενής',
     ]);
-    expect(steps[0]).toHaveTextContent('← Χειρουργείο');
-    expect(steps[1]).toHaveClass('is-empty');
-    expect(steps[3]).toHaveTextContent('Κλίβανος Ατμού 02');
-    expect(steps[3]).toHaveTextContent('Νίκος');
-    expect(steps[4]).toHaveTextContent('12/11/2026 08:30');
-    expect(steps[5]).toHaveTextContent('→ Χειρουργείο');
-    fireEvent.click(within(steps[6]).getByRole('button', {name: 'PT-2026-0177'}));
+    expect(steps[1]).toHaveTextContent('← Χειρουργείο');
+    expect(steps[2]).toHaveClass('is-empty');
+    expect(steps[4]).toHaveTextContent('Κλίβανος Ατμού 02');
+    // The cycle's result here; its release is said once, in «Αποδέσμευση».
+    expect(steps[4]).toHaveTextContent('Επιτυχία');
+    expect(steps[4]).not.toHaveTextContent('Αποδεσμεύτηκε');
+    expect(steps[0]).toHaveClass('is-empty');
+    expect(steps[4]).toHaveTextContent('Νίκος');
+    expect(steps[5]).toHaveTextContent('12/11/2026 08:30');
+    expect(steps[6]).toHaveTextContent('→ Χειρουργείο');
+    fireEvent.click(within(steps[7]).getByRole('button', {name: 'PT-2026-0177'}));
     expect(onPatient).toHaveBeenCalledWith('PT-2026-0177');
-    fireEvent.click(within(steps[3]).getByRole('button', {name: 'Φορτίο'}));
+    fireEvent.click(within(steps[4]).getByRole('button', {name: 'Φορτίο'}));
     expect(onLoad).toHaveBeenCalledWith('L1');
   });
 
@@ -75,10 +81,27 @@ describe('TraceFlow', () => {
     };
     render(<TraceFlow rounds={[r]} undone={new Set()} onPatient={vi.fn()} onLoad={vi.fn()} />);
     const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
-    expect(steps[4]).toHaveTextContent('ΑΝΑΚΛΗΣΗ φορτίου 2026-0927');
-    expect(within(steps[4]).getByRole('button', {name: 'PT-1'})).toBeInTheDocument();
-    expect(steps[6]).toHaveTextContent('Καταμέτρηση εργαλείων υπογεγραμμένη');
-    expect(steps[6]).not.toHaveTextContent('PT-1');
+    expect(steps[5]).toHaveTextContent('ΑΝΑΚΛΗΣΗ φορτίου 2026-0927');
+    expect(within(steps[5]).getByRole('button', {name: 'PT-1'})).toBeInTheDocument();
+    expect(steps[7]).toHaveTextContent('Καταμέτρηση εργαλείων υπογεγραμμένη');
+    expect(steps[7]).not.toHaveTextContent('PT-1');
     expect(screen.getByText(/Set S000321 → Set S000341/)).toBeInTheDocument();
+  });
+
+  it('puts a send without a patient code under «Αποστολή», leaving «Ασθενής» empty, and the load moves once', () => {
+    const r: Round = {
+      key: 'r3',
+      cycle: {...round.cycle!, id: 'L9', loadId: 'L9'},
+      moves: [
+        move('s', 'Αποστολή προς αποστείρωση', '18/11/2026 13:22', {from: 'ΜΕΘ', by: 'ΣΑΡΡΟΣ'}),
+        move('l', 'Φορτίο L9 · ΚΛΙΒΑΝΟΣ Α · κύκλος 3 · σε εξέλιξη', '19/11/2026 12:47', {to: 'Στον κλίβανο'}),
+      ],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} onPatient={vi.fn()} onLoad={vi.fn()} />);
+    const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
+    expect(steps[0]).toHaveTextContent('← ΜΕΘ');
+    expect(steps[0]).toHaveTextContent('ΣΑΡΡΟΣ');
+    expect(steps[7]).toHaveClass('is-empty');
+    expect(screen.queryByText(/Στον κλίβανο/)).toBeNull();
   });
 });

@@ -30,6 +30,8 @@ export type CycleEntry = {
   /** Who loaded it, and when the load was released. */
   by?: string;
   releasedAt?: string;
+  /** The load's status, when the cycle was recorded as a load. */
+  status?: ProcessLoadStatus;
 };
 
 export const LOAD_STATUS: Record<ProcessLoadStatus, {label: string; tone: Tone}> = {
@@ -75,6 +77,7 @@ export const cyclesOf = (
         via: viaSet ? inSet?.barcode : undefined,
         by: l.createdByName,
         releasedAt: l.releasedAt,
+        status: l.status,
       });
     });
   sterilizationCycles

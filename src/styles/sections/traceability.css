@@ -485,7 +485,7 @@ html body .trace-flow-round h4 span {
 }
 html body .trace-flow {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   margin: 0;
   padding: 12px 8px;
   list-style: none;
@@ -556,9 +556,7 @@ html body .trace-flow-event + .trace-flow-event {
   border-top: 1px dashed var(--c-gray-90);
 }
 html body .trace-flow-event > * {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 html body .trace-flow-event b {
   color: var(--c-blue-15-2);
@@ -578,9 +576,6 @@ html body .trace-flow-event .trace-link {
 }
 html body .trace-flow-event > .trace-flow-action {
   color: var(--c-blue-15-2);
-}
-html body .trace-flow-event > .wrap {
-  white-space: normal;
 }
 html body .trace-flow-event > .trace-flow-result {
   display: flex;

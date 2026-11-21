@@ -13,22 +13,23 @@ type Props = {
 
 /** The stages of one round, in the order an item goes through them. */
 const STAGES: Array<{key: string; label: string; kinds: MovementKind[]}> = [
+  {key: 'send', label: 'Αποστολή', kinds: ['SEND']},
   {key: 'receive', label: 'Παραλαβή', kinds: ['RECEIVE']},
   {key: 'wash', label: 'Καθαρισμός', kinds: ['WASH']},
   {key: 'prep', label: 'Σύνθεση', kinds: ['PREP']},
   {key: 'cycle', label: 'Κλίβανος', kinds: ['CYCLE']},
   {key: 'release', label: 'Αποδέσμευση', kinds: ['RELEASE']},
   {key: 'delivery', label: 'Παράδοση', kinds: ['DELIVERY']},
-  {key: 'patient', label: 'Ασθενής', kinds: ['SEND']},
+  {key: 'patient', label: 'Ασθενής', kinds: []},
 ];
 
 /**
- * The stage of a move, by what it did: a send back (and a count signed at the operation) is the use on the patient;
- * a recall carries the item's patient code too, but stays a recall.
+ * The stage of a move, by what it did: a send back with a patient code (or a count signed at the operation) is the use
+ * on that patient, a send without one only the send; a recall carries the item's patient code too, but stays a recall.
  */
 const stageOf = (m: Movement) => {
   const kind = movementKindOf(m.status);
-  if (kind === 'SEND' || (kind === 'OTHER' && m.patientCode)) return 'patient';
+  if ((kind === 'SEND' || kind === 'OTHER') && m.patientCode) return 'patient';
   return STAGES.find(s => s.kinds.includes(kind))?.key;
 };
 
@@ -48,7 +49,10 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
       {rounds.map((round, index) => {
         const byStage = new Map<string, Movement[]>();
         const others: Movement[] = [];
+        // The load's own moves (into the sterilizer, its result) are the cycle shown once in «Κλίβανος».
+        const loadText = round.cycle?.loadId && `Φορτίο ${round.cycle.loadId} `;
         [...round.moves]
+          .filter(m => !loadText || !m.status.startsWith(loadText))
           .sort((a, b) => time(a.at) - time(b.at))
           .forEach(m => {
             const stage = stageOf(m);
@@ -70,9 +74,13 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
               {STAGES.map(stage => {
                 const moves = byStage.get(stage.key) || [];
                 const cycle = stage.key === 'cycle' ? round.cycle : undefined;
-                // A released load fills the release, when no move recorded it.
+                // The load's release fills the release, when no move recorded it.
                 const released =
-                  stage.key === 'release' && !moves.length && round.cycle?.releasedAt ? round.cycle : undefined;
+                  stage.key === 'release' &&
+                  !moves.length &&
+                  (round.cycle?.releasedAt || round.cycle?.status === 'AWAITING_RELEASE')
+                    ? round.cycle
+                    : undefined;
                 const empty = !moves.length && !cycle && !released;
                 return (
                   <li key={stage.key} className={`trace-flow-step ${stage.key}${empty ? ' is-empty' : ''}`}>
@@ -81,7 +89,13 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
                     {cycle && <CycleStep cycle={cycle} onLoad={onLoad} />}
                     {released && (
                       <div className="trace-flow-event">
-                        <span className="trace-when">{released.releasedAt}</span>
+                        {released.releasedAt ? (
+                          <span className="trace-when">{released.releasedAt}</span>
+                        ) : (
+                          <span className="trace-flow-result">
+                            <i className="trace-tone wait">{tr('Αναμονή αποδέσμευσης')}</i>
+                          </span>
+                        )}
                         <b>
                           {tr('Φορτίο')} #{shortCycleNumber(released.cycleNumber)}
                         </b>
@@ -112,19 +126,30 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
   );
 }
 
+/** A load past its cycle: the cycle went well; its release is said in «Αποδέσμευση». */
+const CYCLE_OK = new Set(['PASSED', 'AWAITING_RELEASE', 'RELEASED']);
+
 function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad: (loadId: string) => void}) {
+  const ok = !!c.status && CYCLE_OK.has(c.status);
+  const startDay = c.start && c.start !== c.at ? day(c.start) : undefined;
   return (
     <div className="trace-flow-event">
-      <span className="trace-when">{c.at}</span>
-      <b className="wrap">{c.sterilizer}</b>
+      <span className="trace-when">
+        {startDay
+          ? startDay === day(c.at)
+            ? `${c.start} – ${c.at.split(' ')[1] || ''}`
+            : `${c.start} – ${c.at}`
+          : c.at}
+      </span>
+      <b>{c.sterilizer}</b>
       <small>
         {tr('κύκλος {0}', shortCycleNumber(c.cycleNumber))}
         {c.program ? ` · ${c.program}` : ''}
       </small>
       {c.via && <small>{tr('με το Σετ {0}', c.via)}</small>}
-      {c.by && <small className="wrap">{trData(c.by)}</small>}
+      {c.by && <small>{trData(c.by)}</small>}
       <span className="trace-flow-result">
-        <i className={`trace-tone ${c.tone}`}>{tr(c.label)}</i>
+        <i className={`trace-tone ${ok ? 'ok' : c.tone}`}>{ok ? tr('Επιτυχία') : tr(c.label)}</i>
         {c.loadId && (
           <button type="button" className="trace-link" onClick={() => onLoad(c.loadId!)}>
             {tr('Φορτίο')}
@@ -137,12 +162,14 @@ function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad: (loadId: stri
 
 function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean; onPatient: (code: string) => void}) {
   const stage = stageOf(m);
-  const back = stage === 'receive' || stage === 'patient';
+  const back = stage === 'send' || stage === 'receive' || stage === 'patient';
   const place = back ? m.from : m.to;
   return (
     <div className={`trace-flow-event${undone ? ' undone' : ''}`} title={movementText(m.status)}>
       <span className="trace-when">{m.at}</span>
-      {stage && MIXED.has(stage) && <small className="trace-flow-action">{movementText(m.status)}</small>}
+      {stage && MIXED.has(stage) && movementKindOf(m.status) !== 'SEND' && (
+        <small className="trace-flow-action">{movementText(m.status)}</small>
+      )}
       {m.patientCode && (
         <button type="button" className="trace-link" onClick={() => onPatient(m.patientCode!)}>
           {m.patientCode}
@@ -156,7 +183,7 @@ function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean
             {back ? '←' : '→'} {trData(place)}
           </b>
         ))}
-      <small className="wrap">{trData(m.by)}</small>
+      <small>{trData(m.by)}</small>
       {undone && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
     </div>
   );
