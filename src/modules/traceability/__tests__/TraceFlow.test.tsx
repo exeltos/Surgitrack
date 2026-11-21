@@ -120,4 +120,19 @@ describe('TraceFlow', () => {
     const action = within(wash).getByText(/Πλυντήριο 2 · 14 · ΑΠΟΤΥΧΙΑ/);
     expect(action).toHaveClass('failed');
   });
+
+  it('says an undo and its reason, and shows a patient as plain text without access to Ιχνηλάτηση', () => {
+    const r: Round = {
+      key: 'r5',
+      moves: [
+        move('u', 'Αναίρεση: Παραλαβή στην Αποστείρωση', '18/11/2026 15:00', {undoes: 'x', note: 'Λάθος Σετ'}),
+        move('p', 'Αποστολή προς αποστείρωση', '18/11/2026 16:00', {patientCode: 'PT-9'}),
+      ],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} />);
+    expect(screen.getByText('Αιτιολογία: Λάθος Σετ')).toBeInTheDocument();
+    expect(screen.getByText(/Αναίρεση: Παραλαβή/)).toBeInTheDocument();
+    expect(screen.getByText('PT-9')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'PT-9'})).toBeNull();
+  });
 });

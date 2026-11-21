@@ -7,8 +7,9 @@ import {time, type CycleEntry, type Round} from './traceModel';
 type Props = {
   rounds: Round[];
   undone: Set<string>;
-  onPatient: (code: string) => void;
-  onLoad: (loadId: string) => void;
+  /** Open a patient, a load; without them (no access to Ιχνηλάτηση) the code is plain text and there is no link. */
+  onPatient?: (code: string) => void;
+  onLoad?: (loadId: string) => void;
 };
 
 /** The stages of one round, in the order an item goes through them. */
@@ -136,7 +137,7 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
 /** A load past its cycle: the cycle went well; its release is said in «Αποδέσμευση». */
 const CYCLE_OK = new Set(['PASSED', 'AWAITING_RELEASE', 'RELEASED']);
 
-function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad: (loadId: string) => void}) {
+function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad?: (loadId: string) => void}) {
   const ok = !!c.status && CYCLE_OK.has(c.status);
   const startDay = c.start && c.start !== c.at ? day(c.start) : undefined;
   return (
@@ -157,7 +158,7 @@ function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad: (loadId: stri
       {c.by && <small>{trData(c.by)}</small>}
       <span className="trace-flow-result">
         <i className={`trace-tone ${ok ? 'ok' : c.tone}`}>{ok ? tr('Επιτυχία') : tr(c.label)}</i>
-        {c.loadId && (
+        {c.loadId && onLoad && (
           <button type="button" className="trace-link" onClick={() => onLoad(c.loadId!)}>
             {tr('Φορτίο')}
           </button>
@@ -167,21 +168,32 @@ function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad: (loadId: stri
   );
 }
 
-function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean; onPatient: (code: string) => void}) {
+function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean; onPatient?: (code: string) => void}) {
   const stage = stageOf(m);
   const back = stage === 'send' || stage === 'receive' || stage === 'patient';
   const place = back ? m.from : m.to;
   return (
     <div className={`trace-flow-event${undone ? ' undone' : ''}`} title={movementText(m.status)}>
       <span className="trace-when">{m.at}</span>
-      {stage && MIXED.has(stage) && movementKindOf(m.status) !== 'SEND' && (
-        <small className={`trace-flow-action${FAILED.test(m.status) ? ' failed' : ''}`}>{movementText(m.status)}</small>
+      {/* An undo always says what it undid, and why. */}
+      {(m.undoes || (stage && MIXED.has(stage) && movementKindOf(m.status) !== 'SEND')) && (
+        <small className={`trace-flow-action${FAILED.test(m.status) || m.undoes ? ' failed' : ''}`}>
+          {movementText(m.status)}
+        </small>
       )}
-      {m.patientCode && (
-        <button type="button" className="trace-link" onClick={() => onPatient(m.patientCode!)}>
-          {m.patientCode}
-        </button>
+      {m.undoes && m.note && (
+        <small>
+          {tr('Αιτιολογία')}: {m.note}
+        </small>
       )}
+      {m.patientCode &&
+        (onPatient ? (
+          <button type="button" className="trace-link" onClick={() => onPatient(m.patientCode!)}>
+            {m.patientCode}
+          </button>
+        ) : (
+          <b>{m.patientCode}</b>
+        ))}
       {place &&
         (stage === 'patient' ? (
           <small>{trData(place)}</small>

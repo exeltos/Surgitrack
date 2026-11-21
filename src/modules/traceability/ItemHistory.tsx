@@ -10,8 +10,8 @@ import {roundsBetween, traceOf, type Round} from './traceModel';
 
 type Props = {
   rounds: Round[];
-  onPatient: (code: string) => void;
-  onLoad: (loadId: string) => void;
+  onPatient?: (code: string) => void;
+  onLoad?: (loadId: string) => void;
   /** The heading over it; none when the page already says it. */
   title?: string;
 };
@@ -95,15 +95,17 @@ export default function ItemHistory({rounds, onPatient, onLoad, title = tr('Ισ
 
 /** The same «Ιστορικό» on a Set's or an instrument's own page: a patient or a load opens in Ιχνηλάτηση. */
 export function AssetItemHistory({item}: {item: SetAsset | Tool}) {
-  const {sets, movements, processLoads, sterilizationCycles} = useSurgi();
+  const {sets, movements, processLoads, sterilizationCycles, can} = useSurgi();
+  // A patient or a load opens in Ιχνηλάτηση: only for those who may see it (not a department).
+  const trace = can('traceability.view');
   const navigate = useNavigate();
   const {rounds} = traceOf(item, sets, movements, processLoads, sterilizationCycles);
   return (
     <ItemHistory
       rounds={rounds}
       title={tr('Ιστορικό κινήσεων')}
-      onPatient={code => navigate(`/traceability?tab=patients&patient=${encodeURIComponent(code)}`)}
-      onLoad={id => navigate(`/traceability?tab=load&load=${encodeURIComponent(id)}`)}
+      onPatient={trace ? code => navigate(`/traceability?tab=patients&patient=${encodeURIComponent(code)}`) : undefined}
+      onLoad={trace ? id => navigate(`/traceability?tab=load&load=${encodeURIComponent(id)}`) : undefined}
     />
   );
 }
