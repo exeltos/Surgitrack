@@ -164,7 +164,9 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
     );
   return (
     <div
-      className={`ster-work-panel ${queue === 'INCOMING' ? 'receipt-queue-panel' : ''}${noStatus ? ' no-status' : ''}`}
+      className={`ster-work-panel ${queue === 'INCOMING' ? 'receipt-queue-panel' : ''}${noStatus ? ' no-status' : ''}${
+        queue === 'READY' ? ' by-department' : ''
+      }`}
     >
       {/* The stage and its count are in the step bar above: this row only holds the stage's actions. */}
       <div className="ster-panel-head">
@@ -352,10 +354,7 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                         <ScanBarcode size={15} /> {tr('Παραλαβή όλων')}
                       </button>
                     ) : (
-                      <button
-                        className="app-button app-button-secondary ster-group-action"
-                        onClick={() => openDeliveryBatch(item.department)}
-                      >
+                      <button className="primary compact" onClick={() => openDeliveryBatch(item.department)}>
                         <UserRoundCheck size={15} /> {tr('Παράδοση όλων')}
                       </button>
                     )}
