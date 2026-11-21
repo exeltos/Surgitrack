@@ -47,39 +47,102 @@
   font-weight: 600;
   box-shadow: inset 0 -2px 0 var(--c-cyan-35);
 }
-/* The tab's figures: small KPI boxes in a row, the same width each. */
+/* The tab's figures: KPI cards in a row, the same width each — an icon on a light tint, what it counts, the figure,
+   a line that places it. */
 .ind-facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 10px;
-  margin: 0;
 }
-.ind-facts:has(> div:only-child) {
-  grid-template-columns: minmax(150px, 280px);
+.ind-facts:has(> :only-child) {
+  grid-template-columns: minmax(190px, 300px);
 }
-.ind-facts > div {
-  padding: 10px 14px;
+.ind-fact {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px 14px;
   border: 1px solid var(--c-gray-90);
   border-radius: 12px;
   background: var(--c-white);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgb(16 42 52 / 4%);
 }
-.ind-facts dt {
+a.ind-fact {
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+a.ind-fact:hover {
+  border-color: var(--c-cyan-65);
+  box-shadow: 0 2px 8px rgb(16 42 52 / 8%);
+}
+.ind-fact-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-35);
+}
+.ind-fact-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.ind-fact-label {
+  overflow: hidden;
   color: var(--c-gray-45);
   font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.ind-facts dd {
-  margin: 4px 0 0;
+.ind-fact-value {
+  color: var(--c-cyan-20-3);
   font-size: 22px;
   font-weight: 600;
+  line-height: 1.15;
   font-variant-numeric: tabular-nums;
 }
-.ind-facts dd small {
+.ind-fact-sub {
+  overflow: hidden;
   color: var(--c-gray-45);
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ind-fact-go {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: var(--c-gray-65);
+}
+a.ind-fact:hover .ind-fact-go {
+  color: var(--c-cyan-35);
+}
+/* A problem in its colour: the figure and its icon. */
+.ind-fact.bad .ind-fact-value,
+.ind-fact.bad .ind-fact-icon {
+  color: var(--c-red-35);
+}
+.ind-fact.bad .ind-fact-icon {
+  background: #fdf0ef;
+}
+.ind-fact.warn .ind-fact-value,
+.ind-fact.warn .ind-fact-icon {
+  color: #8a5a00;
+}
+.ind-fact.warn .ind-fact-icon {
+  background: #fdf6e7;
+}
+.ind-fact.good .ind-fact-icon {
+  background: #edf7f1;
+  color: var(--c-green-35);
 }
 .ind-cap {
   text-transform: capitalize;
@@ -174,27 +237,7 @@
 .ind-columns-three .ind-rows li {
   grid-template-columns: minmax(110px, 1fr) minmax(60px, 1fr) auto;
 }
-/* A figure that opens its list: the whole box is the link. */
-.ind-facts > div:has(.ind-fact-link) {
-  position: relative;
-}
-.ind-facts > div:has(.ind-fact-link):hover {
-  border-color: var(--c-cyan-65);
-}
-.ind-fact-link {
-  color: inherit;
-  text-decoration: none;
-}
-.ind-fact-link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-}
-.ind-fact-link:focus-visible::after {
-  outline: 2px solid var(--c-cyan-35);
-  outline-offset: 2px;
-}
+
 .ind-rows li > small {
   grid-column: 1 / -1;
   color: var(--c-gray-45);

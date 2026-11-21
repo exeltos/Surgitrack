@@ -1,6 +1,24 @@
 import {useMemo, useState, type ReactNode} from 'react';
 import {Link} from 'react-router-dom';
-import {Clock, Flame, ShieldCheck, Users} from 'lucide-react';
+import {
+  Activity,
+  AlertTriangle,
+  CalendarDays,
+  ChevronRight,
+  Clock,
+  Flame,
+  Hourglass,
+  Layers3,
+  RefreshCcw,
+  RotateCcw,
+  ShieldCheck,
+  Timer,
+  Undo2,
+  Users,
+  Wrench,
+  XCircle,
+  type LucideIcon,
+} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import PageHeader from '../../components/ui/PageHeader';
 import {useAppPreferences} from '../../core/AppPreferences';
@@ -19,6 +37,48 @@ import {
 } from './indicatorsModel';
 
 type Tab = 'LOAD' | 'TURNAROUND' | 'USE' | 'QUALITY';
+
+/**
+ * One figure of a tab: its icon on a light tint, what it counts, the figure, and a line that places it («σε 30
+ * ημέρες», «9 ανοιχτές»). A problem shows in its colour; one that opens its list is a link, with an arrow.
+ */
+function Fact({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  tone,
+  to,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: ReactNode;
+  sub?: ReactNode;
+  tone?: 'bad' | 'warn' | 'good';
+  to?: string;
+}) {
+  const body = (
+    <>
+      <span className="ind-fact-icon" aria-hidden="true">
+        <Icon size={16} />
+      </span>
+      <span className="ind-fact-text">
+        <span className="ind-fact-label">{label}</span>
+        <strong className="ind-fact-value">{value}</strong>
+        {sub && <span className="ind-fact-sub">{sub}</span>}
+      </span>
+      {to && <ChevronRight className="ind-fact-go" size={16} aria-hidden="true" />}
+    </>
+  );
+  const className = `ind-fact${tone ? ` ${tone}` : ''}`;
+  return to ? (
+    <Link className={className} to={to}>
+      {body}
+    </Link>
+  ) : (
+    <div className={className}>{body}</div>
+  );
+}
 const PERIODS = [7, 30, 90] as const;
 
 /**
@@ -93,15 +153,7 @@ export default function IndicatorsPage() {
     if (!n) return L('όσο ο συνήθης', 'as usual');
     return `${n > 0 ? '+' : '−'}${hoursText(Math.abs(n))}`;
   };
-  // A figure that opens its list (Εκκρεμότητες, Φορτία) for those who may see it.
-  const factLink = (to: string, allowed: boolean, children: ReactNode) =>
-    allowed ? (
-      <Link className="ind-fact-link" to={to}>
-        {children}
-      </Link>
-    ) : (
-      children
-    );
+  const inDays = L(`σε ${days} ημέρες`, `in ${days} days`);
 
   const tabs: Array<{id: Tab; label: string; icon: typeof Clock}> = [
     {id: 'LOAD', label: L('Φόρτος', 'Workload'), icon: Flame},
@@ -168,24 +220,27 @@ export default function IndicatorsPage() {
 
       {tab === 'LOAD' && (
         <>
-          <dl className="ind-facts">
-            <div>
-              <dt>{L('Κινήσεις', 'Movements')}</dt>
-              <dd>{load.total}</dd>
-            </div>
-            <div>
-              <dt>{L('Μέσος όρος ανά ημέρα', 'Average per day')}</dt>
-              <dd>{load.perDay.toFixed(1).replace('.', lang === 'el' ? ',' : '.')}</dd>
-            </div>
-            <div>
-              <dt>{L('Πιο φορτωμένη ώρα', 'Busiest hour')}</dt>
-              <dd>{load.peakHour === undefined ? '—' : hourSpan(load.peakHour)}</dd>
-            </div>
-            <div>
-              <dt>{L('Πιο φορτωμένη ημέρα', 'Busiest day')}</dt>
-              <dd className="ind-cap">{load.peakDay === undefined ? '—' : weekday(load.peakDay, 'long')}</dd>
-            </div>
-          </dl>
+          <div className="ind-facts">
+            <Fact icon={Activity} label={L('Κινήσεις', 'Movements')} value={load.total} sub={inDays} />
+            <Fact
+              icon={CalendarDays}
+              label={L('Μέσος όρος ανά ημέρα', 'Average per day')}
+              value={load.perDay.toFixed(1).replace('.', lang === 'el' ? ',' : '.')}
+              sub={L('κινήσεις', 'movements')}
+            />
+            <Fact
+              icon={Clock}
+              label={L('Πιο φορτωμένη ώρα', 'Busiest hour')}
+              value={load.peakHour === undefined ? '—' : hourSpan(load.peakHour)}
+            />
+            <Fact
+              icon={Flame}
+              label={L('Πιο φορτωμένη ημέρα', 'Busiest day')}
+              value={
+                <span className="ind-cap">{load.peakDay === undefined ? '—' : weekday(load.peakDay, 'long')}</span>
+              }
+            />
+          </div>
 
           <section className="ind-section" aria-labelledby="ind-heat">
             <h2 id="ind-heat">{L('Φόρτος ανά ημέρα και ώρα', 'Load by day and hour')}</h2>
@@ -277,20 +332,25 @@ export default function IndicatorsPage() {
 
       {tab === 'TURNAROUND' && (
         <>
-          <dl className="ind-facts">
-            <div>
-              <dt>{L('Συνήθης χρόνος επιστροφής', 'Typical turnaround')}</dt>
-              <dd>{rounds.overall.rounds ? hoursText(rounds.overall.median) : '—'}</dd>
-            </div>
-            <div>
-              <dt>{L('Το 90% επιστρέφει σε', '90% are back within')}</dt>
-              <dd>{rounds.overall.rounds ? hoursText(rounds.overall.p90) : '—'}</dd>
-            </div>
-            <div>
-              <dt>{L('Ολοκληρωμένοι κύκλοι', 'Completed cycles')}</dt>
-              <dd>{rounds.overall.rounds}</dd>
-            </div>
-          </dl>
+          <div className="ind-facts">
+            <Fact
+              icon={Timer}
+              label={L('Συνήθης χρόνος επιστροφής', 'Typical turnaround')}
+              value={rounds.overall.rounds ? hoursText(rounds.overall.median) : '—'}
+              sub={L('από την αποστολή ως την επιστροφή', 'from dispatch until back')}
+            />
+            <Fact
+              icon={Hourglass}
+              label={L('Το 90% επιστρέφει σε', '90% are back within')}
+              value={rounds.overall.rounds ? hoursText(rounds.overall.p90) : '—'}
+            />
+            <Fact
+              icon={RefreshCcw}
+              label={L('Ολοκληρωμένοι κύκλοι', 'Completed cycles')}
+              value={rounds.overall.rounds}
+              sub={inDays}
+            />
+          </div>
           <section className="ind-section" aria-labelledby="ind-turn">
             <h2 id="ind-turn">{L('Ανά τμήμα', 'By department')}</h2>
             <p className="ind-note">
@@ -330,24 +390,24 @@ export default function IndicatorsPage() {
       {tab === 'USE' && (
         <>
           {/* Instruments used one by one, patients told apart from uses: shown only when they say something. */}
-          <dl className="ind-facts">
-            <div>
-              <dt>{L('Χρήσεις σε ασθενή', 'Uses on a patient')}</dt>
-              <dd>{use.departments.reduce((n, d) => n + d.uses, 0)}</dd>
-            </div>
+          <div className="ind-facts">
+            <Fact
+              icon={Users}
+              label={L('Χρήσεις σε ασθενή', 'Uses on a patient')}
+              value={use.departments.reduce((n, d) => n + d.uses, 0)}
+              sub={inDays}
+            />
             {showSets && (
-              <div>
-                <dt>{L('Σετ', 'Sets')}</dt>
-                <dd>{use.departments.reduce((n, d) => n + d.sets, 0)}</dd>
-              </div>
+              <Fact icon={Layers3} label={L('Σετ', 'Sets')} value={use.departments.reduce((n, d) => n + d.sets, 0)} />
             )}
             {showTools && (
-              <div>
-                <dt>{L('Εργαλεία', 'Instruments')}</dt>
-                <dd>{use.departments.reduce((n, d) => n + d.tools, 0)}</dd>
-              </div>
+              <Fact
+                icon={Wrench}
+                label={L('Εργαλεία', 'Instruments')}
+                value={use.departments.reduce((n, d) => n + d.tools, 0)}
+              />
             )}
-          </dl>
+          </div>
           <section className="ind-section" aria-labelledby="ind-use">
             <h2 id="ind-use">{L('Ανά τμήμα', 'By department')}</h2>
             {use.departments.length && !showPatients && !showSets && !showTools ? (
@@ -433,33 +493,45 @@ export default function IndicatorsPage() {
 
       {tab === 'QUALITY' && (
         <>
-          <dl className="ind-facts">
-            <div>
-              <dt>{L('Κύκλοι αποστείρωσης', 'Sterilization cycles')}</dt>
-              <dd>{factLink(LOADS, canReports, q.cycles)}</dd>
-            </div>
-            <div>
-              <dt>{L('Ανεπιτυχείς', 'Failed')}</dt>
-              <dd>
-                {factLink(LOADS, canReports, q.failed)} <small>{pct(q.failed, q.cycles)}</small>
-              </dd>
-            </div>
-            <div>
-              <dt>{L('Επανεπεξεργασία', 'Reprocessed')}</dt>
-              <dd>{factLink(LOADS, canReports, q.reprocess)}</dd>
-            </div>
-            <div>
-              <dt>{L('Ανακλήσεις', 'Recalls')}</dt>
-              <dd>{factLink(LOADS, canReports, q.recalled)}</dd>
-            </div>
-            <div>
-              <dt>{L('Εκκρεμότητες', 'Issues')}</dt>
-              <dd>
-                {factLink('/issues', can('issue.view'), problems.total)}{' '}
-                <small>{L(`${problems.open} ανοιχτές`, `${problems.open} open`)}</small>
-              </dd>
-            </div>
-          </dl>
+          <div className="ind-facts">
+            <Fact
+              icon={Flame}
+              label={L('Κύκλοι αποστείρωσης', 'Sterilization cycles')}
+              value={q.cycles}
+              sub={inDays}
+              to={canReports ? LOADS : undefined}
+            />
+            <Fact
+              icon={XCircle}
+              label={L('Ανεπιτυχείς', 'Failed')}
+              value={q.failed}
+              sub={L(`${pct(q.failed, q.cycles)} των κύκλων`, `${pct(q.failed, q.cycles)} of the cycles`)}
+              tone={q.failed ? 'bad' : 'good'}
+              to={canReports ? LOADS : undefined}
+            />
+            <Fact
+              icon={RotateCcw}
+              label={L('Επανεπεξεργασία', 'Reprocessed')}
+              value={q.reprocess}
+              tone={q.reprocess ? 'warn' : undefined}
+              to={canReports ? LOADS : undefined}
+            />
+            <Fact
+              icon={Undo2}
+              label={L('Ανακλήσεις', 'Recalls')}
+              value={q.recalled}
+              tone={q.recalled ? 'bad' : undefined}
+              to={canReports ? LOADS : undefined}
+            />
+            <Fact
+              icon={AlertTriangle}
+              label={L('Εκκρεμότητες', 'Issues')}
+              value={problems.total}
+              sub={L(`${problems.open} ανοιχτές`, `${problems.open} open`)}
+              tone={problems.open ? 'warn' : undefined}
+              to={can('issue.view') ? '/issues' : undefined}
+            />
+          </div>
           <div className="ind-columns ind-columns-three">
             <section className="ind-section" aria-labelledby="ind-types">
               <h2 id="ind-types">{L('Εκκρεμότητες ανά είδος', 'Issues by kind')}</h2>
