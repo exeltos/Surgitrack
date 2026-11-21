@@ -1,8 +1,5 @@
-import SortHeader from '../../components/ui/SortHeader';
-import {useTableSort} from '../../components/ui/useTableSort';
-import LedgerAsset from '../movements/LedgerAsset';
 import {useState} from 'react';
-import {ChevronRight, Route, UserRound} from 'lucide-react';
+import {Route} from 'lucide-react';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -22,10 +19,19 @@ const dateKey = (value: string) => {
 const time = (value: string) => parseDisplayDate(value)?.getTime() ?? 0;
 
 /**
- * Every movement recorded with a patient code, newest first: the list that was the "Patient traceability"
- * report. A patient code opens that patient's trace (what was used, with the last cycle before the use).
+ * The patients with something recorded for them, the latest first: one line each (code, last use, department, how
+ * many items). One opens beside the list, in the card. The download holds every record, one line per movement.
  */
-export default function PatientUses({movements, onOpen}: {movements: Movement[]; onOpen: (code: string) => void}) {
+export default function PatientUses({
+  movements,
+  onOpen,
+  selected,
+}: {
+  movements: Movement[];
+  onOpen: (code: string) => void;
+  /** The patient open in the card: marked in the list. */
+  selected?: string;
+}) {
   const [code, setCode] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -38,14 +44,18 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
       return (!dateFrom || !d || d >= dateFrom) && (!dateTo || !d || d <= dateTo);
     })
     .sort((a, b) => time(b.at) - time(a.at));
-  const order = useTableSort(filtered, {
-    at: m => parseDisplayDate(m.at)?.getTime(),
-    asset: m => m.asset,
-    department: m => trData(m.from),
-    code: m => m.patientCode,
-    by: m => trData(m.by),
-  });
-  const rows = useProgressiveList(order.rows, [needle, dateFrom, dateTo, order.sort?.key, order.sort?.dir].join('|'));
+  // One line per patient: the latest use first, with its department and how many items were recorded.
+  const patients = (() => {
+    const map = new Map<string, {code: string; at: string; department: string; items: Set<string>}>();
+    for (const m of filtered) {
+      const code = m.patientCode!;
+      const entry = map.get(code);
+      if (!entry) map.set(code, {code, at: m.at, department: m.from, items: new Set([m.asset.split(' · ')[0]])});
+      else entry.items.add(m.asset.split(' · ')[0]);
+    }
+    return [...map.values()];
+  })();
+  const rows = useProgressiveList(patients, [needle, dateFrom, dateTo].join('|'));
   const table = (): ExportTable => ({
     title: tr('Καταγραφές με κωδικό ασθενούς'),
     subtitle: [
@@ -102,77 +112,37 @@ export default function PatientUses({movements, onOpen}: {movements: Movement[];
         ]}
         extra={<DownloadMenu table={table} onPrint={() => setReport(tableReportHtml(table(), getI18nLang()))} />}
       />
-      <div className="movement-ledger trace-patients-ledger">
-        <div
-          className="ledger-head"
-          title={tr(
-            'Κάθε φορά που ένα Σετ ή εργαλείο στάλθηκε προς Αποστείρωση με κωδικό ασθενούς. Πατήστε μια γραμμή για τον ασθενή.',
-          )}
-        >
-          <div>
-            <span>{tr('{0} καταγραφές', filtered.length)}</span>
-          </div>
-        </div>
-        <div className="ledger-columns">
-          <span>
-            <SortHeader label={tr('Ημερομηνία / ώρα')} sortKey="at" sort={order.sort} onSort={order.toggle} />
-          </span>
-          <span>
-            <SortHeader label={tr('Σετ / Εργαλείο')} sortKey="asset" sort={order.sort} onSort={order.toggle} />
-          </span>
-          <span>
-            <SortHeader label={tr('Τμήμα')} sortKey="department" sort={order.sort} onSort={order.toggle} />
-          </span>
-          <span>
-            <SortHeader label={tr('Κωδικός ασθενούς')} sortKey="code" sort={order.sort} onSort={order.toggle} />
-          </span>
-          <span>
-            <SortHeader label={tr('Χρήστης')} sortKey="by" sort={order.sort} onSort={order.toggle} />
-          </span>
-          <span></span>
-        </div>
-        <div className="ledger-scroll">
-          {filtered.length ? (
-            rows.visible.map(m => {
-              const [barcode, ...rest] = m.asset.split(' · ');
-              return (
+      <section className="trace-recent-list" aria-label={tr('Ασθενείς')}>
+        <h3 className="trace-section-title">{tr('{0} ασθενείς', patients.length)}</h3>
+        {patients.length ? (
+          <ul>
+            {rows.visible.map(p => (
+              <li key={p.code}>
                 <button
                   type="button"
-                  className="ledger-row"
-                  key={m.id}
-                  onClick={() => onOpen(m.patientCode || '')}
-                  title={tr('Ιχνηλάτηση ασθενούς {0}', m.patientCode || '')}
+                  className={selected === p.code ? 'selected' : undefined}
+                  aria-current={selected === p.code ? 'true' : undefined}
+                  onClick={() => onOpen(p.code)}
                 >
-                  <span className="ledger-date">
-                    <b>{m.at}</b>
-                  </span>
-                  <LedgerAsset kind={m.assetKind} barcode={barcode} name={rest.join(' · ') || undefined} />
-                  <span className="ledger-route">
-                    <i>{trData(m.from)}</i>
-                  </span>
-                  <span>
-                    <mark className="movement-chip">{m.patientCode}</mark>
-                  </span>
-                  <span className="ledger-user">
-                    <UserRound size={15} />
-                    <span>
-                      <b title={trData(m.by)}>{trData(m.by)}</b>
-                    </span>
-                  </span>
-                  <ChevronRight className="ledger-open" size={18} />
+                  <b className="mono trace-code">
+                    <mark className="movement-chip">{p.code}</mark>
+                  </b>
+                  <span>{trData(p.department)}</span>
+                  <span>{p.items.size === 1 ? tr('1 αντικείμενο') : tr('{0} αντικείμενα', p.items.size)}</span>
+                  <span>{p.at}</span>
                 </button>
-              );
-            })
-          ) : (
-            <div className="ledger-empty">
-              <Route size={28} />
-              <strong>{tr('Δεν βρέθηκαν καταγραφές με κωδικό ασθενούς')}</strong>
-              <span>{tr('Άλλαξε τον κωδικό ή τις ημερομηνίες.')}</span>
-            </div>
-          )}
-          {rows.hasMore && <MoreRows onVisible={rows.showMore} />}
-        </div>
-      </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="ledger-empty">
+            <Route size={28} />
+            <strong>{tr('Δεν βρέθηκαν καταγραφές με κωδικό ασθενούς')}</strong>
+            <span>{tr('Άλλαξε τον κωδικό ή τις ημερομηνίες.')}</span>
+          </div>
+        )}
+        {rows.hasMore && <MoreRows onVisible={rows.showMore} />}
+      </section>
       {report && (
         <PrintPreviewModal title={tr('Καταγραφές με κωδικό ασθενούς')} html={report} onClose={() => setReport(null)} />
       )}

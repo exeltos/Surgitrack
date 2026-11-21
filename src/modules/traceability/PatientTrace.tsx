@@ -89,7 +89,10 @@ export default function PatientTrace({
             label={tr('Ασθενής')}
             rows={[
               {label: tr('Χρήση'), value: [moves[0].at.split(' ')[0], place].filter(Boolean).join(' · ')},
-              {label: tr('Τι χρησιμοποιήθηκε'), value: tr('{0} αντικείμενα', used.length)},
+              {
+                label: tr('Τι χρησιμοποιήθηκε'),
+                value: used.length === 1 ? tr('1 αντικείμενο') : tr('{0} αντικείμενα', used.length),
+              },
               {
                 label: tr('Αποστείρωση'),
                 value: unconfirmed ? (

@@ -1,8 +1,7 @@
 import PageHeader from '../../components/ui/PageHeader';
 import {useEffect, useState} from 'react';
-import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, Search, History, Flame, Users, Package, Layers3, Wrench} from 'lucide-react';
-import AppButton from '../../components/ui/AppButton';
+import {useSearchParams} from 'react-router-dom';
+import {Search, History, Flame, Users, Package, Layers3, Wrench} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -68,16 +67,6 @@ export default function TraceabilityPage() {
   const openTab = (next: Tab) => {
     if (next !== tab) setParams(TAB_PARAM[next] ? {tab: TAB_PARAM[next]!} : {});
   };
-  const navigate = useNavigate();
-  // A step to go back to inside the app: the browser's history index (a page reached by a redirect is at 0 too); where
-  // there is none (tests, in memory), the router's key, «default» on the first page.
-  const location = useLocation();
-  const historyIndex = (window.history.state as {idx?: number} | null)?.idx;
-  const canGoBack = typeof historyIndex === 'number' ? historyIndex > 0 : location.key !== 'default';
-  // Something open on the tab (a search, a patient, a load): with nothing before it, «Πίσω» returns to the tab's start.
-  const detailOpen = !!(urlQuery || patient || loadId);
-  const goBack = () =>
-    canGoBack ? navigate(-1) : setParams(TAB_PARAM[tab] ? {tab: TAB_PARAM[tab]!} : {}, {replace: true});
   const openPatient = (code: string) => setParams({tab: 'patients', patient: code});
   const openLoad = (id: string) => setParams({tab: 'load', load: id});
   const openItem = (barcode: string) => commit(barcode);
@@ -121,7 +110,7 @@ export default function TraceabilityPage() {
     return out;
   })();
   // The item open in the card, shown in the list beside it (scrolled to, when further down).
-  const openId = asset?.id;
+  const openId = asset?.id || patient || loadId;
   useEffect(() => {
     if (!openId) return;
     // A newly opened card starts at its head, not where the one before was scrolled to.
@@ -185,21 +174,25 @@ export default function TraceabilityPage() {
             </button>
           ))}
         </div>
-        {/* A patient or a load opened: back to its list. The Sets and instruments keep their list beside them. */}
-        {detailOpen && tab !== 'SEARCH' && (
-          <AppButton icon={<ArrowLeft size={16} />} onClick={goBack} className="trace-page-back">
-            {tr('Πίσω')}
-          </AppButton>
-        )}
       </div>
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}
       {tab === 'HISTORY' ? (
         <MovementsPage embedded />
-      ) : tab === 'PATIENTS' && !patient ? (
-        <PatientUses movements={movements} onOpen={openPatient} />
       ) : tab === 'PATIENTS' ? (
-        <PatientTrace patient={patient} onItem={openItem} onLoad={openLoad} />
+        // The patients on the left, the one open on the right, as for the Sets and instruments.
+        <div className="trace-split">
+          <aside className="trace-split-list" aria-label={tr('Ασθενείς')}>
+            <PatientUses movements={movements} onOpen={openPatient} selected={patient} />
+          </aside>
+          <section className="trace-split-card" aria-label={tr('Ασθενής')}>
+            {patient ? (
+              <PatientTrace patient={patient} onItem={openItem} onLoad={openLoad} />
+            ) : (
+              <p className="trace-split-empty">{tr('Διαλέξτε έναν ασθενή από τη λίστα, ή γράψτε τον κωδικό του.')}</p>
+            )}
+          </section>
+        </div>
       ) : tab === 'LOAD' ? (
         <LoadTrace key={loadId} loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
       ) : (
