@@ -194,7 +194,7 @@ export default function TraceabilityPage() {
           </section>
         </div>
       ) : tab === 'LOAD' ? (
-        <LoadTrace key={loadId} loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
+        <LoadTrace loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
       ) : (
         // The list on the left (search, recent searches, the items that moved last or those a name fits), the open
         // item's card on the right: picking another changes only the card. Each side scrolls on its own.

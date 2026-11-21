@@ -133,6 +133,12 @@ export default function PatientUses({
                 </button>
               </li>
             ))}
+            {/* At the end of what scrolls: more patients only when the list is scrolled to them. */}
+            {rows.hasMore && (
+              <li>
+                <MoreRows onVisible={rows.showMore} />
+              </li>
+            )}
           </ul>
         ) : (
           <div className="ledger-empty">
@@ -141,7 +147,6 @@ export default function PatientUses({
             <span>{tr('Άλλαξε τον κωδικό ή τις ημερομηνίες.')}</span>
           </div>
         )}
-        {rows.hasMore && <MoreRows onVisible={rows.showMore} />}
       </section>
       {report && (
         <PrintPreviewModal title={tr('Καταγραφές με κωδικό ασθενούς')} html={report} onClose={() => setReport(null)} />

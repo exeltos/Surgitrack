@@ -177,6 +177,8 @@ export default function LoadTrace({
       <section className="trace-split-card" aria-label={tr('Φορτίο')}>
         {load ? (
           <LoadView
+            // The card's own state is the load's: a new one starts afresh; the list and its search stay.
+            key={load.id}
             load={load}
             sets={sets}
             tools={tools}
