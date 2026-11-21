@@ -13,29 +13,39 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  justify-content: space-between;
   gap: 8px 16px;
+}
+/* The tabs' line runs to the period, which sits on it at the right, light, as «Πίσω» beside Ιχνηλάτηση's tabs. */
+.ind-head > [role='tablist'] {
+  flex: 1 1 auto;
 }
 .ind-period {
   display: inline-flex;
-  border: 1px solid var(--c-gray-85);
-  border-radius: 999px;
+  gap: 2px;
+  margin-bottom: 6px;
   padding: 2px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
 }
 .ind-period button {
   border: 0;
-  border-radius: 999px;
-  padding: 5px 12px;
+  border-radius: 8px;
+  padding: 4px 10px;
   background: none;
   color: var(--c-gray-45);
   font: inherit;
   font-size: 13px;
   cursor: pointer;
 }
+.ind-period button:hover {
+  color: var(--c-cyan-20-3);
+}
 .ind-period button[aria-pressed='true'] {
-  background: var(--c-cyan-20);
-  color: var(--c-white);
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-20-3);
   font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--c-cyan-35);
 }
 /* The tab's figures: small KPI boxes in a row, the same width each. */
 .ind-facts {
@@ -43,6 +53,9 @@
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
   margin: 0;
+}
+.ind-facts:has(> div:only-child) {
+  grid-template-columns: minmax(150px, 280px);
 }
 .ind-facts > div {
   padding: 10px 14px;
@@ -100,7 +113,8 @@
 }
 .ind-rows li {
   display: grid;
-  grid-template-columns: minmax(120px, 1.2fr) minmax(80px, 2fr) auto;
+  /* The name, a bar of a reading width, the figure right after it (not across the page). */
+  grid-template-columns: minmax(140px, 280px) minmax(80px, 360px) minmax(0, 1fr);
   align-items: center;
   gap: 2px 12px;
   padding: 6px 0;
@@ -117,8 +131,69 @@
   font-size: 13px;
   font-weight: 600;
   min-width: 3ch;
-  text-align: right;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ind-rows li > strong small {
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 400;
+}
+.ind-bad {
+  color: var(--c-red-35);
+  font-style: normal;
+}
+/* How a department differs from the usual turnaround: slower in red, quicker in green. */
+.ind-diff {
+  margin-left: 6px;
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+}
+.ind-diff.up {
+  color: var(--c-red-35);
+}
+.ind-diff.down {
+  color: var(--c-green-35);
+}
+/* A long ranking in two columns, read down each. */
+.ind-rows.ind-rows-two {
+  display: block;
+  columns: 2;
+  column-gap: 40px;
+}
+.ind-rows.ind-rows-two li {
+  break-inside: avoid;
+  grid-template-columns: minmax(140px, 1fr) minmax(80px, 1fr) auto;
+}
+/* The quality: three lists side by side. */
+.ind-columns.ind-columns-three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.ind-columns-three .ind-rows li {
+  grid-template-columns: minmax(110px, 1fr) minmax(60px, 1fr) auto;
+}
+/* A figure that opens its list: the whole box is the link. */
+.ind-facts > div:has(.ind-fact-link) {
+  position: relative;
+}
+.ind-facts > div:has(.ind-fact-link):hover {
+  border-color: var(--c-cyan-65);
+}
+.ind-fact-link {
+  color: inherit;
+  text-decoration: none;
+}
+.ind-fact-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+}
+.ind-fact-link:focus-visible::after {
+  outline: 2px solid var(--c-cyan-35);
+  outline-offset: 2px;
 }
 .ind-rows li > small {
   grid-column: 1 / -1;
@@ -168,15 +243,54 @@
 .ind-heat td.on {
   background: #1f7a93;
 }
+@media (max-width: 1100px) {
+  .ind-columns.ind-columns-three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 900px) {
-  .ind-columns {
+  .ind-columns,
+  .ind-columns.ind-columns-three {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .ind-rows.ind-rows-two {
+    columns: 1;
   }
 }
 /* The heat map is a grid of squares, not a data table: none of the tables' width, padding or row lines. */
 .indicators .ind-heat {
+  width: 100%;
+  min-width: 640px;
+  table-layout: fixed;
+}
+.indicators .ind-heat thead th:first-child,
+.indicators .ind-heat tbody th {
+  width: 44px;
+}
+.indicators .ind-heat td {
   width: auto;
-  min-width: 0;
+  height: 24px;
+}
+/* Under the map: light to dark, and what dark stands for. */
+.ind-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 0 48px;
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+.ind-legend i {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #1f7a93;
+}
+.ind-legend span:first-child {
+  margin-right: 4px;
+}
+.ind-legend span:nth-last-child(2) {
+  margin-left: 4px;
 }
 .indicators .ind-heat th,
 .indicators .ind-heat td {
