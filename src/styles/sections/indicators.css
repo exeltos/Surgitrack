@@ -1,72 +1,205 @@
 /* Indicators (modules/indicators): the tabs with the period beside them, a line of facts, then lists with a thin bar
    per row and, for the workload, a week-by-hour heat map. The page scrolls itself (the content pane does not). */
 .indicators {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
   height: 100%;
   min-height: 0;
   overflow-y: auto;
   padding: 0 4px 12px 0;
 }
+/* Below the figures, white panels side by side filling the window: a long list scrolls inside its panel, the page
+   stays put. */
+.ind-board {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+  gap: 12px;
+  min-height: 220px;
+}
+.ind-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px 16px 6px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgb(16 42 52 / 5%);
+}
+.ind-panel-wide {
+  grid-column: span 2;
+}
+.ind-board > .ind-panel:only-child {
+  grid-column: 1 / -1;
+}
+.ind-panel > .ind-rows,
+.ind-panel > .ind-heat-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+.ind-panel h2 {
+  margin: 0 0 2px;
+}
 .ind-head {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  justify-content: space-between;
   gap: 8px 16px;
+}
+/* The tabs' line runs to the period, which sits on it at the right, light, as «Πίσω» beside Ιχνηλάτηση's tabs. */
+.ind-head > [role='tablist'] {
+  flex: 1 1 auto;
 }
 .ind-period {
   display: inline-flex;
-  border: 1px solid var(--c-gray-85);
-  border-radius: 999px;
+  gap: 2px;
+  margin-bottom: 6px;
   padding: 2px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 10px;
+  background: var(--c-white);
 }
 .ind-period button {
   border: 0;
-  border-radius: 999px;
-  padding: 5px 12px;
+  border-radius: 8px;
+  padding: 4px 10px;
   background: none;
   color: var(--c-gray-45);
   font: inherit;
   font-size: 13px;
   cursor: pointer;
 }
-.ind-period button[aria-pressed='true'] {
-  background: var(--c-cyan-20);
-  color: var(--c-white);
-  font-weight: 600;
+.ind-period button:hover {
+  color: var(--c-cyan-20-3);
 }
-/* The tab's figures: small KPI boxes in a row, the same width each. */
+.ind-period button[aria-pressed='true'] {
+  background: var(--c-gray-100-2);
+  color: var(--c-cyan-20-3);
+  font-weight: 600;
+  box-shadow: inset 0 -2px 0 var(--c-cyan-35);
+}
+/* The tab's figures: low KPI cards in a row, the same width each — what it counts on top, the figure with its
+   comparison on one line, a strip down the left in the colour of how it stands. */
 .ind-facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 10px;
-  margin: 0;
 }
-.ind-facts > div {
-  padding: 10px 14px;
+.ind-facts:has(> :only-child) {
+  grid-template-columns: minmax(190px, 300px);
+}
+.ind-fact {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 9px 14px 9px 17px;
+  overflow: hidden;
   border: 1px solid var(--c-gray-90);
   border-radius: 12px;
   background: var(--c-white);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgb(16 42 52 / 5%);
 }
-.ind-facts dt {
+.ind-fact::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #1f7a93;
+}
+.ind-fact.bad::before {
+  background: var(--c-red-35);
+}
+.ind-fact.warn::before {
+  background: #d9a21b;
+}
+.ind-fact.good::before {
+  background: #3c9a6b;
+}
+a.ind-fact {
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+a.ind-fact:hover {
+  border-color: var(--c-cyan-65);
+  box-shadow: 0 2px 8px rgb(16 42 52 / 8%);
+}
+.ind-fact-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  overflow: hidden;
   color: var(--c-gray-45);
   font-size: 12px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
-.ind-facts dd {
-  margin: 4px 0 0;
+.ind-fact-go {
+  flex: none;
+  color: var(--c-gray-65);
+}
+a.ind-fact:hover .ind-fact-go {
+  color: var(--c-cyan-35);
+}
+/* The figure and, beside it, its comparison or note. */
+.ind-fact-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  min-width: 0;
+}
+.ind-fact-value {
+  color: var(--c-cyan-20-3);
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-.ind-facts dd small {
+.ind-fact-value small {
   color: var(--c-gray-45);
-  font-size: 0.85rem;
+  font-size: 12px;
   font-weight: 500;
+  letter-spacing: 0;
+}
+.ind-fact.bad .ind-fact-value {
+  color: var(--c-red-35);
+}
+.ind-fact.warn .ind-fact-value {
+  color: #8a5a00;
+}
+.ind-fact-sub {
+  color: var(--c-gray-45);
+  font-size: 12px;
+  white-space: nowrap;
+}
+/* The comparison with the period before: red the bad way, green the good one, grey otherwise. */
+.ind-chip {
+  margin-right: 2px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-gray-45);
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 600;
+}
+.ind-chip.bad {
+  background: #fdeceb;
+  color: var(--c-red-35);
+}
+.ind-chip.good {
+  background: #e8f5ee;
+  color: var(--c-green-35);
 }
 .ind-cap {
   text-transform: capitalize;
@@ -87,20 +220,18 @@
   color: var(--c-gray-45);
   font-size: 12.5px;
 }
-.ind-columns {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 32px;
-}
+
 .ind-rows {
   display: grid;
+  align-content: start;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .ind-rows li {
   display: grid;
-  grid-template-columns: minmax(120px, 1.2fr) minmax(80px, 2fr) auto;
+  /* The name, a bar of a reading width, the figure right after it (not across the page). */
+  grid-template-columns: minmax(120px, 280px) minmax(60px, 360px) auto;
   align-items: center;
   gap: 2px 12px;
   padding: 6px 0;
@@ -117,9 +248,58 @@
   font-size: 13px;
   font-weight: 600;
   min-width: 3ch;
-  text-align: right;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
+.ind-rows li > strong small {
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 400;
+}
+.ind-bad {
+  color: var(--c-red-35);
+  font-style: normal;
+}
+/* How a department differs from the usual turnaround: slower in red, quicker in green. */
+.ind-diff {
+  margin-left: 6px;
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+}
+.ind-diff.up {
+  color: var(--c-red-35);
+}
+.ind-diff.down {
+  color: var(--c-green-35);
+}
+/* A long ranking in two columns, read down each. */
+.ind-rows.ind-rows-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  column-gap: 40px;
+}
+
+/* In a panel: the whole name with its figure at the right, the bar under them across, then the note. */
+.ind-panel .ind-rows li {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px 12px;
+  padding: 7px 0;
+}
+.ind-panel .ind-rows li > b {
+  grid-column: 1;
+  white-space: normal;
+}
+.ind-panel .ind-rows li > strong {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: right;
+}
+.ind-panel .ind-rows li > .ind-bar {
+  grid-column: 1 / -1;
+}
+
 .ind-rows li > small {
   grid-column: 1 / -1;
   color: var(--c-gray-45);
@@ -168,15 +348,58 @@
 .ind-heat td.on {
   background: #1f7a93;
 }
-@media (max-width: 900px) {
-  .ind-columns {
+/* A narrow window: the panels one under the other, at their own height; the page scrolls. */
+@media (max-width: 1000px) {
+  .ind-board {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+  }
+  .ind-panel-wide {
+    grid-column: auto;
+  }
+  .ind-panel > .ind-rows,
+  .ind-panel > .ind-heat-wrap {
+    overflow-y: visible;
+  }
+  .ind-rows.ind-rows-two {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 /* The heat map is a grid of squares, not a data table: none of the tables' width, padding or row lines. */
 .indicators .ind-heat {
+  width: 100%;
+  min-width: 640px;
+  table-layout: fixed;
+}
+.indicators .ind-heat thead th:first-child,
+.indicators .ind-heat tbody th {
+  width: 44px;
+}
+.indicators .ind-heat td {
   width: auto;
-  min-width: 0;
+  height: 24px;
+}
+/* Under the map: light to dark, and what dark stands for. */
+.ind-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 0 48px;
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+.ind-legend i {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #1f7a93;
+}
+.ind-legend span:first-child {
+  margin-right: 4px;
+}
+.ind-legend span:nth-last-child(2) {
+  margin-left: 4px;
 }
 .indicators .ind-heat th,
 .indicators .ind-heat td {
@@ -185,35 +408,4 @@
 }
 .indicators .ind-heat tbody th {
   padding-right: 8px;
-}
-/* A table of figures (use by department): the name, then numbers; the first one with its bar. */
-.ind-table-wrap {
-  overflow-x: auto;
-}
-.indicators .ind-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-.indicators .ind-table th,
-.indicators .ind-table td {
-  padding: 7px 10px;
-  border-bottom: 1px solid var(--c-gray-95);
-  font-weight: 400;
-  text-align: left;
-  text-transform: none;
-}
-.indicators .ind-table thead th {
-  color: var(--c-gray-15);
-  font-size: 12px;
-  font-weight: 600;
-}
-.indicators .ind-table tbody th {
-  font-weight: 600;
-}
-.ind-cell-bar {
-  display: grid;
-  grid-template-columns: 3ch minmax(80px, 240px);
-  align-items: center;
-  gap: 10px;
 }

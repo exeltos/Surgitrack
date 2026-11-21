@@ -27,6 +27,11 @@ export type CycleEntry = {
   tone: Tone;
   /** The Set the instrument was in, when the cycle was its Set's. */
   via?: string;
+  /** Who loaded it, and when the load was released. */
+  by?: string;
+  releasedAt?: string;
+  /** The load's status, when the cycle was recorded as a load. */
+  status?: ProcessLoadStatus;
 };
 
 export const LOAD_STATUS: Record<ProcessLoadStatus, {label: string; tone: Tone}> = {
@@ -70,6 +75,9 @@ export const cyclesOf = (
         label: status.label,
         tone: status.tone,
         via: viaSet ? inSet?.barcode : undefined,
+        by: l.createdByName,
+        releasedAt: l.releasedAt,
+        status: l.status,
       });
     });
   sterilizationCycles
@@ -177,4 +185,44 @@ export const firstUseAfter = (
   return uses
     .filter(m => m.patientCode && barcodeOf(m) === item.barcode && time(m.at) >= done && time(m.at) < next)
     .sort((a, b) => time(a.at) - time(b.at))[0];
+};
+
+/**
+ * An item's trail: its moves (a member instrument's include its Set's, as it travels inside it), its cycles, and the
+ * rounds they make.
+ */
+export const traceOf = (
+  item: SetAsset | Tool,
+  sets: SetAsset[],
+  movements: Movement[],
+  processLoads: ProcessLoadRecord[],
+  sterilizationCycles: SterilizationCycleRecord[],
+) => {
+  const carrierSet = !isSetAsset(item) && item.mode === 'SET_MEMBER' ? sets.find(s => s.id === item.setId) : undefined;
+  const codes = [item, carrierSet]
+    .flatMap(x => (x ? [x.barcode, ...(x.legacyBarcodes || [])] : []))
+    .map(b => b.toLowerCase());
+  const moves = movements.filter(m => codes.includes(barcodeOf(m).toLowerCase()));
+  const cycles = cyclesOf(item, sets, processLoads, sterilizationCycles);
+  return {carrierSet, moves, cycles, rounds: roundsOf(moves, cycles)};
+};
+
+/** YYYY-MM-DD → the start (or with `end`, the last moment) of that local day; nothing for an empty or bad value. */
+const dayEdge = (isoDate: string, end = false) => {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  if (!y || !m || !d) return undefined;
+  return end ? new Date(y, m - 1, d, 23, 59, 59, 999).getTime() : new Date(y, m - 1, d).getTime();
+};
+
+/** The rounds with something on a day from `from` to `to` (YYYY-MM-DD, either may be empty). */
+export const roundsBetween = (rounds: Round[], from: string, to: string) => {
+  const start = from ? dayEdge(from) : undefined;
+  const end = to ? dayEdge(to, true) : undefined;
+  if (start === undefined && end === undefined) return rounds;
+  return rounds.filter(r =>
+    [...r.moves.map(m => m.at), ...(r.cycle ? [r.cycle.start, r.cycle.at] : [])].some(at => {
+      const t = time(at);
+      return !!t && (start === undefined || t >= start) && (end === undefined || t <= end);
+    }),
+  );
 };

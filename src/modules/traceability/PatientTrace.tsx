@@ -80,6 +80,10 @@ export default function PatientTrace({
               <small>{tr('ΚΩΔΙΚΟΣ ΑΣΘΕΝΟΥΣ')}</small>
               <h2>{shownCode}</h2>
             </div>
+            {/* The print for the patient's file, at the right of the name as every page's actions. */}
+            <AppButton icon={<Printer size={16} />} onClick={() => setReport(tableReportHtml(table(), getI18nLang()))}>
+              {tr('Εκτύπωση για τον φάκελο του ασθενούς')}
+            </AppButton>
           </div>
           <InfoList
             label={tr('Ασθενής')}
@@ -154,11 +158,6 @@ export default function PatientTrace({
                 ))}
               </tbody>
             </table>
-          </div>
-          <div>
-            <AppButton icon={<Printer size={16} />} onClick={() => setReport(tableReportHtml(table(), getI18nLang()))}>
-              {tr('Εκτύπωση για τον φάκελο του ασθενούς')}
-            </AppButton>
           </div>
         </>
       )}

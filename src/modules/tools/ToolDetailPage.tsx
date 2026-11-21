@@ -1,3 +1,4 @@
+import {AssetItemHistory} from '../traceability/ItemHistory';
 import {useState} from 'react';
 import BrowseArrows from '../../components/assets/BrowseArrows';
 import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom';
@@ -7,7 +8,6 @@ import {
   Barcode,
   Copy,
   Flag,
-  History,
   Layers3,
   Printer,
   Send,
@@ -44,15 +44,12 @@ import ActionMenu from '../../components/ui/ActionMenu';
 import {useConfirm} from '../../components/ui/useConfirm';
 import {ToolReportModal} from './ToolDialogs';
 import NewBarcodeModal from '../../components/assets/NewBarcodeModal';
-import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
-import {movementText} from '../../core/movementText';
 
 export default function ToolDetailPage() {
   const {
     sets,
     tools,
     retiredTools,
-    movements,
     issues,
     reportIssue,
     markLost,
@@ -68,7 +65,6 @@ export default function ToolDetailPage() {
     recordUsage,
   } = useSurgi();
   const manualUses = useManualUses();
-  const undone = useUndoneMovements();
   const navigate = useNavigate();
   const [confirmNode, ask] = useConfirm();
   const {id} = useParams();
@@ -113,15 +109,6 @@ export default function ToolDetailPage() {
     );
 
   const set = sets.find(item => item.id === tool.setId);
-  const knownBarcodes = [tool.barcode, ...(tool.legacyBarcodes || [])];
-  const history = movements
-    .filter(movement => knownBarcodes.some(barcode => movement.asset.includes(barcode)))
-    .slice(0, 30);
-  // A member instrument travels inside its Set: the Set's own moves are shown too, apart.
-  const setHistory =
-    tool.mode === 'SET_MEMBER' && set
-      ? movements.filter(m => m.asset.includes(set.barcode) && !history.includes(m)).slice(0, 30)
-      : [];
   const toolIssues = issues.filter(issue => issue.status === 'OPEN' && issue.asset.startsWith(tool.barcode));
   const location = set
     ? `Set ${set.barcode}`
@@ -130,20 +117,6 @@ export default function ToolDetailPage() {
       : tool.department
         ? trData(tool.department)
         : tr('Μεμονωμένο');
-  const historyRow = (item: (typeof movements)[number]) => (
-    <div className="asset-history-row" key={item.id}>
-      <span className="history-dot" />
-      <div>
-        <strong>
-          {movementText(item.status)} {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
-        </strong>
-        <small>
-          {trData(item.from)} → {trData(item.to)} · {item.at} · {trData(item.by)}
-          {item.undoes && item.note ? ` · ${tr('Αιτιολογία')}: ${item.note}` : ''}
-        </small>
-      </div>
-    </div>
-  );
   const departmentView = role === 'DEPARTMENT';
   const backTo = departmentView ? (tool.mode === 'STANDALONE' ? '/department/tools' : '/department') : '/tools';
   const workflowLocked = !['IN_DEPARTMENT', 'IN_STOCK', 'SERVICE', 'LOST'].includes(tool.state);
@@ -302,32 +275,8 @@ export default function ToolDetailPage() {
           <div className="asset-detail-body">
             {tab === 'HISTORY' && (
               <section className="asset-section asset-detail-full-panel">
-                <div className="asset-section-head">
-                  <div>
-                    <h2>{tr('Ιστορικό κινήσεων')}</h2>
-                    <p>{tr('Όλες οι κινήσεις του συγκεκριμένου φυσικού εργαλείου.')}</p>
-                  </div>
-                  <History size={19} />
-                </div>
-                <div
-                  className="asset-history asset-detail-scroll"
-                  tabIndex={0}
-                  role="region"
-                  aria-label={tr('Ιστορικό κινήσεων')}
-                >
-                  {history.length ? (
-                    history.map(historyRow)
-                  ) : setHistory.length ? null : (
-                    <AssetEmptyState>{tr('Δεν υπάρχει καταγεγραμμένη κίνηση.')}</AssetEmptyState>
-                  )}
-                  {setHistory.length > 0 && set && (
-                    <>
-                      <h3 className="asset-history-group">
-                        {tr('Κινήσεις του Σετ {0}', `${set.barcode} · ${set.name}`)}
-                      </h3>
-                      {setHistory.map(historyRow)}
-                    </>
-                  )}
+                <div className="asset-detail-scroll" tabIndex={0} role="region" aria-label={tr('Ιστορικό κινήσεων')}>
+                  <AssetItemHistory item={tool} />
                 </div>
               </section>
             )}

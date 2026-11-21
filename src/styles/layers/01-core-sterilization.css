@@ -601,13 +601,6 @@ td {
 .table-panel {
   padding-top: 8px;
 }
-.history-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #1b667d;
-  margin-top: 5px;
-}
 .tool-photo-placeholder {
   width: 78px;
   height: 78px;
@@ -2892,28 +2885,6 @@ td {
   font-weight: 600;
   color: var(--c-blue-25-4);
   min-width: 0;
-}
-.asset-history {
-  padding: 4px 16px 12px;
-}
-.asset-history-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 9px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--c-gray-95);
-}
-.asset-history-row:last-child {
-  border-bottom: 0;
-}
-.asset-history-row strong {
-  font-size: 11.5px;
-}
-.asset-history-row small {
-  display: block;
-  margin-top: 2px;
-  font-size: 11.5px;
-  color: var(--st-muted);
 }
 .asset-empty {
   display: flex;

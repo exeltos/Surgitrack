@@ -124,11 +124,6 @@ html body .trace-load-items h3 {
   font-size: 14px;
   font-weight: 600;
 }
-html body .trace-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 12px;
-}
 
 /* A table of what was used, or what was in a load. */
 html body .trace-table-wrap {
@@ -259,37 +254,65 @@ html body .trace-item-head h2 {
 html body .trace-item-head .trace-open {
   text-decoration: none;
 }
-html body .trace-info {
-  margin: 0 0 18px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-}
-html body .trace-info > div {
-  display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-  align-items: center;
-  gap: 4px 16px;
-  min-height: 44px;
-  padding: 8px 16px;
-  border-top: 1px solid var(--c-gray-95);
-}
-html body .trace-info > div:first-child {
-  border-top: 0;
-}
-html body .trace-info dt {
-  color: var(--c-blue-40);
-  font-size: 12.5px;
-  font-weight: 500;
-}
-html body .trace-info dd {
+/* The item's own actions together at the right of its name: «Λήψη», its card. */
+html body .trace-head-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 8px;
+  gap: 8px;
+}
+/* What is known, as low cards in a row (the look of the Indicators' figures): the label on top, the value under it. */
+html body .trace-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin: 0 0 16px;
+}
+html body .trace-info > div {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+  padding: 9px 14px 10px 17px;
+  overflow: hidden;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgb(16 42 52 / 5%);
+}
+html body .trace-info > div::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #1f7a93;
+}
+html body .trace-info dt {
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 400;
+}
+html body .trace-info dd {
   margin: 0;
   color: var(--c-blue-15-2);
   font-size: 13.5px;
+  line-height: 1.45;
+}
+/* Its value first, on its own line; what follows flows as text, a badge or a link inline. */
+html body .trace-info dd > b:first-child,
+html body .trace-info dd > .trace-link:first-child {
+  display: block;
+}
+html body .trace-info dd > small {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--c-gray-45);
+  font-size: 12.5px;
+}
+html body .trace-info dd .trace-tone,
+html body .trace-info dd .trace-link {
+  margin-right: 6px;
 }
 html body .trace-info dd b {
   font-weight: 600;
@@ -302,38 +325,6 @@ html body .trace-section-title {
 }
 
 /* The history: one table, a line where each round begins. */
-html body .trace-history .trace-round-row th {
-  padding: 10px 18px;
-  border-top: 1px solid var(--c-gray-90);
-  background: var(--c-gray-95);
-  color: var(--c-blue-15-2);
-  font-size: 12.5px;
-  font-weight: 600;
-  text-transform: none;
-}
-html body .trace-history td {
-  padding: 9px 18px;
-  font-size: 13px;
-}
-html body .trace-history td b {
-  font-weight: 600;
-}
-html body .trace-history td small {
-  color: var(--c-blue-40);
-  font-size: 12px;
-}
-html body .trace-history .trace-when {
-  color: var(--c-blue-40);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-html body .trace-history .trace-end {
-  text-align: right;
-  white-space: nowrap;
-}
-html body .trace-history .trace-end > * + * {
-  margin-left: 10px;
-}
 
 /* Recently moved items, recent loads: one line each. */
 html body .trace-recent-list ul {
@@ -373,9 +364,6 @@ html body .trace-recent-list button span {
   white-space: nowrap;
 }
 @media (max-width: 720px) {
-  html body .trace-info > div {
-    grid-template-columns: 1fr;
-  }
   html body .trace-recent-list button {
     grid-template-columns: 1fr auto;
   }
@@ -402,10 +390,6 @@ html body .trace-table th {
   font-size: 12px;
   font-weight: 600;
   text-transform: none;
-}
-html body .trace-history td:nth-child(3),
-html body .trace-history td:nth-child(4) {
-  white-space: nowrap;
 }
 /* The search as on every other list: one line with its button, not a large box. */
 html body .trace-search {
@@ -489,4 +473,236 @@ html body .trace-load-search .trace-load-sterilizer {
   color: var(--c-cyan-20-3);
   font: inherit;
   font-size: 13px;
+}
+
+/* The history as a flow: a line per round, its stages side by side from receipt to the patient. */
+html body .trace-flow-rounds {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .trace-flow-round {
+  container: trace-round / inline-size;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .trace-flow-round h4 {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--c-gray-95);
+  color: var(--c-blue-15-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .trace-flow-round h4 span {
+  color: var(--c-gray-45);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+html body .trace-flow {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  margin: 0;
+  padding: 12px 8px;
+  list-style: none;
+}
+html body .trace-flow-step {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 10px 0 14px;
+}
+/* The stage's dot on one line through all stages. */
+html body .trace-flow-step strong {
+  position: relative;
+  padding-top: 16px;
+  color: var(--c-cyan-20-3);
+  font-size: 12px;
+  font-weight: 600;
+}
+html body .trace-flow-step strong::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--c-cyan-35);
+  border-radius: 50%;
+  background: var(--c-cyan-35);
+}
+html body .trace-flow-step::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 30px;
+  right: -12px;
+  height: 2px;
+  background: var(--c-cyan-35);
+}
+html body .trace-flow-step:last-child::after {
+  display: none;
+}
+html body .trace-flow-step.is-empty strong {
+  color: var(--c-gray-45);
+  font-weight: 400;
+}
+html body .trace-flow-step.is-empty strong::before {
+  border-color: var(--c-gray-80);
+  background: var(--c-white);
+}
+html body .trace-flow-step.is-empty::after,
+html body .trace-flow-step:has(+ .is-empty)::after {
+  background: var(--c-gray-90);
+}
+html body .trace-flow-none {
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+html body .trace-flow-event {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  font-size: 12.5px;
+}
+html body .trace-flow-event + .trace-flow-event {
+  padding-top: 6px;
+  border-top: 1px dashed var(--c-gray-90);
+}
+html body .trace-flow-event > * {
+  overflow-wrap: anywhere;
+}
+html body .trace-flow-event b {
+  color: var(--c-blue-15-2);
+  font-weight: 600;
+}
+html body .trace-flow-event small,
+html body .trace-flow .trace-when {
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+html body .trace-flow-event .trace-link {
+  justify-self: start;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+html body .trace-flow-event > .trace-flow-action {
+  color: var(--c-blue-15-2);
+}
+html body .trace-flow-event > .trace-flow-action.failed {
+  color: var(--c-red-35);
+  font-weight: 600;
+}
+html body .trace-flow-event > .trace-flow-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 2px;
+  overflow: visible;
+}
+html body .trace-flow-event.undone,
+html body .trace-flow-others .undone {
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+html body .trace-flow-others {
+  margin: 0;
+  padding: 8px 16px 10px;
+  border-top: 1px solid var(--c-gray-95);
+  color: var(--c-blue-40);
+  font-size: 12.5px;
+  list-style: none;
+}
+html body .trace-flow-others b {
+  font-weight: 600;
+}
+/* Narrow (a phone, or the card on a Set's page): the stages one under the other, the line down their left. */
+@container trace-round (max-width: 860px) {
+  html body .trace-flow {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  html body .trace-flow-step {
+    grid-template-columns: 110px minmax(0, 1fr);
+    padding: 0 0 0 18px;
+  }
+  html body .trace-flow-step strong {
+    padding-top: 0;
+  }
+  html body .trace-flow-step strong::before {
+    top: 3px;
+    left: -18px;
+  }
+  html body .trace-flow-step::after {
+    top: 16px;
+    bottom: -12px;
+    left: 4px;
+    right: auto;
+    width: 2px;
+    height: auto;
+  }
+  html body .trace-flow-step > :not(strong) {
+    grid-column: 2;
+  }
+}
+
+/* «Ιστορικό» with its days: the title and the count on the left, «Από» / «Έως» on the right. */
+html body .trace-history-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 4px 0 8px;
+}
+html body .trace-history-head .trace-section-title {
+  margin: 0;
+}
+html body .trace-history-head .quick-filters {
+  margin: 0 auto 0 0;
+}
+/* Each choice as wide as its words, not shared out evenly. */
+html body .trace-history-head .quick-filters button {
+  flex: 0 0 auto;
+}
+html body .trace-dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+html body .trace-dates label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-gray-45);
+  font-size: 12.5px;
+}
+html body .trace-dates input {
+  min-height: 32px;
+  padding: 3px 8px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 8px;
+  background: var(--c-white);
+  color: var(--c-blue-15-2);
+  font: inherit;
+  font-size: 13px;
+}
+html body .trace-dates .trace-link {
+  font-size: 12.5px;
+}
+/* On a Set's or an instrument's page, inside its card. */
+html body .asset-detail-full-panel .trace-history-block {
+  padding: 4px 2px;
 }
