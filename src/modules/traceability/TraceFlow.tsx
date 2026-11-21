@@ -35,10 +35,23 @@ const stageOf = (m: Movement) => {
 };
 
 /**
- * Stages whose events say their action: those that gather more than one kind, and a washer's or a sterilizer's own
- * record (which machine, which cycle, a failure).
+ * How a stage's routine moves begin: such a move only adds what follows its name («Παραλαβή στην Αποστείρωση ·
+ * υπογραφή» → «υπογραφή»). Any other move in the stage (a replacement, a recall, a receipt with a deviation) is said in
+ * full, so nothing it records is lost.
  */
-const MIXED = new Set(['wash', 'cycle', 'release', 'patient']);
+const ROUTINE: Record<string, string[]> = {
+  send: ['αποστολη'],
+  receive: ['παραλαβη'],
+  wash: ['καθαρισμ', 'φορτιο πλυντηριου'],
+  prep: ['συνθεση', 'ολοκληρωση ελεγχου'],
+  cycle: ['φορτιο', 'φορτωση'],
+  release: ['αποδεσμευ'],
+  delivery: ['παραδοση'],
+  patient: ['αποστολη'],
+};
+const plain = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+const isRoutine = (stage: string | undefined, status: string) =>
+  !!stage && (ROUTINE[stage] || []).some(start => plain(status.trim()).startsWith(start));
 
 /** A problem written in a move's text (a failure, a deviation on receipt, a damage, a missing piece): shown as one. */
 const FAILED = /αποτυχ|αποκλισ|απόκλισ|ελλειψ|έλλειψ|βλαβ|βλάβ|fail|deviat|missing|damage/i;
@@ -182,14 +195,14 @@ function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean
   return (
     <div className={`trace-flow-event${undone ? ' undone' : ''}`} title={movementText(m.status)}>
       <span className="trace-when">{m.at}</span>
-      {/* An undo always says what it undid, and why. */}
-      {(m.undoes || (stage && MIXED.has(stage) && movementKindOf(m.status) !== 'SEND')) && (
+      {/* Any other move in full; an undo also says what it undid, and why. */}
+      {(m.undoes || !isRoutine(stage, m.status)) && (
         <small className={`trace-flow-action${FAILED.test(m.status) || m.undoes ? ' failed' : ''}`}>
           {movementText(m.status)}
         </small>
       )}
-      {/* Elsewhere, what the move adds after its name («εμφανής απόκλιση», «υπογραφή παραλαμβάνοντα»). */}
-      {!m.undoes && !(stage && MIXED.has(stage) && movementKindOf(m.status) !== 'SEND') && detailOf(m.status) && (
+      {/* A routine move: what it adds after its name («υπογραφή παραλαμβάνοντα», «χωρίς χρήση: …»). */}
+      {!m.undoes && isRoutine(stage, m.status) && detailOf(m.status) && (
         <small className={`trace-flow-action${FAILED.test(m.status) ? ' failed' : ''}`}>{detailOf(m.status)}</small>
       )}
       {m.undoes && m.note && (
