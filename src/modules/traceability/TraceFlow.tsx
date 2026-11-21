@@ -22,12 +22,18 @@ const STAGES: Array<{key: string; label: string; kinds: MovementKind[]}> = [
   {key: 'patient', label: 'Ασθενής', kinds: ['SEND']},
 ];
 
-/** The stage of a move: a move with a patient code is the use, whatever its text. */
+/**
+ * The stage of a move, by what it did: a send back (and a count signed at the operation) is the use on the patient;
+ * a recall carries the item's patient code too, but stays a recall.
+ */
 const stageOf = (m: Movement) => {
-  if (m.patientCode) return 'patient';
   const kind = movementKindOf(m.status);
+  if (kind === 'SEND' || (kind === 'OTHER' && m.patientCode)) return 'patient';
   return STAGES.find(s => s.kinds.includes(kind))?.key;
 };
+
+/** Stages that gather more than one action: the action is said on each event. */
+const MIXED = new Set(['release', 'patient']);
 
 const day = (at: string) => at.split(' ')[0];
 
@@ -92,7 +98,8 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
               <ul className="trace-flow-others">
                 {others.map(m => (
                   <li key={m.id} className={undone.has(m.id) ? 'undone' : undefined}>
-                    <span className="trace-when">{m.at}</span> <b>{movementText(m.status)}</b> · {trData(m.by)}
+                    <span className="trace-when">{m.at}</span> <b>{movementText(m.status)}</b>
+                    {(m.from || m.to) && ` · ${trData(m.from) || '—'} → ${trData(m.to) || '—'}`} · {trData(m.by)}
                     {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
                   </li>
                 ))}
@@ -129,23 +136,26 @@ function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad: (loadId: stri
 }
 
 function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean; onPatient: (code: string) => void}) {
-  const receive = stageOf(m) === 'receive';
-  const place = m.patientCode || receive ? m.from : m.to;
+  const stage = stageOf(m);
+  const back = stage === 'receive' || stage === 'patient';
+  const place = back ? m.from : m.to;
   return (
     <div className={`trace-flow-event${undone ? ' undone' : ''}`} title={movementText(m.status)}>
       <span className="trace-when">{m.at}</span>
-      {m.patientCode ? (
+      {stage && MIXED.has(stage) && <small className="trace-flow-action">{movementText(m.status)}</small>}
+      {m.patientCode && (
         <button type="button" className="trace-link" onClick={() => onPatient(m.patientCode!)}>
           {m.patientCode}
         </button>
-      ) : (
-        place && (
-          <b>
-            {receive ? '←' : '→'} {trData(place)}
-          </b>
-        )
       )}
-      {m.patientCode && place && <small>{trData(place)}</small>}
+      {place &&
+        (stage === 'patient' ? (
+          <small>{trData(place)}</small>
+        ) : (
+          <b>
+            {back ? '←' : '→'} {trData(place)}
+          </b>
+        ))}
       <small className="wrap">{trData(m.by)}</small>
       {undone && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
     </div>

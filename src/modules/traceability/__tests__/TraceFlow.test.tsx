@@ -63,4 +63,22 @@ describe('TraceFlow', () => {
     fireEvent.click(within(steps[3]).getByRole('button', {name: 'Φορτίο'}));
     expect(onLoad).toHaveBeenCalledWith('L1');
   });
+
+  it('keeps a recall a recall, a signed count with the patient, and a transfer with its endpoints', () => {
+    const r: Round = {
+      key: 'r2',
+      moves: [
+        move('a', 'ΑΝΑΚΛΗΣΗ φορτίου 2026-0927', '13/11/2026 10:00', {patientCode: 'PT-1'}),
+        move('b', 'Μεταφορά εργαλείου σε Set', '13/11/2026 11:00', {from: 'Set S000321', to: 'Set S000341'}),
+        move('c', 'Καταμέτρηση εργαλείων υπογεγραμμένη · 9/9', '14/11/2026 12:00', {patientCode: 'PT-2'}),
+      ],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} onPatient={vi.fn()} onLoad={vi.fn()} />);
+    const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
+    expect(steps[4]).toHaveTextContent('ΑΝΑΚΛΗΣΗ φορτίου 2026-0927');
+    expect(within(steps[4]).getByRole('button', {name: 'PT-1'})).toBeInTheDocument();
+    expect(steps[6]).toHaveTextContent('Καταμέτρηση εργαλείων υπογεγραμμένη');
+    expect(steps[6]).not.toHaveTextContent('PT-1');
+    expect(screen.getByText(/Set S000321 → Set S000341/)).toBeInTheDocument();
+  });
 });
