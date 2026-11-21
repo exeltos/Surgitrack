@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
+import QuickFilters from '../../components/ui/QuickFilters';
 import {tr} from '../../i18n';
 import {useSurgi} from '../../store/SurgiStore';
 import type {SetAsset, Tool} from '../../types/domain';
@@ -15,42 +16,71 @@ type Props = {
   title?: string;
 };
 
-/** «Ιστορικό»: an item's rounds as a flow, cut to the days asked for (from, to). */
+/** What the history shows: the round under way, every round, or the rounds on the days asked for. */
+type View = 'CURRENT' | 'ALL' | 'DATES';
+
+/** «Ιστορικό»: an item's rounds as a flow — the current one first, every one, or those of some days (from, to). */
 export default function ItemHistory({rounds, onPatient, onLoad, title = tr('Ιστορικό')}: Props) {
   const undone = useUndoneMovements();
+  const [view, setView] = useState<View>('CURRENT');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
-  const shown = roundsBetween(rounds, from, to);
-  const cut = !!(from || to);
+  const inDates = roundsBetween(rounds, from, to);
+  const shown = view === 'CURRENT' ? rounds.slice(0, 1) : view === 'ALL' ? rounds : inDates;
   return (
     <section className="trace-history-block" aria-label={title}>
       <div className="trace-history-head">
-        <h3 className="trace-section-title">
-          {title}
-          <small>{cut ? tr('{0} από {1} γύρους', shown.length, rounds.length) : tr('{0} γύροι', rounds.length)}</small>
-        </h3>
-        <div className="trace-dates">
-          <label>
-            <span>{tr('Από')}</span>
-            <input type="date" value={from} max={to || undefined} onChange={e => setFrom(e.target.value)} />
-          </label>
-          <label>
-            <span>{tr('Έως')}</span>
-            <input type="date" value={to} min={from || undefined} onChange={e => setTo(e.target.value)} />
-          </label>
-          {cut && (
-            <button
-              type="button"
-              className="trace-link"
-              onClick={() => {
-                setFrom('');
-                setTo('');
-              }}
-            >
-              {tr('Όλες οι ημερομηνίες')}
-            </button>
-          )}
-        </div>
+        <h3 className="trace-section-title">{title}</h3>
+        <QuickFilters
+          label={tr('Προβολή ιστορικού')}
+          items={[
+            {
+              key: 'current',
+              label: tr('Τρέχων γύρος'),
+              count: Math.min(1, rounds.length),
+              active: view === 'CURRENT',
+              onClick: () => setView('CURRENT'),
+            },
+            {
+              key: 'all',
+              label: tr('Όλοι οι γύροι'),
+              count: rounds.length,
+              active: view === 'ALL',
+              onClick: () => setView('ALL'),
+            },
+            {
+              key: 'dates',
+              label: tr('Ημερομηνίες'),
+              count: inDates.length,
+              active: view === 'DATES',
+              onClick: () => setView('DATES'),
+            },
+          ]}
+        />
+        {view === 'DATES' && (
+          <div className="trace-dates">
+            <label>
+              <span>{tr('Από')}</span>
+              <input type="date" value={from} max={to || undefined} onChange={e => setFrom(e.target.value)} />
+            </label>
+            <label>
+              <span>{tr('Έως')}</span>
+              <input type="date" value={to} min={from || undefined} onChange={e => setTo(e.target.value)} />
+            </label>
+            {(from || to) && (
+              <button
+                type="button"
+                className="trace-link"
+                onClick={() => {
+                  setFrom('');
+                  setTo('');
+                }}
+              >
+                {tr('Καθαρισμός')}
+              </button>
+            )}
+          </div>
+        )}
       </div>
       {rounds.length === 0 ? (
         <p className="trace-hint">{tr('Δεν βρέθηκαν κινήσεις')}</p>

@@ -2520,8 +2520,9 @@ export const en: Record<string, string> = {
   'Βλάβες & απώλειες': 'Damage & losses',
   'Αναζήτηση στην αναφορά…': 'Search the report…',
   'Σάρωση ή αναζήτηση: barcode, ονομασία, κωδικός ή τμήμα…': 'Scan or search: barcode, name, code or department…',
-  '{0} από {1} γύρους': '{0} of {1} rounds',
-  '{0} γύροι': '{0} rounds',
   'Όλες οι ημερομηνίες': 'All dates',
+  'Προβολή ιστορικού': 'History view',
+  'Όλοι οι γύροι': 'All rounds',
+  Ημερομηνίες: 'Dates',
   'Καμία κίνηση σε αυτές τις ημερομηνίες': 'No movement on these dates',
 };
