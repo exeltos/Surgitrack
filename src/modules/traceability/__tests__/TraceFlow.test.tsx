@@ -95,6 +95,7 @@ describe('TraceFlow', () => {
       moves: [
         move('s', 'Αποστολή προς αποστείρωση', '18/11/2026 13:22', {from: 'ΜΕΘ', by: 'ΣΑΡΡΟΣ'}),
         move('l', 'Φορτίο L9 · ΚΛΙΒΑΝΟΣ Α · κύκλος 3 · σε εξέλιξη', '19/11/2026 12:47', {to: 'Στον κλίβανο'}),
+        move('r', 'Φορτίο L9 · ΚΛΙΒΑΝΟΣ Α · 3 · επιτυχές', '19/11/2026 13:25', {by: 'Ελένη'}),
       ],
     };
     render(<TraceFlow rounds={[r]} undone={new Set()} onPatient={vi.fn()} onLoad={vi.fn()} />);
@@ -103,6 +104,8 @@ describe('TraceFlow', () => {
     expect(steps[0]).toHaveTextContent('ΣΑΡΡΟΣ');
     expect(steps[7]).toHaveClass('is-empty');
     expect(screen.queryByText(/Στον κλίβανο/)).toBeNull();
+    // Who loaded it and who recorded its result, both on the cycle.
+    expect(steps[4]).toHaveTextContent('Νίκος · Μαρία · Ελένη');
   });
 
   it('says a failed wash, with its washer, in «Καθαρισμός»', () => {

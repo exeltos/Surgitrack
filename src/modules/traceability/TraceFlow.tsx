@@ -78,6 +78,15 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
         const others: Movement[] = [];
         // The load's own moves (into the sterilizer, its result) are the cycle shown once in «Κλίβανος».
         const loadText = round.cycle?.loadId && `Φορτίο ${round.cycle.loadId} `;
+        // Who loaded it and who recorded its result (they can differ): every one of them, once, on the cycle.
+        const loadPeople = [
+          ...new Set(
+            [
+              round.cycle?.by,
+              ...round.moves.filter(m => loadText && m.status.startsWith(loadText)).map(m => m.by),
+            ].filter((name): name is string => !!name),
+          ),
+        ];
         [...round.moves]
           .filter(m => !loadText || !m.status.startsWith(loadText))
           .sort((a, b) => time(a.at) - time(b.at))
@@ -113,7 +122,7 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
                   <li key={stage.key} className={`trace-flow-step ${stage.key}${empty ? ' is-empty' : ''}`}>
                     <strong>{tr(stage.label)}</strong>
                     {empty && <span className="trace-flow-none">—</span>}
-                    {cycle && <CycleStep cycle={cycle} onLoad={onLoad} />}
+                    {cycle && <CycleStep cycle={cycle} people={loadPeople} onLoad={onLoad} />}
                     {released && (
                       <div className="trace-flow-event">
                         {released.releasedAt ? (
@@ -157,7 +166,15 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
 /** A load past its cycle: the cycle went well; its release is said in «Αποδέσμευση». */
 const CYCLE_OK = new Set(['PASSED', 'AWAITING_RELEASE', 'RELEASED']);
 
-function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad?: (loadId: string) => void}) {
+function CycleStep({
+  cycle: c,
+  people,
+  onLoad,
+}: {
+  cycle: CycleEntry;
+  people: string[];
+  onLoad?: (loadId: string) => void;
+}) {
   const ok = !!c.status && CYCLE_OK.has(c.status);
   const startDay = c.start && c.start !== c.at ? day(c.start) : undefined;
   return (
@@ -175,7 +192,7 @@ function CycleStep({cycle: c, onLoad}: {cycle: CycleEntry; onLoad?: (loadId: str
         {c.program ? ` · ${c.program}` : ''}
       </small>
       {c.via && <small>{tr('με το Σετ {0}', c.via)}</small>}
-      {c.by && <small>{trData(c.by)}</small>}
+      {people.length > 0 && <small>{people.map(name => trData(name)).join(' · ')}</small>}
       <span className="trace-flow-result">
         <i className={`trace-tone ${ok ? 'ok' : c.tone}`}>{ok ? tr('Επιτυχία') : tr(c.label)}</i>
         {c.loadId && onLoad && (
