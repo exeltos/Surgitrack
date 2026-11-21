@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 import {shortCycleNumber} from '../../core/cycleNumber';
 import {Link} from 'react-router-dom';
 import {ExternalLink} from 'lucide-react';
@@ -19,13 +20,15 @@ type Props = {
   rounds: Round[];
   onPatient: (code: string) => void;
   onLoad: (loadId: string) => void;
+  /** More actions beside «Καρτέλα Σετ» (the download). */
+  actions?: ReactNode;
 };
 
 /**
  * One Set or instrument: a list of what is known (where it is, last cycle, last patient, uses, expiry), then every
  * step in one table, newest first, with a line where each round (a cycle and what followed it) begins.
  */
-export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onPatient, onLoad}: Props) {
+export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onPatient, onLoad, actions}: Props) {
   const undone = useUndoneMovements();
   const isSet = isSetAsset(asset);
   const tool = isSet ? undefined : asset;
@@ -50,9 +53,12 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
           </small>
           <h2>{asset.name}</h2>
         </div>
-        <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
-          <ExternalLink size={16} /> {isSet ? tr('Καρτέλα Σετ') : tr('Καρτέλα εργαλείου')}
-        </Link>
+        <div className="trace-head-actions">
+          {actions}
+          <Link className="app-button trace-open" to={isSet ? `/sets/${asset.id}` : `/tools/${asset.id}`}>
+            <ExternalLink size={16} /> {isSet ? tr('Καρτέλα Σετ') : tr('Καρτέλα εργαλείου')}
+          </Link>
+        </div>
       </div>
       <InfoList
         label={tr('Σύνοψη')}
@@ -61,8 +67,11 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
             label: tr('Πού είναι τώρα'),
             value: (
               <>
-                <b>{trData(asset.department) || tr('Απόθεμα')}</b> · {statusLabel(asset.state)}
-                {last && ` · ${tr('από {0}', last.at)}`}
+                <b>{trData(asset.department) || tr('Απόθεμα')}</b>
+                <small>
+                  {statusLabel(asset.state)}
+                  {last && ` · ${tr('από {0}', last.at)}`}
+                </small>
               </>
             ),
           },
@@ -72,8 +81,9 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               <>
                 <b>
                   {lastCycle.sterilizer} · #{shortCycleNumber(lastCycle.cycleNumber)}
-                </b>{' '}
-                · {lastCycle.at} <i className={`trace-tone ${lastCycle.tone}`}>{tr(lastCycle.label)}</i>
+                </b>
+                <small>{lastCycle.at}</small>
+                <i className={`trace-tone ${lastCycle.tone}`}>{tr(lastCycle.label)}</i>
                 {lastCycle.loadId && (
                   <button type="button" className="trace-link" onClick={() => onLoad(lastCycle.loadId!)}>
                     {tr('Φορτίο')}
@@ -90,8 +100,10 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               <>
                 <button type="button" className="trace-link" onClick={() => onPatient(lastPatient.patientCode!)}>
                   {lastPatient.patientCode}
-                </button>{' '}
-                · {lastPatient.at} · {trData(lastPatient.from || lastPatient.to)}
+                </button>
+                <small>
+                  {lastPatient.at} · {trData(lastPatient.from || lastPatient.to)}
+                </small>
               </>
             ) : (
               '—'
@@ -103,8 +115,8 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               <>
                 <b>
                   {uses ?? 0} / {maxUses}
-                </b>{' '}
-                · {tr('Απομένουν {0}', Math.max(0, maxUses - (uses ?? 0)))}
+                </b>
+                <small>{tr('Απομένουν {0}', Math.max(0, maxUses - (uses ?? 0)))}</small>
               </>
             ) : (
               <b>{uses ?? '—'}</b>
@@ -116,10 +128,9 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               <>
                 <b>{formatDate(sterileUntil)}</b>
                 {daysLeft !== undefined && (
-                  <span className={daysLeft < 0 ? 'trace-expired' : undefined}>
-                    {' '}
-                    · {daysLeft < 0 ? tr('Έληξε') : tr('Σε {0} ημέρες', daysLeft)}
-                  </span>
+                  <small className={daysLeft < 0 ? 'trace-expired' : undefined}>
+                    {daysLeft < 0 ? tr('Έληξε') : tr('Σε {0} ημέρες', daysLeft)}
+                  </small>
                 )}
               </>
             ) : (

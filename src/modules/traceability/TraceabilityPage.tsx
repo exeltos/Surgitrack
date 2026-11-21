@@ -266,15 +266,15 @@ export default function TraceabilityPage() {
                 rounds={rounds}
                 onPatient={openPatient}
                 onLoad={openLoad}
+                actions={
+                  moves.length > 0 && (
+                    <DownloadMenu
+                      table={traceTable}
+                      onPrint={() => setReport(tableReportHtml(traceTable(), getI18nLang()))}
+                    />
+                  )
+                }
               />
-              {moves.length > 0 && (
-                <div className="trace-actions">
-                  <DownloadMenu
-                    table={traceTable}
-                    onPrint={() => setReport(tableReportHtml(traceTable(), getI18nLang()))}
-                  />
-                </div>
-              )}
             </>
           ) : needle ? (
             !choosing &&

@@ -145,7 +145,7 @@ describe('TraceFlow', () => {
       moves: [move('d', 'Φυσική παραλαβή · εμφανής απόκλιση', '18/11/2026 15:00')],
     };
     render(<TraceFlow rounds={[r]} undone={new Set()} />);
-    expect(screen.getByText('Φυσική παραλαβή · εμφανής απόκλιση')).toHaveClass('failed');
+    expect(screen.getByText('εμφανής απόκλιση')).toHaveClass('failed');
   });
 
   it('keeps the details of a send with the patient (the instruments not used)', () => {
@@ -168,5 +168,11 @@ describe('TraceFlow', () => {
     };
     render(<TraceFlow rounds={[r]} undone={new Set()} />);
     expect(screen.getByText('Αντικατάσταση στη σύνθεση από T000099')).toBeInTheDocument();
+  });
+
+  it('does not show «χωρίς εμφανή απόκλιση» as a problem', () => {
+    const r: Round = {key: 'r9', moves: [move('k', 'Φυσική παραλαβή · χωρίς εμφανή απόκλιση', '21/11/2026 12:48')]};
+    render(<TraceFlow rounds={[r]} undone={new Set()} />);
+    expect(screen.getByText('χωρίς εμφανή απόκλιση')).not.toHaveClass('failed');
   });
 });

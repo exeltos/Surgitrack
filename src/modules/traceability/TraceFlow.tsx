@@ -41,7 +41,7 @@ const stageOf = (m: Movement) => {
  */
 const ROUTINE: Record<string, string[]> = {
   send: ['αποστολη'],
-  receive: ['παραλαβη'],
+  receive: ['παραλαβη', 'φυσικη παραλαβη'],
   wash: ['καθαρισμ', 'φορτιο πλυντηριου'],
   prep: ['συνθεση', 'ολοκληρωση ελεγχου'],
   cycle: ['φορτιο', 'φορτωση'],
@@ -49,12 +49,16 @@ const ROUTINE: Record<string, string[]> = {
   delivery: ['παραδοση'],
   patient: ['αποστολη'],
 };
-const plain = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 const isRoutine = (stage: string | undefined, status: string) =>
   !!stage && (ROUTINE[stage] || []).some(start => plain(status.trim()).startsWith(start));
 
+const plain = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+
 /** A problem written in a move's text (a failure, a deviation on receipt, a damage, a missing piece): shown as one. */
-const FAILED = /αποτυχ|αποκλισ|απόκλισ|ελλειψ|έλλειψ|βλαβ|βλάβ|fail|deviat|missing|damage/i;
+const PROBLEM = /αποτυχ|αποκλισ|ελλειψ|βλαβ|fail|deviat|missing|damage/;
+/** «Χωρίς εμφανή απόκλιση», «no deviation»: said to be fine, not a problem. */
+const DENIED = /χωρις [^·]*(αποκλισ|ελλειψ|βλαβ)|no [^·]*(deviat|damage)/;
+const FAILED = {test: (status: string) => PROBLEM.test(plain(status)) && !DENIED.test(plain(status))};
 
 /** What a move's text says after its name («Φυσική παραλαβή · εμφανής απόκλιση» → «εμφανής απόκλιση»). */
 const detailOf = (status: string) => {
