@@ -95,6 +95,9 @@ export default function TraceabilityPage() {
   const asset = exact || (nameMatches.length === 1 ? nameMatches[0] : undefined);
   const choosing = !asset && nameMatches.length > 1;
   // Its own screen once opened (Enter, «Αναζήτηση», a pick): not while a barcode is still being typed.
+  // A load's own moves begin with its record id («Φορτίο L1795…-8wmny8 · ΚΛΙΒΑΝΟΣ Α · …»): the sterilizer and
+  // cycle say it, the id does not.
+  const withoutLoadId = (text: string) => text.replace(/^(Φορτίο|Load) L[\w-]+ · /, '');
   const itemOpen = tab === 'SEARCH' && !!asset && (urlQuery || '').trim().toLowerCase() === needle;
   // A member instrument travels inside its Set: the Set's moves belong to its trail too.
   const {carrierSet, moves, cycles, rounds} = asset
@@ -318,7 +321,7 @@ export default function TraceabilityPage() {
                             {item.barcode}
                           </b>
                           <span>{item.name}</span>
-                          <span>{movementText(status)}</span>
+                          <span title={movementText(status)}>{withoutLoadId(movementText(status))}</span>
                           <span>{at}</span>
                         </button>
                       </li>
