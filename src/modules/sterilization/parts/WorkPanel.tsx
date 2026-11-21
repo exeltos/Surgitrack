@@ -123,6 +123,8 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
     awaitingLoads.flatMap(load => load.items.map(item => [`${item.assetKind}:${item.assetId}`, load.id] as const)),
   );
   type Row = (typeof order.rows)[number];
+  // Receipt and delivery list their rows under each department's heading.
+  const byDepartment = queue === 'READY' || queue === 'INCOMING';
   const listed: Array<{load: (typeof awaitingLoads)[number]} | {department: string; items: Row[]} | {x: Row}> =
     queue === 'READY' || queue === 'INCOMING'
       ? // Receipt and delivery: the rows under their department (a handover is with one), in the order the list is
@@ -169,11 +171,14 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
         <div className="ster-panel-head-actions" data-tour="ster-panel-actions">
           {queue === 'INCOMING' && (
             <>
-              <span className="ster-hint">
-                {tr('Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.')}
-              </span>
               {incoming.length > 0 && (
-                <button className="primary compact" onClick={() => openReceiptBatch()}>
+                <button
+                  className="primary compact"
+                  title={tr(
+                    'Γρήγορη φυσική παραλαβή · δήλωση εμφανής απόκλισης · προαιρετική καταμέτρηση βάσει πολιτικής.',
+                  )}
+                  onClick={() => openReceiptBatch()}
+                >
                   <ScanBarcode size={15} /> {tr('Μαζική παραλαβή')}
                 </button>
               )}
@@ -290,7 +295,12 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
               <SortHeader label={tr('Αντικείμενο')} sortKey="name" sort={order.sort} onSort={order.toggle} />
             </span>
             <span>
-              <SortHeader label={tr('Τμήμα')} sortKey="department" sort={order.sort} onSort={order.toggle} />
+              {/* Under a department's heading the column says the specialty (the department is the heading). */}
+              {byDepartment ? (
+                <SortHeader label={tr('Ειδικότητα')} sortKey="specialty" sort={order.sort} onSort={order.toggle} />
+              ) : (
+                <SortHeader label={tr('Τμήμα')} sortKey="department" sort={order.sort} onSort={order.toggle} />
+              )}
             </span>
             <span>
               <SortHeader label={tr('Ειδικότητα')} sortKey="specialty" sort={order.sort} onSort={order.toggle} />
@@ -335,11 +345,17 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                       <small>{contentOf(item.items.map(x => x.kind))}</small>
                     </span>
                     {queue === 'INCOMING' ? (
-                      <button className="primary compact" onClick={() => openReceiptBatch(item.items)}>
+                      <button
+                        className="app-button app-button-secondary ster-group-action"
+                        onClick={() => openReceiptBatch(item.items)}
+                      >
                         <ScanBarcode size={15} /> {tr('Παραλαβή όλων')}
                       </button>
                     ) : (
-                      <button className="primary compact" onClick={() => openDeliveryBatch(item.department)}>
+                      <button
+                        className="app-button app-button-secondary ster-group-action"
+                        onClick={() => openDeliveryBatch(item.department)}
+                      >
                         <UserRoundCheck size={15} /> {tr('Παράδοση όλων')}
                       </button>
                     )}
@@ -383,8 +399,14 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
                     </div>
                   </div>
                   <div className="ster-cell-text ster-cell-department">
-                    <strong>{trData(x.department) || tr('Χωρίς τμήμα')}</strong>
-                    <span className="ster-tablet-specialty">{trData(x.specialty) || '—'}</span>
+                    {byDepartment ? (
+                      <span>{trData(x.specialty) || '—'}</span>
+                    ) : (
+                      <>
+                        <strong>{trData(x.department) || tr('Χωρίς τμήμα')}</strong>
+                        <span className="ster-tablet-specialty">{trData(x.specialty) || '—'}</span>
+                      </>
+                    )}
                   </div>
                   <div className="ster-cell-text ster-cell-specialty">
                     <span>{trData(x.specialty) || '—'}</span>

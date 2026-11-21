@@ -3152,3 +3152,10 @@ html body .sent-note {
   background: var(--c-red-85);
   color: var(--c-red-35);
 }
+/* A department's heading in Receipt and Delivery: the department, what it sent, and «… όλων» as a plain button (the
+   rows keep the strong one). */
+html body .sterilization-workspace .ster-load-group .ster-group-action {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
