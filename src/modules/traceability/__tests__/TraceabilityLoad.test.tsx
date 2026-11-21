@@ -29,7 +29,7 @@ describe('Ιχνηλάτηση › Φορτίο κλιβάνου', () => {
     const held = screen.getByRole('region', {name: 'Τι ήταν στο φορτίο'});
     fireEvent.click(within(held).getAllByRole('button')[0]);
     // The item's trail, with the load among its cycles.
-    // The item's card: «Πίσω» in place of the tabs.
+    // The item in the card beside the list, with the tabs above.
     expect(screen.getByRole('tablist', {name: 'Τι ψάχνετε'})).toBeInTheDocument();
     expect(screen.getByRole('link', {name: /Καρτέλα (Σετ|εργαλείου)/})).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole('button', {name: 'Φορτίο'})[0]);

@@ -171,18 +171,20 @@ html body .trace-used {
   color: var(--c-amber-35);
   font-weight: 700;
 }
+/* «Ανάκληση φορτίου»: the size of every other button beside a name, red as what it does. */
 html body .trace-recall {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 2px solid var(--c-red-40);
-  border-radius: 12px;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--c-red-40);
+  border-radius: 10px;
   background: var(--c-white);
   color: var(--c-red-40);
   font: inherit;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
 }
 html body .trace-recall:hover {
@@ -196,16 +198,7 @@ html body .trace-patients {
   min-height: 0;
 }
 /* Uses with a patient code: the item gets the room, the department what it needs, the user one line. */
-html body .trace-patients-ledger .ledger-columns,
-html body .trace-patients-ledger .ledger-row {
-  grid-template-columns: 128px minmax(220px, 1.6fr) minmax(150px, 1fr) 150px minmax(170px, 1fr) 24px;
-}
 /* The patient code as a chip its own size, not the column's. */
-html body .trace-patients-ledger .movement-chip {
-  justify-self: start;
-  width: fit-content;
-  max-width: 100%;
-}
 
 /* The search: the suggestions list opens under it, and with nothing typed a line of help is all the page shows. */
 html body .trace-search {
@@ -379,10 +372,6 @@ html body .trace-tabs-row {
 html body .trace-tabs-row > .trace-tabs {
   flex: 1 1 auto;
 }
-html body .trace-tabs-row > .trace-page-back {
-  flex: none;
-  margin-bottom: 6px;
-}
 /* The trail's column titles as on every other list: sentence case, small, grey. */
 html body .trace-table th {
   padding: 10px 18px;
@@ -422,20 +411,12 @@ html body .trace-recent-list .trace-code svg {
   color: var(--c-gray-45);
 }
 /* Loads: one line each, in columns under their titles. */
-html body .trace-loads .trace-list-head,
 html body .trace-loads button {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) 150px 130px 190px;
   align-items: center;
   gap: 4px 16px;
 }
-html body .trace-loads .trace-list-head {
-  padding: 0 16px 6px;
-  color: var(--c-gray-45);
-  font-size: 12px;
-  font-weight: 600;
-}
-html body .trace-loads .trace-list-head > :last-child,
 html body .trace-loads button > :last-child {
   justify-self: end;
 }
@@ -447,9 +428,6 @@ html body .trace-loads button > b {
   white-space: nowrap;
 }
 @media (max-width: 720px) {
-  html body .trace-loads .trace-list-head {
-    display: none;
-  }
   html body .trace-loads button {
     grid-template-columns: 1fr auto;
   }
@@ -705,4 +683,122 @@ html body .trace-dates .trace-link {
 /* On a Set's or an instrument's page, inside its card. */
 html body .asset-detail-full-panel .trace-history-block {
   padding: 4px 2px;
+}
+
+/* «Σετ / εργαλείο»: the page at the window's height, the list on the left and the open item's card on the right, each
+   scrolling inside itself — nothing cut, the page stays put. */
+html body .trace-page:has(> .trace-split) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 8px;
+}
+html body .trace-split {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
+  gap: 14px;
+  min-height: 0;
+}
+html body .trace-split-card {
+  min-height: 0;
+  overflow-y: auto;
+}
+/* The search stays on top; only the list under it scrolls. */
+html body .trace-split-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+html body .trace-split-list .trace-recent-list,
+html body .trace-split-list .trace-patients {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+html body .trace-split-list .trace-recent-list > ul {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+/* Loads in the narrow list: the sterilizer and cycle with the status, the date and items under them. */
+html body .trace-split-list .trace-loads button {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+html body .trace-split-list .trace-loads button > span {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+html body .trace-split-list .trace-load-search .trace-load-sterilizer {
+  flex: 0 1 150px;
+  min-width: 0;
+}
+/* A patient: the code with the date, the department and how many items under it. */
+html body .trace-split-list .trace-patients .movement-chip {
+  width: fit-content;
+}
+html body .trace-split-list .trace-search-bar {
+  margin-bottom: 0;
+}
+html body .trace-split-card {
+  padding: 14px 18px 18px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 14px;
+  background: var(--c-white);
+  box-shadow: 0 1px 3px rgb(16 42 52 / 5%);
+}
+html body .trace-split-card .trace-item-head {
+  margin-top: 0;
+}
+html body .trace-split-empty {
+  margin: 40px auto;
+  max-width: 320px;
+  color: var(--c-gray-45);
+  text-align: center;
+}
+/* In the narrow list: the barcode with the date, the name, then what happened — on lines of their own. */
+html body .trace-split-list .trace-recent-list button {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  padding: 9px 14px;
+}
+html body .trace-split-list .trace-recent-list button > span:nth-child(2) {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  color: var(--c-blue-15-2);
+  white-space: normal;
+}
+html body .trace-split-list .trace-recent-list button > span:nth-child(3) {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  font-size: 12px;
+}
+html body .trace-split-list .trace-recent-list button > span:nth-child(4) {
+  grid-column: 2;
+  grid-row: 1;
+  font-size: 12px;
+}
+/* The item open in the card, marked in the list. */
+html body .trace-split-list .trace-recent-list button.selected {
+  background: var(--c-gray-100-2);
+  box-shadow: inset 3px 0 0 var(--c-cyan-35);
+}
+/* A narrow window: the list, then the card, one under the other; the page scrolls. */
+@media (max-width: 1000px) {
+  html body .trace-page:has(> .trace-split) {
+    display: block;
+    overflow-y: auto;
+  }
+  /* At their own height, the list then the card: none of the window-height sharing. */
+  html body .trace-split {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+  }
+  html body .trace-split-card,
+  html body .trace-split-list .trace-recent-list > ul {
+    overflow: visible;
+  }
 }
