@@ -304,7 +304,6 @@ export const en: Record<string, string> = {
   'Όλες οι θέσεις': 'All locations',
   'Όλες οι καταστάσεις': 'All statuses',
   'Όλες οι κινήσεις': 'All movements',
-  'Όλες οι κινήσεις του συγκεκριμένου φυσικού εργαλείου.': 'Every movement of this physical instrument.',
   'Όλοι οι ενεργοί έλεγχοι πρέπει να επιβεβαιωθούν για να προχωρήσει η ροή.':
     'All active checks must be confirmed for the workflow to continue.',
   'Όλοι οι τύποι': 'All types',
@@ -480,7 +479,6 @@ export const en: Record<string, string> = {
   'Δεν επιτρέπεται αποδέσμευση': 'Release not allowed',
   'Δεν επιτρέπεται διαγραφή όσο το Σετ βρίσκεται σε ενεργή διαδικασία αποστείρωσης.':
     'Deletion is not allowed while the set is in an active sterilization process.',
-  'Δεν υπάρχει καταγεγραμμένη κίνηση.': 'No recorded movement.',
   'Δεν υπάρχει πρόσβαση σε αυτό το Σετ.': 'No access to this set.',
   'Δεν υπάρχει πρόσβαση σε αυτό το εργαλείο.': 'No access to this instrument.',
   'Δεν υπάρχουν ανοικτές εκκρεμότητες.': 'No open issues.',
@@ -904,7 +902,6 @@ export const en: Record<string, string> = {
     'With more pieces, the serial number is filled in on each piece’s card.',
   'με το Σετ': 'with the Set',
   'από το Σετ': 'from the Set',
-  'Κινήσεις του Σετ {0}': 'Moves of the Set {0}',
   'Μόνο εργαλεία': 'Instruments only',
   'Μόνο η λειτουργική σύνοψη του Σετ· τα στοιχεία ταυτότητας παραμένουν αριστερά.':
     "The set's operational summary only; identity details stay on the left.",
@@ -2523,4 +2520,8 @@ export const en: Record<string, string> = {
   'Βλάβες & απώλειες': 'Damage & losses',
   'Αναζήτηση στην αναφορά…': 'Search the report…',
   'Σάρωση ή αναζήτηση: barcode, ονομασία, κωδικός ή τμήμα…': 'Scan or search: barcode, name, code or department…',
+  '{0} από {1} γύρους': '{0} of {1} rounds',
+  '{0} γύροι': '{0} rounds',
+  'Όλες οι ημερομηνίες': 'All dates',
+  'Καμία κίνηση σε αυτές τις ημερομηνίες': 'No movement on these dates',
 };

@@ -120,6 +120,7 @@ export default function TraceFlow({rounds, undone, onPatient, onLoad}: Props) {
                   <li key={m.id} className={undone.has(m.id) ? 'undone' : undefined}>
                     <span className="trace-when">{m.at}</span> <b>{movementText(m.status)}</b>
                     {(m.from || m.to) && ` · ${trData(m.from) || '—'} → ${trData(m.to) || '—'}`} · {trData(m.by)}
+                    {m.undoes && m.note ? ` · ${tr('Αιτιολογία')}: ${m.note}` : ''}
                     {undone.has(m.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
                   </li>
                 ))}
