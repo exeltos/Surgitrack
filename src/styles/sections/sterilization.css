@@ -3167,8 +3167,13 @@ html body .sterilization-workspace .ster-load-group .ster-group-action {
   html body .sterilization-workspace .ster-work-panel.by-department .ster-work-row > .ster-cell-department {
     display: none;
   }
+  /* The specialty takes the department's column too; with no status column, the status's as well. */
   html body .sterilization-workspace .ster-work-panel.by-department .ster-list-head > span:nth-child(3),
   html body .sterilization-workspace .ster-work-panel.by-department .ster-work-row > .ster-cell-specialty {
+    grid-column: 2 / span 2;
+  }
+  html body .sterilization-workspace .ster-work-panel.by-department.no-status .ster-list-head > span:nth-child(3),
+  html body .sterilization-workspace .ster-work-panel.by-department.no-status .ster-work-row > .ster-cell-specialty {
     grid-column: 2 / span 3;
   }
 }
