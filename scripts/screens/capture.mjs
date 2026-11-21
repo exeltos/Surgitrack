@@ -595,9 +595,10 @@ async function main() {
         const started = Date.now();
         await page.evaluate(h => (location.hash = h), `#${target}`);
         await settle(page);
-        // SCREENS_CLICK="Κανόνες" presses that button first (a tab of the page), for a shot of what it shows.
+        // SCREENS_CLICK="Κανόνες" presses that button (or tab) first (a tab of the page), for a shot of what it shows.
         if (process.env.SCREENS_CLICK) {
-          await page.getByRole('button', {name: process.env.SCREENS_CLICK}).first().click({timeout: 3000});
+          const name = process.env.SCREENS_CLICK;
+          await page.getByRole('button', {name}).or(page.getByRole('tab', {name})).first().click({timeout: 3000});
           await page.waitForTimeout(300);
         }
         // SCREENS_SCROLL=400 scrolls what scrolls (the page or its panel) before the shot, to see what stays put.
