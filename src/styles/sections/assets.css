@@ -18,10 +18,6 @@
   color: var(--muted);
 }
 /* In the Reports filter strip the Filters button sits on the left: open its panel to the right. */
-.reports-filter-strip .asset-filter-panel {
-  left: 0;
-  right: auto;
-}
 
 /* Tool / Set card: when editing makes the fields taller than the screen, the card scrolls
    instead of squeezing the barcode, uses and photo tiles out of sight. */

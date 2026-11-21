@@ -1,5 +1,6 @@
+import AssetFilterBar from '../../../components/assets/AssetFilterBar';
 import {useState} from 'react';
-import {Plus, Search, Trash2, Pencil, Palette, ListPlus} from 'lucide-react';
+import {Plus, Trash2, Pencil, Palette, ListPlus} from 'lucide-react';
 import AppButton from '../../../components/ui/AppButton';
 import ColorTapeLibrary from '../ColorTapeLibrary';
 import SterilizerBatchDialog from '../SterilizerBatchDialog';
@@ -96,15 +97,12 @@ export default function LibrariesTab({s}: {s: StudioPageState}) {
                 </div>
               </header>
               {cloudError && <div className="auth-message">{cloudError}</div>}
-              <div className="studio-search">
-                <Search size={17} />
-                <input
-                  type="search"
-                  value={query}
-                  onChange={e => setQuery(e.target.value)}
-                  placeholder={L('Αναζήτηση ονομασίας ή κωδικού...', 'Search name or code...')}
-                />
-              </div>
+              <AssetFilterBar
+                className="studio-library-bar"
+                query={query}
+                onQueryChange={setQuery}
+                placeholder={L('Αναζήτηση ονομασίας ή κωδικού...', 'Search name or code...')}
+              />
               <div className="studio-list-head">
                 <span>{L('Ονομασία', 'Name')}</span>
                 <span>{L('Αγγλικά', 'English')}</span>

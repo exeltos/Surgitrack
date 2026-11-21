@@ -143,12 +143,7 @@ html body .trace-table {
   border-collapse: collapse;
 }
 html body .trace-table th {
-  padding: 12px 18px;
-  color: var(--c-blue-40);
-  font-size: 12px;
-  font-weight: 700;
   text-align: left;
-  text-transform: uppercase;
 }
 html body .trace-table td {
   padding: 14px 18px;
@@ -165,39 +160,7 @@ html body .trace-table td > b {
   color: var(--c-blue-15-2);
 }
 
-/* A load: sterilizer and cycle to find it; what it held, with the ones already used on a patient marked. */
-html body .trace-load-search {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-html body .trace-load-search label {
-  display: grid;
-  gap: 6px;
-  color: var(--c-blue-40);
-  font-size: 13px;
-  font-weight: 600;
-}
-html body .trace-load-search select,
-html body .trace-load-search input {
-  min-width: 180px;
-  min-height: 46px;
-  padding: 0 12px;
-  border: 1px solid var(--c-gray-90-4);
-  border-radius: 10px;
-  background: var(--c-white);
-  color: var(--c-blue-15-2);
-  font: inherit;
-  font-weight: 600;
-}
-html body .trace-load-search button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 46px;
-}
+/* A load: what it held, with the ones already used on a patient marked. */
 html body .trace-load-items {
   display: grid;
   gap: 10px;
@@ -253,7 +216,6 @@ html body .trace-patients-ledger .movement-chip {
 html body .trace-search {
   position: relative;
   margin-bottom: 10px;
-  padding: 6px 8px 6px 12px;
 }
 html body .trace-hint {
   margin: 4px 2px 0;
@@ -419,7 +381,112 @@ html body .trace-recent-list button span {
   }
 }
 /* The page's «Πίσω», top left where a title would be, as «Πίσω στη λίστα» on the Set and instrument pages. */
-html body .trace-head {
+
+/* The tabs on every step; «Πίσω» on their right inside a found card. */
+html body .trace-tabs-row {
   display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+html body .trace-tabs-row > .trace-tabs {
+  flex: 1 1 auto;
+}
+html body .trace-tabs-row > .trace-page-back {
+  flex: none;
+  margin-bottom: 6px;
+}
+/* The trail's column titles as on every other list: sentence case, small, grey. */
+html body .trace-table th {
+  padding: 10px 18px;
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+}
+html body .trace-history td:nth-child(3),
+html body .trace-history td:nth-child(4) {
+  white-space: nowrap;
+}
+/* The search as on every other list: one line with its button, not a large box. */
+html body .trace-search {
+  min-height: 0;
+  padding: 3px 4px 3px 12px;
+  border-radius: 10px;
+}
+html body .trace-search input {
+  min-height: 34px;
+  font-size: 14px;
+}
+html body .trace-search > svg {
+  width: 17px;
+  height: 17px;
+}
+html body .trace-search button.primary {
+  min-height: 32px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+/* Recently moved: a Set or instrument icon by the code, in the list's own size. */
+html body .trace-recent-list .trace-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+}
+html body .trace-recent-list .trace-code svg {
+  flex: none;
+  color: var(--c-gray-45);
+}
+/* Loads: one line each, in columns under their titles. */
+html body .trace-loads .trace-list-head,
+html body .trace-loads button {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) 150px 130px 190px;
+  align-items: center;
+  gap: 4px 16px;
+}
+html body .trace-loads .trace-list-head {
+  padding: 0 16px 6px;
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 600;
+}
+html body .trace-loads .trace-list-head > :last-child,
+html body .trace-loads button > :last-child {
+  justify-self: end;
+}
+html body .trace-loads button > b {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 720px) {
+  html body .trace-loads .trace-list-head {
+    display: none;
+  }
+  html body .trace-loads button {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+/* Traceability's searches are the bar above every other list; the suggestions open under it. */
+html body .trace-search-bar {
+  position: relative;
   margin-bottom: 10px;
+}
+html body .trace-load-search {
+  margin-bottom: 10px;
+}
+html body .trace-load-search .trace-load-sterilizer {
+  flex: 0 0 220px;
+  height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 9px;
+  background: var(--c-white);
+  color: var(--c-cyan-20-3);
+  font: inherit;
+  font-size: 13px;
 }

@@ -3,7 +3,8 @@ import {useSearchParams} from 'react-router-dom';
 import {useFitWidth} from '../../components/ui/useFitWidth';
 import {AlertTriangle, FileText, Printer} from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
-import FilterMenu, {type SelectFilter} from '../../components/assets/FilterMenu';
+import {type SelectFilter} from '../../components/assets/FilterMenu';
+import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {useSurgi} from '../../store/SurgiStore';
@@ -20,7 +21,6 @@ import {
   LOAD_STATUS,
   cellText,
   genericReportHtml,
-  reportGroups,
   reports,
   stateLabel,
   type InventoryGroup,
@@ -70,6 +70,8 @@ export default function ReportsPage() {
   // The period (from, to), for the reports of things that happened on a day.
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  // A word in any column of the report.
+  const [query, setQuery] = useState('');
   const sterilizerNames = useMemo(
     () =>
       Array.from(new Set(processLoads.filter(l => l.kind === 'STERILIZATION').map(l => l.equipment))).sort((a, b) =>
@@ -161,17 +163,21 @@ export default function ReportsPage() {
   // The period cuts the dated reports to the days in it (a record without a readable day stays).
   const dateKey = DATE_OF[active];
   const reportData = useMemo(() => {
-    if (!dateKey || (!dateFrom && !dateTo)) return built;
+    const needle = query.trim().toLowerCase();
+    if (!needle && (!dateKey || (!dateFrom && !dateTo))) return built;
     return {
       ...built,
       rows: built.rows.filter(row => {
+        if (needle && !built.columns.some(c => cellText(c.key, row[c.key]).toLowerCase().includes(needle)))
+          return false;
+        if (!dateKey || (!dateFrom && !dateTo)) return true;
         const at = parseDisplayDate(String(row[dateKey] ?? ''));
         if (!at) return true;
         const day = dayKey(at);
         return (!dateFrom || day >= dateFrom) && (!dateTo || day <= dateTo);
       }),
     };
-  }, [built, dateKey, dateFrom, dateTo]);
+  }, [built, dateKey, dateFrom, dateTo, query]);
   const period =
     dateKey && (dateFrom || dateTo)
       ? [dateFrom ? showDay(dateFrom) : '…', dateTo ? showDay(dateTo) : '…'].join(' – ')
@@ -442,6 +448,7 @@ export default function ReportsPage() {
       signature,
       dateFrom,
       dateTo,
+      query,
     ].join('|'),
   );
   const resultBody = useFitWidth<HTMLDivElement>([reportData, shownRows.visible.length]);
@@ -465,74 +472,39 @@ export default function ReportsPage() {
       </div>
       <HistoryWindowNote auto />
       <div className="reports-workbench">
-        <aside className="reports-catalog" aria-label={tr('Τύποι αναφορών')}>
-          <div className="reports-catalog-head">
-            <strong>{tr('Αναφορές')}</strong>
-            <span>
-              {reports.length} {tr('διαθέσιμες')}
-            </span>
-          </div>
-          <div className="reports-categories" role="group" aria-label={tr('Κατηγορίες αναφορών')}>
-            {reportGroups.map(g => (
-              <button
-                key={g.id}
-                type="button"
-                className={`reports-category ${activeMeta.group === g.id ? 'active' : ''}`}
-                aria-pressed={activeMeta.group === g.id}
-                onClick={() => {
-                  if (activeMeta.group === g.id) return;
-                  setActive(reports.find(r => r.group === g.id)!.id);
-                  setView(null);
-                }}
-              >
-                {tr(g.title)}
-                <b>{reports.filter(r => r.group === g.id).length}</b>
-              </button>
-            ))}
-          </div>
-        </aside>
         <section className="reports-stage">
           <header className="reports-stage-head">
             {/* The title of the report is its button below; the heading is for readers who navigate by headings. */}
             <h2 className="visually-hidden">{tr(activeMeta.title)}</h2>
-            <div
-              className="reports-catalog-list"
-              role="group"
-              aria-label={tr(reportGroups.find(g => g.id === activeMeta.group)!.title)}
-            >
-              {reports
-                .filter(report => report.group === activeMeta.group)
-                .map(report => {
-                  const Icon = report.icon;
-                  return (
-                    <button
-                      key={report.id}
-                      title={tr(report.purpose)}
-                      className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
-                      onClick={() => {
-                        setActive(report.id);
-                        setView(null);
-                      }}
-                    >
-                      <span className="reports-catalog-icon">
-                        <Icon size={18} />
-                      </span>
-                      <span>
-                        <strong>{tr(report.title)}</strong>
-                        <small>{tr(report.purpose)}</small>
-                      </span>
-                    </button>
-                  );
-                })}
-            </div>
-            <div className="reports-stage-actions" data-tour="report-download">
-              <DownloadMenu variant="primary" table={reportTable} onPrint={openPreview} />
+            <div className="reports-catalog-list" role="group" aria-label={tr('Αναφορές')}>
+              {/* Every report on one row of tabs (no row of categories over them): its short name, its title in the
+                  tooltip and for screen readers. */}
+              {reports.map(report => {
+                const Icon = report.icon;
+                return (
+                  <button
+                    key={report.id}
+                    title={tr(report.purpose)}
+                    aria-label={tr(report.title)}
+                    className={`reports-catalog-item ${active === report.id ? 'active' : ''}`}
+                    onClick={() => {
+                      setActive(report.id);
+                      setView(null);
+                    }}
+                  >
+                    <span className="reports-catalog-icon">
+                      <Icon size={18} />
+                    </span>
+                    <span>
+                      <strong>{tr(report.tab)}</strong>
+                      <small>{tr(report.purpose)}</small>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </header>
           <div className="reports-overview">
-            <div className="reports-filter-strip">
-              <FilterMenu filters={reportFilters} align="left" />
-            </div>
             <ul className="reports-summary" aria-label={tr('Σύνολα')}>
               {summary.map(chip => (
                 <li key={chip.label}>
@@ -550,8 +522,33 @@ export default function ReportsPage() {
               ))}
             </ul>
           </div>
+          {/* The search, Filters and the download on one bar, as above every other list. */}
+          <AssetFilterBar
+            className="reports-filter-bar"
+            query={query}
+            onQueryChange={setQuery}
+            placeholder={tr('Αναζήτηση στην αναφορά…')}
+            filters={reportFilters}
+            extra={
+              <span data-tour="report-download">
+                <DownloadMenu table={reportTable} onPrint={openPreview} />
+              </span>
+            }
+          />
           <div className="reports-result-card">
-            <div className="reports-result-head">
+            {/* The count is the «Σύνολο» figure above: the line shows only for a list a figure narrowed (with «Εμφάνιση
+                όλων») or with a warning; otherwise it is read out only. */}
+            <div
+              className={`reports-result-head${
+                view ||
+                (active === 'usage' &&
+                  reportData.rows.some(
+                    (r: Row) => r.stateLabel === 'Σε χρήση' && Number(r.remaining) <= warningThreshold,
+                  ))
+                  ? ''
+                  : ' visually-hidden'
+              }`}
+            >
               <div>
                 <strong>{view ? view.label : tr('Αποτελέσματα')}</strong>
                 <span>

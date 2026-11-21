@@ -812,23 +812,6 @@ html body .load-modal .cycle-note textarea {
   height: 38px;
 }
 /* Sterilization: one bar for search and scanning, with the filters next to it. */
-html body .ster-scan.ster-scan-restored {
-  grid-template-columns: auto auto minmax(0, 1fr) auto;
-}
-html body .ster-scan-filters {
-  display: flex;
-  align-items: center;
-}
-html body .ster-scan-filters > div > button {
-  min-height: 42px;
-}
-html body .ster-scan-input .ster-scan-clear {
-  background: transparent;
-  border: 0;
-  color: var(--c-cyan-55-3);
-  padding: 0 6px;
-  min-width: 0;
-}
 html body .ster-scan-feedback-inline {
   grid-column: 1 / -1;
 }
@@ -1238,10 +1221,6 @@ html body .prep-workspace-modal .prep-head-prints button {
   white-space: nowrap;
 }
 /* Sterilization review: the scan button reads like every other button. */
-html body .ster-scan.ster-scan-restored .ster-scan-input > button:not(.ster-scan-clear) {
-  font-size: 13px;
-  font-weight: 600;
-}
 /* Stage cards: the short description shows whole, on two lines where it needs them; every card in a row keeps
    the same height. */
 html body .sterilization-workspace .sterile-queues.modern button > small {
@@ -1291,20 +1270,6 @@ html body .ster-load-badge.in {
   }
 }
 @media (max-width: 700px) {
-  html body .ster-scan.ster-scan-restored {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-  }
-  html body .ster-scan.ster-scan-restored .ster-scan-input,
-  html body .ster-scan.ster-scan-restored .ster-scan-feedback-inline {
-    grid-column: 1 / -1;
-  }
-  html body .ster-scan.ster-scan-restored .ster-scan-input {
-    grid-row: 2;
-  }
-  html body .ster-scan.ster-scan-restored .ster-scan-filters {
-    grid-column: 3;
-    grid-row: 1;
-  }
   html body .delivery-batch-modal .barcode-capture {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -1336,9 +1301,6 @@ html body .ster-load-badge.in {
     height: auto;
     max-height: none;
     overflow: visible !important;
-  }
-  html body .ster-scan.ster-scan-restored .ster-scan-copy span {
-    display: none;
   }
   html body .prep-workspace-modal > .receipt-card-head {
     flex-wrap: wrap;

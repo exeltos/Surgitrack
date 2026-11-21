@@ -298,7 +298,7 @@ export default function IssuesPage() {
                         <SortTh label={tr('Σημείωση')} sortKey="note" sort={order.sort} onSort={order.toggle} />
                         <SortTh
                           className="col-created"
-                          label={tr('Δημιουργήθηκε')}
+                          label={tr('Δηλώθηκε')}
                           sortKey="created"
                           sort={order.sort}
                           onSort={order.toggle}
@@ -363,8 +363,8 @@ export default function IssuesPage() {
                           <td>
                             {/* An open issue says how long it has waited (orange after a week); a resolved one says so. */}
                             {i.status === 'OPEN' ? (
-                              <span className={`issue-age${isOld(i) ? ' old' : ''}`} title={tr('Ανοικτή')}>
-                                {issueAge(i.created)}
+                              <span className={`issue-age${isOld(i) ? ' old' : ''}`}>
+                                {tr('Ανοικτή')} · {issueAge(i.created)}
                               </span>
                             ) : (
                               <span className="badge">{tr('Επιλυμένη')}</span>

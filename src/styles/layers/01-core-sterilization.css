@@ -1055,14 +1055,6 @@ td {
   margin-bottom: 14px;
   color: var(--c-white);
 }
-.ster-scan-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  display: grid;
-  place-items: center;
-}
 .ster-scan-copy {
   display: flex;
   flex-direction: column;
@@ -1075,33 +1067,6 @@ td {
   font-size: 11px;
   color: var(--c-gray-80);
   margin-top: 2px;
-}
-.ster-scan-input {
-  height: 40px;
-  background: var(--c-white);
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  padding-left: 11px;
-  color: var(--c-blue-55);
-  overflow: hidden;
-}
-.ster-scan-input input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  padding: 0 9px;
-  font-size: 12px;
-}
-.ster-scan-input button {
-  height: 100%;
-  border: 0;
-  background: var(--c-gray-95);
-  color: var(--c-cyan-30-5);
-  font-weight: 650;
-  padding: 0 15px;
-  cursor: pointer;
 }
 .sterile-queues.modern button.active {
   background: var(--c-gray-100-2);
@@ -1268,9 +1233,6 @@ td {
   .ster-scan {
     grid-template-columns: auto minmax(0, 1fr);
   }
-  .ster-scan-input {
-    grid-column: 1/3;
-  }
 }
 @media (max-width: 700px) {
   .ster-work-head {
@@ -1278,10 +1240,6 @@ td {
   }
   .ster-scan {
     grid-template-columns: auto minmax(0, 1fr);
-  }
-  .ster-scan-input {
-    grid-column: 1/3;
-    min-width: 0;
   }
   .ster-work-row {
     grid-template-columns: 38px minmax(0, 1fr);
@@ -4796,28 +4754,6 @@ td {
 }
 
 /* v0.24.3 — restore the dedicated dark quick-scan console on the CSSD home workspace */
-.ster-scan-restored {
-  position: relative;
-  margin-bottom: 12px;
-  box-shadow: 0 8px 22px rgba(23, 56, 77, 0.1);
-}
-.ster-scan-restored .ster-scan-input {
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-.ster-scan-restored .ster-scan-input > svg {
-  flex: 0 0 auto;
-  color: var(--c-cyan-45-8);
-}
-.ster-scan-restored .ster-scan-input button {
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
-}
-.ster-scan-restored .ster-scan-input button:hover {
-  background: var(--c-gray-90);
-  color: var(--c-cyan-20);
-}
 .ster-scan-feedback-inline {
   grid-column: 3;
   font-size: 11px;

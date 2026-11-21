@@ -7,31 +7,6 @@
   border-radius: 12px;
   background: var(--c-white);
 }
-.replacements-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.replacements-search {
-  display: flex;
-  flex: 1 1 200px;
-  align-items: center;
-  gap: 7px;
-  min-width: min(200px, 100%);
-  padding: 0 11px;
-  min-height: 38px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 10px;
-  color: var(--st-muted);
-}
-.replacements-search input {
-  flex: 1;
-  border: 0;
-  outline: 0;
-  font: inherit;
-  font-size: 13px;
-  background: transparent;
-}
 .replacements-bulk b {
   margin-right: 6px;
   color: var(--c-cyan-35);
@@ -280,10 +255,6 @@
 .replacements-order-lines td.mono {
   white-space: nowrap;
 }
-.replacements-toolbar .replacements-search {
-  flex: 1 1 120px;
-  min-width: 0;
-}
 .receive-modal .replacements-order-lines input {
   width: 72px;
   margin-right: 8px;
@@ -340,9 +311,6 @@ html body .replacements .replacements-table {
   overflow-y: auto;
 }
 /* The search icon keeps its size next to the field. */
-html body .replacements-search > svg {
-  flex: 0 0 auto;
-}
 @media (max-width: 900px) {
   .replacements-order-fields {
     grid-template-columns: minmax(0, 1fr);
@@ -351,33 +319,9 @@ html body .replacements-search > svg {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-@media (max-width: 1180px) {
-  .replacements-toolbar .label-wide {
-    display: none;
-  }
-}
 /* Only the main action keeps its words; the others are icons with a tooltip, so the instrument's name has room. */
 html body .replacements-table .row-actions button:not(.primary) .btn-label {
   display: none;
-}
-@media (max-width: 700px) {
-  html body .replacements-toolbar .replacements-search {
-    flex: 1 0 100%;
-  }
-  html body .replacements-toolbar .replacements-spacer {
-    display: none;
-  }
-  /* Replacements toolbar: the search on one line, the three buttons side by side below it. */
-  html body .replacements-toolbar {
-    flex-wrap: wrap;
-  }
-  html body .replacements-toolbar > :not(.replacements-search):not(.replacements-spacer) {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  html body .replacements-toolbar button > svg {
-    flex: 0 0 auto;
-  }
 }
 @media (min-width: 701px) and (max-width: 1280px) {
   html body .replacements-fixed th.col-set {
