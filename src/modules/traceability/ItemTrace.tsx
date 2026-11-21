@@ -3,12 +3,12 @@ import {Link} from 'react-router-dom';
 import {ExternalLink} from 'lucide-react';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {formatDate} from '../../core/displayDate';
-import {movementText} from '../../core/movementText';
 import {tr, trData} from '../../i18n';
 import {statusLabel} from '../../components/ui/statusLabel';
 import type {Movement, SetAsset, Tool} from '../../types/domain';
 import InfoList from './InfoList';
-import {daysUntil, isSetAsset, patientsIn, time, type CycleEntry, type Round} from './traceModel';
+import TraceFlow from './TraceFlow';
+import {daysUntil, isSetAsset, time, type CycleEntry, type Round} from './traceModel';
 
 type Props = {
   asset: SetAsset | Tool;
@@ -133,87 +133,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
       {rounds.length === 0 ? (
         <p className="trace-hint">{tr('Δεν βρέθηκαν κινήσεις')}</p>
       ) : (
-        <div className="trace-table-wrap" role="region" tabIndex={0} aria-label={tr('Ιστορικό')}>
-          <table className="trace-table trace-history">
-            <thead>
-              <tr>
-                <th>{tr('Ημερομηνία / ώρα')}</th>
-                <th>{tr('Ενέργεια')}</th>
-                <th>{tr('Από → Προς')}</th>
-                <th>{tr('Χρήστης')}</th>
-                <th>
-                  <span className="visually-hidden">{tr('Σύνδεσμοι')}</span>
-                </th>
-              </tr>
-            </thead>
-            {rounds.map((round, index) => {
-              // Newest first, the cycle among the moves.
-              const steps: Array<{at: string; move?: Movement; cycle?: CycleEntry}> = [
-                ...round.moves.map(m => ({at: m.at, move: m})),
-                ...(round.cycle ? [{at: round.cycle.at, cycle: round.cycle}] : []),
-              ].sort((a, b) => time(b.at) - time(a.at));
-              const patients = patientsIn(round.moves);
-              return (
-                <tbody key={round.key}>
-                  <tr className="trace-round-row">
-                    <th colSpan={5} scope="rowgroup">
-                      {index === 0 ? tr('Τρέχων γύρος') : tr('Γύρος')}
-                      {' · '}
-                      {round.cycle
-                        ? `${round.cycle.sterilizer} · #${shortCycleNumber(round.cycle.cycleNumber)}`
-                        : tr('Χωρίς καταγεγραμμένο κύκλο')}
-                      {patients.length > 0 && ` · ${tr('ασθενής {0}', patients.join(', '))}`}
-                    </th>
-                  </tr>
-                  {steps.map(({move: m, cycle: c}) =>
-                    c ? (
-                      <tr key={c.id}>
-                        <td className="trace-when">{c.at}</td>
-                        <td>
-                          <b>{tr('Αποστείρωση')}</b>{' '}
-                          <small>
-                            {c.sterilizer} · {tr('κύκλος {0}', shortCycleNumber(c.cycleNumber))}
-                            {c.program ? ` · ${c.program}` : ''}
-                            {c.via ? ` · ${tr('με το Σετ {0}', c.via)}` : ''}
-                          </small>
-                        </td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td className="trace-end">
-                          <i className={`trace-tone ${c.tone}`}>{tr(c.label)}</i>
-                          {c.loadId && (
-                            <button type="button" className="trace-link" onClick={() => onLoad(c.loadId!)}>
-                              {tr('Φορτίο')}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ) : (
-                      <tr key={m!.id}>
-                        <td className="trace-when">{m!.at}</td>
-                        <td>
-                          <b>{movementText(m!.status)}</b>{' '}
-                          {undone.has(m!.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
-                        </td>
-                        <td>
-                          {trData(m!.from)} → {trData(m!.to)}
-                        </td>
-                        <td>{trData(m!.by)}</td>
-                        <td className="trace-end">
-                          {m!.patientCode && (
-                            <button type="button" className="trace-link" onClick={() => onPatient(m!.patientCode!)}>
-                              {tr('Ασθενής {0}', m!.patientCode)}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ),
-                  )}
-                </tbody>
-              );
-            })}
-          </table>
-        </div>
+        <TraceFlow rounds={rounds} undone={undone} onPatient={onPatient} onLoad={onLoad} />
       )}
     </>
   );

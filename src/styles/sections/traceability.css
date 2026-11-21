@@ -302,38 +302,6 @@ html body .trace-section-title {
 }
 
 /* The history: one table, a line where each round begins. */
-html body .trace-history .trace-round-row th {
-  padding: 10px 18px;
-  border-top: 1px solid var(--c-gray-90);
-  background: var(--c-gray-95);
-  color: var(--c-blue-15-2);
-  font-size: 12.5px;
-  font-weight: 600;
-  text-transform: none;
-}
-html body .trace-history td {
-  padding: 9px 18px;
-  font-size: 13px;
-}
-html body .trace-history td b {
-  font-weight: 600;
-}
-html body .trace-history td small {
-  color: var(--c-blue-40);
-  font-size: 12px;
-}
-html body .trace-history .trace-when {
-  color: var(--c-blue-40);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-html body .trace-history .trace-end {
-  text-align: right;
-  white-space: nowrap;
-}
-html body .trace-history .trace-end > * + * {
-  margin-left: 10px;
-}
 
 /* Recently moved items, recent loads: one line each. */
 html body .trace-recent-list ul {
@@ -402,10 +370,6 @@ html body .trace-table th {
   font-size: 12px;
   font-weight: 600;
   text-transform: none;
-}
-html body .trace-history td:nth-child(3),
-html body .trace-history td:nth-child(4) {
-  white-space: nowrap;
 }
 /* The search as on every other list: one line with its button, not a large box. */
 html body .trace-search {
@@ -489,4 +453,183 @@ html body .trace-load-search .trace-load-sterilizer {
   color: var(--c-cyan-20-3);
   font: inherit;
   font-size: 13px;
+}
+
+/* The history as a flow: a line per round, its stages side by side from receipt to the patient. */
+html body .trace-flow-rounds {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+html body .trace-flow-round {
+  border: 1px solid var(--c-gray-90);
+  border-radius: 12px;
+  background: var(--c-white);
+}
+html body .trace-flow-round h4 {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--c-gray-95);
+  color: var(--c-blue-15-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+html body .trace-flow-round h4 span {
+  color: var(--c-gray-45);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+html body .trace-flow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin: 0;
+  padding: 12px 8px;
+  list-style: none;
+}
+html body .trace-flow-step {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 10px 0 14px;
+}
+/* The stage's dot on one line through all stages. */
+html body .trace-flow-step strong {
+  position: relative;
+  padding-top: 16px;
+  color: var(--c-cyan-20-3);
+  font-size: 12px;
+  font-weight: 600;
+}
+html body .trace-flow-step strong::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--c-cyan-35);
+  border-radius: 50%;
+  background: var(--c-cyan-35);
+}
+html body .trace-flow-step::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 30px;
+  right: -12px;
+  height: 2px;
+  background: var(--c-cyan-35);
+}
+html body .trace-flow-step:last-child::after {
+  display: none;
+}
+html body .trace-flow-step.is-empty strong {
+  color: var(--c-gray-45);
+  font-weight: 400;
+}
+html body .trace-flow-step.is-empty strong::before {
+  border-color: var(--c-gray-80);
+  background: var(--c-white);
+}
+html body .trace-flow-step.is-empty::after,
+html body .trace-flow-step:has(+ .is-empty)::after {
+  background: var(--c-gray-90);
+}
+html body .trace-flow-none {
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+html body .trace-flow-event {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  font-size: 12.5px;
+}
+html body .trace-flow-event + .trace-flow-event {
+  padding-top: 6px;
+  border-top: 1px dashed var(--c-gray-90);
+}
+html body .trace-flow-event > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .trace-flow-event b {
+  color: var(--c-blue-15-2);
+  font-weight: 600;
+}
+html body .trace-flow-event small,
+html body .trace-flow .trace-when {
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+html body .trace-flow-event .trace-link {
+  justify-self: start;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+html body .trace-flow-event > .wrap {
+  white-space: normal;
+}
+html body .trace-flow-event > .trace-flow-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 2px;
+  overflow: visible;
+}
+html body .trace-flow-event.undone,
+html body .trace-flow-others .undone {
+  opacity: 0.7;
+  text-decoration: line-through;
+}
+html body .trace-flow-others {
+  margin: 0;
+  padding: 8px 16px 10px;
+  border-top: 1px solid var(--c-gray-95);
+  color: var(--c-blue-40);
+  font-size: 12.5px;
+  list-style: none;
+}
+html body .trace-flow-others b {
+  font-weight: 600;
+}
+/* Narrow: the stages one under the other, the line down their left. */
+@media (max-width: 900px) {
+  html body .trace-flow {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+  html body .trace-flow-step {
+    grid-template-columns: 110px minmax(0, 1fr);
+    padding: 0 0 0 18px;
+  }
+  html body .trace-flow-step strong {
+    padding-top: 0;
+  }
+  html body .trace-flow-step strong::before {
+    top: 3px;
+    left: -18px;
+  }
+  html body .trace-flow-step::after {
+    top: 16px;
+    bottom: -12px;
+    left: 4px;
+    right: auto;
+    width: 2px;
+    height: auto;
+  }
+  html body .trace-flow-step > :not(strong) {
+    grid-column: 2;
+  }
 }

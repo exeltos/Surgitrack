@@ -27,6 +27,9 @@ export type CycleEntry = {
   tone: Tone;
   /** The Set the instrument was in, when the cycle was its Set's. */
   via?: string;
+  /** Who loaded it, and when the load was released. */
+  by?: string;
+  releasedAt?: string;
 };
 
 export const LOAD_STATUS: Record<ProcessLoadStatus, {label: string; tone: Tone}> = {
@@ -70,6 +73,8 @@ export const cyclesOf = (
         label: status.label,
         tone: status.tone,
         via: viaSet ? inSet?.barcode : undefined,
+        by: l.createdByName,
+        releasedAt: l.releasedAt,
       });
     });
   sterilizationCycles
