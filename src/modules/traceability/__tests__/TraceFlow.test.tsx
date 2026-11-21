@@ -135,4 +135,13 @@ describe('TraceFlow', () => {
     expect(screen.getByText('PT-9')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'PT-9'})).toBeNull();
   });
+
+  it('keeps what a move adds after its name, a deviation on receipt as a problem', () => {
+    const r: Round = {
+      key: 'r6',
+      moves: [move('d', 'Φυσική παραλαβή · εμφανής απόκλιση', '18/11/2026 15:00')],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} />);
+    expect(screen.getByText('εμφανής απόκλιση')).toHaveClass('failed');
+  });
 });

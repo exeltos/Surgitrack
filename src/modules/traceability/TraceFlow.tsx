@@ -40,8 +40,15 @@ const stageOf = (m: Movement) => {
  */
 const MIXED = new Set(['wash', 'cycle', 'release', 'patient']);
 
-/** A failure written in a move's text («ΑΠΟΤΥΧΙΑ»): shown as one. */
-const FAILED = /αποτυχ|fail/i;
+/** A problem written in a move's text (a failure, a deviation on receipt, a damage, a missing piece): shown as one. */
+const FAILED = /αποτυχ|αποκλισ|απόκλισ|ελλειψ|έλλειψ|βλαβ|βλάβ|fail|deviat|missing|damage/i;
+
+/** What a move's text says after its name («Φυσική παραλαβή · εμφανής απόκλιση» → «εμφανής απόκλιση»). */
+const detailOf = (status: string) => {
+  const text = movementText(status);
+  const at = text.indexOf(' · ');
+  return at < 0 ? '' : text.slice(at + 3);
+};
 
 const day = (at: string) => at.split(' ')[0];
 
@@ -180,6 +187,10 @@ function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean
         <small className={`trace-flow-action${FAILED.test(m.status) || m.undoes ? ' failed' : ''}`}>
           {movementText(m.status)}
         </small>
+      )}
+      {/* Elsewhere, what the move adds after its name («εμφανής απόκλιση», «υπογραφή παραλαμβάνοντα»). */}
+      {!m.undoes && !(stage && MIXED.has(stage)) && detailOf(m.status) && (
+        <small className={`trace-flow-action${FAILED.test(m.status) ? ' failed' : ''}`}>{detailOf(m.status)}</small>
       )}
       {m.undoes && m.note && (
         <small>
