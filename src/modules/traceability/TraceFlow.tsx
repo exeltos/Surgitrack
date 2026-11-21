@@ -189,7 +189,7 @@ function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean
         </small>
       )}
       {/* Elsewhere, what the move adds after its name («εμφανής απόκλιση», «υπογραφή παραλαμβάνοντα»). */}
-      {!m.undoes && !(stage && MIXED.has(stage)) && detailOf(m.status) && (
+      {!m.undoes && !(stage && MIXED.has(stage) && movementKindOf(m.status) !== 'SEND') && detailOf(m.status) && (
         <small className={`trace-flow-action${FAILED.test(m.status) ? ' failed' : ''}`}>{detailOf(m.status)}</small>
       )}
       {m.undoes && m.note && (

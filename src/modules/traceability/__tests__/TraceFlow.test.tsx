@@ -144,4 +144,17 @@ describe('TraceFlow', () => {
     render(<TraceFlow rounds={[r]} undone={new Set()} />);
     expect(screen.getByText('εμφανής απόκλιση')).toHaveClass('failed');
   });
+
+  it('keeps the details of a send with the patient (the instruments not used)', () => {
+    const r: Round = {
+      key: 'r7',
+      moves: [
+        move('s', 'Ηλεκτρονική αποστολή · Μαρία (u1) · χωρίς χρήση: T000012', '18/11/2026 16:00', {
+          patientCode: 'PT-7',
+        }),
+      ],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} />);
+    expect(screen.getByText(/χωρίς χρήση: T000012/)).toBeInTheDocument();
+  });
 });
