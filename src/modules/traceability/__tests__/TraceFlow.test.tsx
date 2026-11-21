@@ -104,4 +104,20 @@ describe('TraceFlow', () => {
     expect(steps[7]).toHaveClass('is-empty');
     expect(screen.queryByText(/Στον κλίβανο/)).toBeNull();
   });
+
+  it('says a failed wash, with its washer, in «Καθαρισμός»', () => {
+    const r: Round = {
+      key: 'r4',
+      moves: [
+        move('w', 'Φορτίο πλυντηρίου W1 · Πλυντήριο 2 · 14 · ΑΠΟΤΥΧΙΑ', '18/11/2026 14:00', {
+          from: 'Καθαρισμός',
+          to: 'Καθαρισμός',
+        }),
+      ],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} onPatient={vi.fn()} onLoad={vi.fn()} />);
+    const wash = screen.getAllByRole('listitem').find(li => li.classList.contains('wash'))!;
+    const action = within(wash).getByText(/Πλυντήριο 2 · 14 · ΑΠΟΤΥΧΙΑ/);
+    expect(action).toHaveClass('failed');
+  });
 });

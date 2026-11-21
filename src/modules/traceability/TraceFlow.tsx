@@ -33,8 +33,14 @@ const stageOf = (m: Movement) => {
   return STAGES.find(s => s.kinds.includes(kind))?.key;
 };
 
-/** Stages that gather more than one action: the action is said on each event. */
-const MIXED = new Set(['release', 'patient']);
+/**
+ * Stages whose events say their action: those that gather more than one kind, and a washer's or a sterilizer's own
+ * record (which machine, which cycle, a failure).
+ */
+const MIXED = new Set(['wash', 'cycle', 'release', 'patient']);
+
+/** A failure written in a move's text («ΑΠΟΤΥΧΙΑ»): shown as one. */
+const FAILED = /αποτυχ|fail/i;
 
 const day = (at: string) => at.split(' ')[0];
 
@@ -168,7 +174,7 @@ function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean
     <div className={`trace-flow-event${undone ? ' undone' : ''}`} title={movementText(m.status)}>
       <span className="trace-when">{m.at}</span>
       {stage && MIXED.has(stage) && movementKindOf(m.status) !== 'SEND' && (
-        <small className="trace-flow-action">{movementText(m.status)}</small>
+        <small className={`trace-flow-action${FAILED.test(m.status) ? ' failed' : ''}`}>{movementText(m.status)}</small>
       )}
       {m.patientCode && (
         <button type="button" className="trace-link" onClick={() => onPatient(m.patientCode!)}>

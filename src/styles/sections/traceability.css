@@ -577,6 +577,10 @@ html body .trace-flow-event .trace-link {
 html body .trace-flow-event > .trace-flow-action {
   color: var(--c-blue-15-2);
 }
+html body .trace-flow-event > .trace-flow-action.failed {
+  color: var(--c-red-35);
+  font-weight: 600;
+}
 html body .trace-flow-event > .trace-flow-result {
   display: flex;
   flex-wrap: wrap;
