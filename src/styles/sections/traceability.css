@@ -793,10 +793,14 @@ html body .trace-split-list .trace-recent-list button.selected {
 /* A narrow window: the list, then the card, one under the other; the page scrolls. */
 @media (max-width: 1000px) {
   html body .trace-page:has(> .trace-split) {
+    display: block;
     overflow-y: auto;
   }
+  /* At their own height, the list then the card: none of the window-height sharing. */
   html body .trace-split {
+    flex: none;
     grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
   }
   html body .trace-split-card,
   html body .trace-split-list > .trace-recent-list > ul {

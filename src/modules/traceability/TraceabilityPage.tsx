@@ -124,6 +124,9 @@ export default function TraceabilityPage() {
   const openId = asset?.id;
   useEffect(() => {
     if (!openId) return;
+    // A newly opened card starts at its head, not where the one before was scrolled to.
+    const card = document.querySelector('.trace-split-card');
+    if (card) card.scrollTop = 0;
     const row = document.querySelector('.trace-split-list .selected');
     if (row && 'scrollIntoView' in row) row.scrollIntoView({block: 'nearest'});
   }, [openId]);
