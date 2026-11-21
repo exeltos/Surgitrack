@@ -1,24 +1,6 @@
 import {useMemo, useState, type ReactNode} from 'react';
 import {Link} from 'react-router-dom';
-import {
-  Activity,
-  AlertTriangle,
-  CalendarDays,
-  ChevronRight,
-  Clock,
-  Flame,
-  Hourglass,
-  Layers3,
-  RefreshCcw,
-  RotateCcw,
-  ShieldCheck,
-  Timer,
-  Undo2,
-  Users,
-  Wrench,
-  XCircle,
-  type LucideIcon,
-} from 'lucide-react';
+import {ChevronRight, Clock, Flame, ShieldCheck, Users} from 'lucide-react';
 import {useSurgi} from '../../store/SurgiStore';
 import PageHeader from '../../components/ui/PageHeader';
 import {useAppPreferences} from '../../core/AppPreferences';
@@ -39,18 +21,17 @@ import {
 type Tab = 'LOAD' | 'TURNAROUND' | 'USE' | 'QUALITY';
 
 /**
- * One figure of a tab: its icon on a light tint, what it counts, the figure, and a line that places it («σε 30
- * ημέρες», «9 ανοιχτές»). A problem shows in its colour; one that opens its list is a link, with an arrow.
+ * One figure of a tab, low: what it counts on top, then the figure with its comparison or a short note on the same
+ * line. A strip down its left says how it stands (a problem red, a warning amber, good green); one that opens its list
+ * is a link, with an arrow.
  */
 function Fact({
-  icon: Icon,
   label,
   value,
   sub,
   tone,
   to,
 }: {
-  icon: LucideIcon;
   label: string;
   value: ReactNode;
   sub?: ReactNode;
@@ -59,15 +40,14 @@ function Fact({
 }) {
   const body = (
     <>
-      <span className="ind-fact-icon" aria-hidden="true">
-        <Icon size={16} />
+      <span className="ind-fact-label">
+        {label}
+        {to && <ChevronRight className="ind-fact-go" size={14} aria-hidden="true" />}
       </span>
-      <span className="ind-fact-text">
-        <span className="ind-fact-label">{label}</span>
+      <span className="ind-fact-line">
         <strong className="ind-fact-value">{value}</strong>
         {sub && <span className="ind-fact-sub">{sub}</span>}
       </span>
-      {to && <ChevronRight className="ind-fact-go" size={16} aria-hidden="true" />}
     </>
   );
   const className = `ind-fact${tone ? ` ${tone}` : ''}`;
@@ -128,6 +108,24 @@ export default function IndicatorsPage() {
   const showSets = use.departments.some(d => d.sets !== d.uses);
   const q = useMemo(() => quality(processLoads, since), [processLoads, since]);
   const problems = useMemo(() => issueCounts(issues, since), [issues, since]);
+  // The period before this one, for the comparison on each figure: the counts of twice the period less this one's.
+  const since2 = sinceDays(days * 2);
+  const before = useMemo(() => {
+    const live2 = liveMovements(movements, since2);
+    const use2 = usage(live2, since2, isSet);
+    const q2 = quality(processLoads, since2);
+    const sum = (list: ReadonlyArray<{uses: number}>) => list.reduce((n, d) => n + d.uses, 0);
+    return {
+      movements: workload(live2, since2, days * 2).total - load.total,
+      rounds: turnaround(movements, since2, b => assetOf.get(b) || b).overall.rounds - rounds.overall.rounds,
+      uses: sum(use2.departments) - sum(use.departments),
+      cycles: q2.cycles - q.cycles,
+      failed: q2.failed - q.failed,
+      reprocess: q2.reprocess - q.reprocess,
+      recalled: q2.recalled - q.recalled,
+      issues: issueCounts(issues, since2).total - problems.total,
+    };
+  }, [movements, since2, isSet, processLoads, days, load, assetOf, rounds, use, q, issues, problems]);
 
   // Monday … Sunday, short and long, in the user's language.
   const weekday = (d: number, style: 'short' | 'long') => {
@@ -153,7 +151,30 @@ export default function IndicatorsPage() {
     if (!n) return L('όσο ο συνήθης', 'as usual');
     return `${n > 0 ? '+' : '−'}${hoursText(Math.abs(n))}`;
   };
-  const inDays = L(`σε ${days} ημέρες`, `in ${days} days`);
+  /**
+   * The figure against the period before: «↑ 20% από 5», «+1 από 0», «= όπως πριν». `worse` says which way is bad
+   * (more failures are; more movements are neither): that way red, the other green.
+   */
+  const trend = (now: number, then: number, worse?: 'up' | 'down') => {
+    if (now === then)
+      return (
+        <>
+          <em className="ind-chip">=</em> {L('όπως πριν', 'as before')}
+        </>
+      );
+    const up = now > then;
+    const tone = !worse ? '' : (up ? worse === 'up' : worse === 'down') ? 'bad' : 'good';
+    // A share of a few says little («↑ 4000%» from 6): below 5 the difference itself.
+    const change =
+      then >= 5
+        ? `${up ? '↑' : '↓'} ${Math.round((Math.abs(now - then) / then) * 100)}%`
+        : `${up ? '+' : '−'}${Math.abs(now - then)}`;
+    return (
+      <>
+        <em className={`ind-chip ${tone}`}>{change}</em> {L(`από ${then}`, `from ${then}`)}
+      </>
+    );
+  };
 
   const tabs: Array<{id: Tab; label: string; icon: typeof Clock}> = [
     {id: 'LOAD', label: L('Φόρτος', 'Workload'), icon: Flame},
@@ -221,20 +242,17 @@ export default function IndicatorsPage() {
       {tab === 'LOAD' && (
         <>
           <div className="ind-facts">
-            <Fact icon={Activity} label={L('Κινήσεις', 'Movements')} value={load.total} sub={inDays} />
+            <Fact label={L('Κινήσεις', 'Movements')} value={load.total} sub={trend(load.total, before.movements)} />
             <Fact
-              icon={CalendarDays}
               label={L('Μέσος όρος ανά ημέρα', 'Average per day')}
               value={load.perDay.toFixed(1).replace('.', lang === 'el' ? ',' : '.')}
               sub={L('κινήσεις', 'movements')}
             />
             <Fact
-              icon={Clock}
               label={L('Πιο φορτωμένη ώρα', 'Busiest hour')}
               value={load.peakHour === undefined ? '—' : hourSpan(load.peakHour)}
             />
             <Fact
-              icon={Flame}
               label={L('Πιο φορτωμένη ημέρα', 'Busiest day')}
               value={
                 <span className="ind-cap">{load.peakDay === undefined ? '—' : weekday(load.peakDay, 'long')}</span>
@@ -334,21 +352,18 @@ export default function IndicatorsPage() {
         <>
           <div className="ind-facts">
             <Fact
-              icon={Timer}
               label={L('Συνήθης χρόνος επιστροφής', 'Typical turnaround')}
               value={rounds.overall.rounds ? hoursText(rounds.overall.median) : '—'}
               sub={L('από την αποστολή ως την επιστροφή', 'from dispatch until back')}
             />
             <Fact
-              icon={Hourglass}
               label={L('Το 90% επιστρέφει σε', '90% are back within')}
               value={rounds.overall.rounds ? hoursText(rounds.overall.p90) : '—'}
             />
             <Fact
-              icon={RefreshCcw}
               label={L('Ολοκληρωμένοι κύκλοι', 'Completed cycles')}
               value={rounds.overall.rounds}
-              sub={inDays}
+              sub={trend(rounds.overall.rounds, before.rounds)}
             />
           </div>
           <section className="ind-section" aria-labelledby="ind-turn">
@@ -392,20 +407,16 @@ export default function IndicatorsPage() {
           {/* Instruments used one by one, patients told apart from uses: shown only when they say something. */}
           <div className="ind-facts">
             <Fact
-              icon={Users}
               label={L('Χρήσεις σε ασθενή', 'Uses on a patient')}
               value={use.departments.reduce((n, d) => n + d.uses, 0)}
-              sub={inDays}
+              sub={trend(
+                use.departments.reduce((n, d) => n + d.uses, 0),
+                before.uses,
+              )}
             />
-            {showSets && (
-              <Fact icon={Layers3} label={L('Σετ', 'Sets')} value={use.departments.reduce((n, d) => n + d.sets, 0)} />
-            )}
+            {showSets && <Fact label={L('Σετ', 'Sets')} value={use.departments.reduce((n, d) => n + d.sets, 0)} />}
             {showTools && (
-              <Fact
-                icon={Wrench}
-                label={L('Εργαλεία', 'Instruments')}
-                value={use.departments.reduce((n, d) => n + d.tools, 0)}
-              />
+              <Fact label={L('Εργαλεία', 'Instruments')} value={use.departments.reduce((n, d) => n + d.tools, 0)} />
             )}
           </div>
           <section className="ind-section" aria-labelledby="ind-use">
@@ -495,39 +506,40 @@ export default function IndicatorsPage() {
         <>
           <div className="ind-facts">
             <Fact
-              icon={Flame}
               label={L('Κύκλοι αποστείρωσης', 'Sterilization cycles')}
               value={q.cycles}
-              sub={inDays}
+              sub={trend(q.cycles, before.cycles)}
               to={canReports ? LOADS : undefined}
             />
             <Fact
-              icon={XCircle}
               label={L('Ανεπιτυχείς', 'Failed')}
-              value={q.failed}
-              sub={L(`${pct(q.failed, q.cycles)} των κύκλων`, `${pct(q.failed, q.cycles)} of the cycles`)}
+              value={
+                <>
+                  {q.failed} <small>{pct(q.failed, q.cycles)}</small>
+                </>
+              }
+              sub={trend(q.failed, before.failed, 'up')}
               tone={q.failed ? 'bad' : 'good'}
               to={canReports ? LOADS : undefined}
             />
             <Fact
-              icon={RotateCcw}
               label={L('Επανεπεξεργασία', 'Reprocessed')}
               value={q.reprocess}
+              sub={trend(q.reprocess, before.reprocess, 'up')}
               tone={q.reprocess ? 'warn' : undefined}
               to={canReports ? LOADS : undefined}
             />
             <Fact
-              icon={Undo2}
               label={L('Ανακλήσεις', 'Recalls')}
               value={q.recalled}
+              sub={trend(q.recalled, before.recalled, 'up')}
               tone={q.recalled ? 'bad' : undefined}
               to={canReports ? LOADS : undefined}
             />
             <Fact
-              icon={AlertTriangle}
-              label={L('Εκκρεμότητες', 'Issues')}
+              label={L(`Εκκρεμότητες · ${problems.open} ανοιχτές`, `Issues · ${problems.open} open`)}
               value={problems.total}
-              sub={L(`${problems.open} ανοιχτές`, `${problems.open} open`)}
+              sub={trend(problems.total, before.issues, 'up')}
               tone={problems.open ? 'warn' : undefined}
               to={can('issue.view') ? '/issues' : undefined}
             />

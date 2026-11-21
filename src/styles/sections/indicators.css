@@ -47,8 +47,8 @@
   font-weight: 600;
   box-shadow: inset 0 -2px 0 var(--c-cyan-35);
 }
-/* The tab's figures: KPI cards in a row, the same width each — an icon on a light tint, what it counts, the figure,
-   a line that places it. */
+/* The tab's figures: low KPI cards in a row, the same width each — what it counts on top, the figure with its
+   comparison on one line, a strip down the left in the colour of how it stands. */
 .ind-facts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -59,17 +59,33 @@
 }
 .ind-fact {
   position: relative;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  display: grid;
+  gap: 2px;
   min-width: 0;
-  padding: 12px 14px;
+  padding: 9px 14px 9px 17px;
+  overflow: hidden;
   border: 1px solid var(--c-gray-90);
   border-radius: 12px;
   background: var(--c-white);
   color: inherit;
   text-decoration: none;
-  box-shadow: 0 1px 2px rgb(16 42 52 / 4%);
+  box-shadow: 0 1px 3px rgb(16 42 52 / 5%);
+}
+.ind-fact::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #1f7a93;
+}
+.ind-fact.bad::before {
+  background: var(--c-red-35);
+}
+.ind-fact.warn::before {
+  background: #d9a21b;
+}
+.ind-fact.good::before {
+  background: #3c9a6b;
 }
 a.ind-fact {
   transition:
@@ -80,68 +96,74 @@ a.ind-fact:hover {
   border-color: var(--c-cyan-65);
   box-shadow: 0 2px 8px rgb(16 42 52 / 8%);
 }
-.ind-fact-icon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: var(--c-gray-100-2);
-  color: var(--c-cyan-35);
-}
-.ind-fact-text {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
 .ind-fact-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
   overflow: hidden;
   color: var(--c-gray-45);
   font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.ind-fact-value {
-  color: var(--c-cyan-20-3);
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.15;
-  font-variant-numeric: tabular-nums;
-}
-.ind-fact-sub {
-  overflow: hidden;
-  color: var(--c-gray-45);
-  font-size: 12px;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 .ind-fact-go {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+  flex: none;
   color: var(--c-gray-65);
 }
 a.ind-fact:hover .ind-fact-go {
   color: var(--c-cyan-35);
 }
-/* A problem in its colour: the figure and its icon. */
-.ind-fact.bad .ind-fact-value,
-.ind-fact.bad .ind-fact-icon {
+/* The figure and, beside it, its comparison or note. */
+.ind-fact-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+  min-width: 0;
+}
+.ind-fact-value {
+  color: var(--c-cyan-20-3);
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.ind-fact-value small {
+  color: var(--c-gray-45);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.ind-fact.bad .ind-fact-value {
   color: var(--c-red-35);
 }
-.ind-fact.bad .ind-fact-icon {
-  background: #fdf0ef;
-}
-.ind-fact.warn .ind-fact-value,
-.ind-fact.warn .ind-fact-icon {
+.ind-fact.warn .ind-fact-value {
   color: #8a5a00;
 }
-.ind-fact.warn .ind-fact-icon {
-  background: #fdf6e7;
+.ind-fact-sub {
+  color: var(--c-gray-45);
+  font-size: 12px;
+  white-space: nowrap;
 }
-.ind-fact.good .ind-fact-icon {
-  background: #edf7f1;
+/* The comparison with the period before: red the bad way, green the good one, grey otherwise. */
+.ind-chip {
+  margin-right: 2px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--c-gray-95);
+  color: var(--c-gray-45);
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 600;
+}
+.ind-chip.bad {
+  background: #fdeceb;
+  color: var(--c-red-35);
+}
+.ind-chip.good {
+  background: #e8f5ee;
   color: var(--c-green-35);
 }
 .ind-cap {

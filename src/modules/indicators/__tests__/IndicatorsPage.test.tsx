@@ -20,5 +20,9 @@ describe('Indicators', () => {
     const links = [...document.querySelectorAll('.ind-facts a')].map(a => a.getAttribute('href'));
     expect(links).toContain('/issues');
     expect(links).toContain('/reports?report=loads');
+    // Each count against the period before («+6 από 0», «= όπως πριν»).
+    const cycles = document.querySelector('.ind-facts a[href="/reports?report=loads"]') as HTMLElement;
+    expect(cycles.querySelector('.ind-chip')).not.toBeNull();
+    expect(cycles).toHaveTextContent(/από \d+|όπως πριν/);
   });
 });
