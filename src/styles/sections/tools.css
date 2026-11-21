@@ -222,12 +222,6 @@ html body .tools-registry td:nth-child(4) .row-sub {
   font-size: 11.5px;
 }
 /* Instrument card: the moves of the Set it travels in, under its own. */
-html body .asset-history-group {
-  margin: 14px 0 4px;
-  color: var(--c-blue-45);
-  font-size: 12px;
-  font-weight: 600;
-}
 /* Standalone list (same columns as the Sets list): uses get room for «Χωρίς όριο»; a group opens in place. */
 html body .standalone-registry th:nth-child(5) {
   width: 96px;

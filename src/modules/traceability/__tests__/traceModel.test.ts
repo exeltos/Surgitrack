@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import type {Movement, ProcessLoadRecord, SterilizationCycleRecord, Tool} from '../../../types/domain';
-import {cyclesOf, daysUntil, firstUseAfter, roundsOf, type CycleEntry} from '../traceModel';
+import {cyclesOf, daysUntil, firstUseAfter, roundsBetween, roundsOf, type CycleEntry} from '../traceModel';
 
 const move = (id: string, at: string, patientCode?: string): Movement =>
   ({id, asset: 'S1 · Set', assetKind: 'SET', from: 'A', to: 'B', status: id, at, by: 'X', patientCode}) as Movement;
@@ -85,5 +85,20 @@ describe('cyclesOf', () => {
     const cycles = cyclesOf(tool, [], [], [record('c1', '19/11/2026 10:00'), record('c2', '19/11/2026 11:00')]);
     expect(cycles).toHaveLength(1);
     expect(cycles[0].loadId).toBe('L1');
+  });
+});
+
+describe('roundsBetween', () => {
+  const at = (id: string, when: string) => move(id, when);
+  const rounds = [
+    {key: 'b', moves: [at('2', '20/11/2026 09:00')]},
+    {key: 'a', moves: [at('1', '01/11/2026 23:30'), at('1b', '03/11/2026 08:00')]},
+  ];
+  it('keeps every round without dates, and the rounds with a day in the period, both days included', () => {
+    expect(roundsBetween(rounds, '', '')).toHaveLength(2);
+    expect(roundsBetween(rounds, '2026-11-15', '').map(r => r.key)).toEqual(['b']);
+    expect(roundsBetween(rounds, '', '2026-11-01').map(r => r.key)).toEqual(['a']);
+    expect(roundsBetween(rounds, '2026-11-02', '2026-11-03').map(r => r.key)).toEqual(['a']);
+    expect(roundsBetween(rounds, '2026-11-04', '2026-11-19')).toHaveLength(0);
   });
 });

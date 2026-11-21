@@ -7,7 +7,7 @@ import {tr, trData} from '../../i18n';
 import {statusLabel} from '../../components/ui/statusLabel';
 import type {Movement, SetAsset, Tool} from '../../types/domain';
 import InfoList from './InfoList';
-import TraceFlow from './TraceFlow';
+import ItemHistory from './ItemHistory';
 import {daysUntil, isSetAsset, time, type CycleEntry, type Round} from './traceModel';
 
 type Props = {
@@ -129,12 +129,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
         ]}
       />
 
-      <h3 className="trace-section-title">{tr('Ιστορικό')}</h3>
-      {rounds.length === 0 ? (
-        <p className="trace-hint">{tr('Δεν βρέθηκαν κινήσεις')}</p>
-      ) : (
-        <TraceFlow rounds={rounds} undone={undone} onPatient={onPatient} onLoad={onLoad} />
-      )}
+      <ItemHistory key={asset.id} rounds={rounds} onPatient={onPatient} onLoad={onLoad} />
     </>
   );
 }

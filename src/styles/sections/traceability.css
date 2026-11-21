@@ -464,6 +464,7 @@ html body .trace-flow-rounds {
   list-style: none;
 }
 html body .trace-flow-round {
+  container: trace-round / inline-size;
   border: 1px solid var(--c-gray-90);
   border-radius: 12px;
   background: var(--c-white);
@@ -601,8 +602,8 @@ html body .trace-flow-others {
 html body .trace-flow-others b {
   font-weight: 600;
 }
-/* Narrow: the stages one under the other, the line down their left. */
-@media (max-width: 900px) {
+/* Narrow (a phone, or the card on a Set's page): the stages one under the other, the line down their left. */
+@container trace-round (max-width: 860px) {
   html body .trace-flow {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -630,4 +631,55 @@ html body .trace-flow-others b {
   html body .trace-flow-step > :not(strong) {
     grid-column: 2;
   }
+}
+
+/* «Ιστορικό» with its days: the title and the count on the left, «Από» / «Έως» on the right. */
+html body .trace-history-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 4px 0 8px;
+}
+html body .trace-history-head .trace-section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+}
+html body .trace-history-head .trace-section-title small {
+  color: var(--c-gray-45);
+  font-size: 12.5px;
+  font-weight: 400;
+}
+html body .trace-dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+html body .trace-dates label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--c-gray-45);
+  font-size: 12.5px;
+}
+html body .trace-dates input {
+  min-height: 32px;
+  padding: 3px 8px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 8px;
+  background: var(--c-white);
+  color: var(--c-blue-15-2);
+  font: inherit;
+  font-size: 13px;
+}
+html body .trace-dates .trace-link {
+  font-size: 12.5px;
+}
+/* On a Set's or an instrument's page, inside its card. */
+html body .asset-detail-full-panel .trace-history-block {
+  padding: 4px 2px;
 }

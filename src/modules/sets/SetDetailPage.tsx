@@ -1,3 +1,4 @@
+import {AssetItemHistory} from '../traceability/ItemHistory';
 import {useMemo, useState} from 'react';
 import BrowseArrows from '../../components/assets/BrowseArrows';
 import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom';
@@ -7,7 +8,6 @@ import {
   Barcode,
   Copy,
   Flag,
-  History,
   Printer,
   Send,
   Settings2,
@@ -48,14 +48,11 @@ import {useConfirm} from '../../components/ui/useConfirm';
 import {printCountForm} from '../../components/department/printCountForm';
 import {formatDateTime} from '../../core/displayDate';
 import SetContents from './SetContents';
-import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
-import {movementText} from '../../core/movementText';
 
 export default function SetDetailPage() {
   const {
     sets,
     tools,
-    movements,
     issues,
     currentUser,
     duplicateSet,
@@ -75,7 +72,6 @@ export default function SetDetailPage() {
     recordUsage,
   } = useSurgi();
   const manualUses = useManualUses();
-  const undone = useUndoneMovements();
   const navigate = useNavigate();
   const [confirmNode, ask] = useConfirm();
   const {id} = useParams();
@@ -127,10 +123,6 @@ export default function SetDetailPage() {
       </div>
     );
 
-  const knownBarcodes = [set.barcode, ...(set.legacyBarcodes || [])];
-  const history = movements
-    .filter(movement => knownBarcodes.some(barcode => movement.asset.includes(barcode)))
-    .slice(0, 30);
   const memberIssues = issues.filter(
     issue =>
       issue.status === 'OPEN' &&
@@ -377,38 +369,8 @@ export default function SetDetailPage() {
 
             {tab === 'HISTORY' && (
               <section className="asset-section asset-detail-full-panel">
-                <div className="asset-section-head">
-                  <div>
-                    <h2>{tr('Ιστορικό κινήσεων')}</h2>
-                  </div>
-                  <History size={19} />
-                </div>
-                <div
-                  className="asset-history asset-detail-scroll"
-                  tabIndex={0}
-                  role="region"
-                  aria-label={tr('Ιστορικό κινήσεων')}
-                >
-                  {history.length ? (
-                    history.map(item => (
-                      <div className="asset-history-row" key={item.id}>
-                        <span className="history-dot" />
-                        <div>
-                          <strong>
-                            {movementText(item.status)}{' '}
-                            {undone.has(item.id) && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
-                          </strong>
-                          <small>
-                            {trData(item.from)} → {trData(item.to)} · {item.at} · {trData(item.by)}
-                            {item.patientCode ? ` · ${item.patientCode}` : ''}
-                            {item.undoes && item.note ? ` · ${tr('Αιτιολογία')}: ${item.note}` : ''}
-                          </small>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <AssetEmptyState>{tr('Δεν υπάρχει καταγεγραμμένη κίνηση.')}</AssetEmptyState>
-                  )}
+                <div className="asset-detail-scroll" tabIndex={0} role="region" aria-label={tr('Ιστορικό κινήσεων')}>
+                  <AssetItemHistory item={set} />
                 </div>
               </section>
             )}

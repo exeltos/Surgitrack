@@ -19,7 +19,7 @@ import {useAssetSuggest} from '../../components/barcode/AssetSuggest';
 import ItemTrace from './ItemTrace';
 import PatientTrace from './PatientTrace';
 import LoadTrace from './LoadTrace';
-import {barcodeOf, cyclesOf, roundsOf, time} from './traceModel';
+import {barcodeOf, time, traceOf} from './traceModel';
 
 type Tab = 'SEARCH' | 'PATIENTS' | 'LOAD' | 'HISTORY';
 const TAB_PARAM: Record<Tab, string | undefined> = {
@@ -94,15 +94,10 @@ export default function TraceabilityPage() {
   const suggest = useAssetSuggest(q, picked => commit(picked), all);
   const asset = exact || (nameMatches.length === 1 ? nameMatches[0] : undefined);
   const choosing = !asset && nameMatches.length > 1;
-  const tool = asset && !sets.some(s => s.id === asset.id) ? (asset as Tool) : undefined;
   // A member instrument travels inside its Set: the Set's moves belong to its trail too.
-  const carrierSet = tool?.mode === 'SET_MEMBER' ? sets.find(s => s.id === tool.setId) : undefined;
-  const codes = [asset, carrierSet]
-    .flatMap(x => (x ? [x.barcode, ...(x.legacyBarcodes || [])] : []))
-    .map(b => b.toLowerCase());
-  const moves = asset ? movements.filter(m => codes.includes(barcodeOf(m).toLowerCase())) : [];
-  const cycles = asset ? cyclesOf(asset, sets, processLoads, sterilizationCycles) : [];
-  const rounds = asset ? roundsOf(moves, cycles) : [];
+  const {carrierSet, moves, cycles, rounds} = asset
+    ? traceOf(asset, sets, movements, processLoads, sterilizationCycles)
+    : {carrierSet: undefined, moves: [], cycles: [], rounds: []};
   // A code typed in the item search: offered to open as a patient.
   const typedPatient =
     needle && !asset && !choosing
