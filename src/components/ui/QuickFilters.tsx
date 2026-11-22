@@ -1,4 +1,4 @@
-import {tr} from '../../i18n';
+import {getI18nLang, tr} from '../../i18n';
 
 export type QuickFilter = {
   /** Defaults to the label. */
@@ -29,7 +29,8 @@ export default function QuickFilters({items, label}: {items: QuickFilter[]; labe
           aria-pressed={item.active}
           onClick={item.onClick}
         >
-          <span>{item.label}</span> <b className={item.tone || ''}>{item.count}</b>
+          <span>{item.label}</span>{' '}
+          <b className={item.tone || ''}>{item.count.toLocaleString(getI18nLang() === 'en' ? 'en-GB' : 'el-GR')}</b>
         </button>
       ))}
     </div>

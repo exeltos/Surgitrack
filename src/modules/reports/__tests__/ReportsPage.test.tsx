@@ -97,7 +97,7 @@ describe('Reports', () => {
   it('lists the instruments in service and those taken out of service, each from its card', () => {
     renderPage(<ReportsPage />);
     choose('Χρήσεις & αποσύρσεις');
-    const card = (name: RegExp) => within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name});
+    const card = (name: RegExp) => within(screen.getByRole('group', {name: 'Σύνολα'})).getByRole('button', {name});
     fireEvent.click(card(/Σε χρήση/));
     expect(new Set(column('Κατάσταση'))).toEqual(new Set(['Σε χρήση']));
     fireEvent.click(card(/Εκτός χρήσης/));
@@ -138,10 +138,10 @@ describe('Reports', () => {
 
   it('lists everything at once, and a total narrows the list', () => {
     renderPage(<ReportsPage />);
-    expect(within(screen.getByRole('list', {name: 'Σύνολα'})).getAllByRole('button').length).toBeGreaterThan(1);
+    expect(within(screen.getByRole('group', {name: 'Σύνολα'})).getAllByRole('button').length).toBeGreaterThan(1);
     const everything = bodyRows().length;
     expect(everything).toBeGreaterThan(0);
-    fireEvent.click(within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name: /Σετ/}));
+    fireEvent.click(within(screen.getByRole('group', {name: 'Σύνολα'})).getByRole('button', {name: /Σετ/}));
     // Set or instrument is said under each name, after its barcode.
     const kinds = () =>
       new Set([...results().querySelectorAll('.registry-row-barcode')].map(sub => sub.textContent!.split(' · ').pop()));

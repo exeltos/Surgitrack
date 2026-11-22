@@ -4,6 +4,7 @@ import {useFitWidth} from '../../components/ui/useFitWidth';
 import {AlertTriangle, FileText, Printer} from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {type SelectFilter} from '../../components/assets/FilterMenu';
+import QuickFilters from '../../components/ui/QuickFilters';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
@@ -531,22 +532,20 @@ export default function ReportsPage() {
             </div>
           </header>
           <div className="reports-overview">
-            <ul className="reports-summary" aria-label={tr('Σύνολα')}>
-              {summary.map(chip => (
-                <li key={chip.label}>
-                  <button
-                    type="button"
-                    className={`${chip.tone && chip.value > 0 ? chip.tone : ''} ${view?.label === chip.label ? 'active' : ''}`}
-                    aria-pressed={view?.label === chip.label}
-                    disabled={chip.value === 0}
-                    onClick={() => setView({label: chip.label, test: chip.test})}
-                  >
-                    <b>{chip.value}</b>
-                    <span>{chip.label}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {/* The report's figures as the same small cards above every list: each narrows the list, pressed again
+                shows all. */}
+            <QuickFilters
+              label={tr('Σύνολα')}
+              items={summary.map(chip => ({
+                key: chip.label,
+                label: chip.label,
+                count: chip.value,
+                tone: chip.tone,
+                active: view?.label === chip.label,
+                onClick: () =>
+                  view?.label === chip.label ? setView(null) : setView({label: chip.label, test: chip.test}),
+              }))}
+            />
           </div>
           {/* The search, Filters and the download on one bar, as above every other list. */}
           <AssetFilterBar
