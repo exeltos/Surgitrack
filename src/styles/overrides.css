@@ -1697,6 +1697,7 @@ div.asset-import-hospital b {
   border-radius: 10px;
   background: var(--c-gray-95);
 }
+.replacements-table th,
 .replacements-order-lines th {
   position: sticky;
   top: 0;
@@ -1708,10 +1709,28 @@ div.asset-import-hospital b {
   text-align: left;
   white-space: nowrap;
 }
-.replacements-order-lines td small {
+.replacements-table tr.selected td {
+  background: var(--c-gray-100-2);
+}
+.replacements-table td small,
+.replacements-order-lines td small,
+.replacements-order-body td small {
   display: block;
   color: var(--st-muted);
   font-size: 11.5px;
+}
+.replacements-table td a {
+  color: var(--c-cyan-35);
+  text-decoration: none;
+}
+.replacements-table .since {
+  color: var(--c-cyan-40-2);
+  font-size: 12px;
+}
+.replacements-table .empty {
+  padding: 26px;
+  text-align: center;
+  color: var(--st-muted);
 }
 .r-SERVICE {
   background: var(--c-gray-95-7);
@@ -1728,6 +1747,40 @@ div.asset-import-hospital b {
 .r-RETIRED {
   background: var(--c-gray-95);
   color: var(--c-cyan-40-2);
+}
+.replacement-status.s-NEEDED {
+  background: var(--c-amber-95);
+  color: var(--c-orange-45-2);
+}
+.replacement-status.s-IN_ORDER,
+.replacement-order-status.o-OPEN,
+.replacement-order-status.o-ORDERED {
+  background: var(--c-gray-95-7);
+  color: var(--c-blue-35-2);
+}
+.replacement-order-status.o-PARTIAL {
+  background: var(--c-amber-95);
+  color: var(--c-orange-45-3);
+}
+.replacement-status.s-REPLACED,
+.replacement-order-status.o-RECEIVED {
+  background: var(--c-gray-95-8);
+  color: var(--c-green-45);
+}
+.replacement-order-status.o-CANCELLED {
+  background: var(--c-gray-95);
+  color: var(--st-muted);
+}
+.replacements-order > header small {
+  display: block;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+.replacements-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 .replacements-order-modal {
   position: relative;
@@ -1999,6 +2052,7 @@ div.asset-import-hospital b {
 /* One table header style on every list: small, bold, sentence case. */
 .reports-table th,
 .devices-table th,
+.replacements-table th,
 .bin-table th,
 .ledger-columns span,
 .sterilization-workspace .ster-list-head span {
@@ -2091,6 +2145,15 @@ html body .page-head > div:first-child > p {
   white-space: nowrap;
 }
 /* Replacements: tighter rows. */
+html body .replacements-table .row-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  width: auto;
+}
+html body .replacements-table .row-actions button {
+  white-space: nowrap;
+}
 /* A one-line page description must not widen a grid page. */
 html body .asset-registry-table td:first-child {
   min-width: 260px;
@@ -2259,8 +2322,60 @@ html body .registry-fixed .badge {
   }
 }
 /* Issues table: object + type/department on two lines, note takes the free width, actions never cut off. */
+html body .issues-fixed {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0;
+}
+html body .issues-fixed th:nth-child(1) {
+  width: 30%;
+}
+html body .issues-fixed th:nth-child(2) {
+  width: auto;
+}
+html body .issues-fixed th:nth-child(3) {
+  width: 150px;
+}
+html body .issues-fixed th:nth-child(4) {
+  width: 110px;
+}
+html body .issues-fixed th:nth-child(5) {
+  width: 100px;
+}
+html body .issues-fixed th:nth-child(6) {
+  width: 132px;
+}
+html body .issues-fixed td {
+  min-width: 0;
+}
 /* The item and the note (what is wrong) read in up to two lines instead of ending in «…». */
+html body .issues-fixed .issue-asset,
+html body .issues-fixed td.issue-note > span {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+  line-height: 1.3;
+}
 /* Replacements table: fixed layout, the tool name takes the free width, actions are always fully visible. */
+html body .replacements-fixed {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0;
+}
+html body .replacements-fixed th.pick {
+  width: 40px;
+}
+html body .replacements-fixed th.col-set {
+  width: 14%;
+}
+html body .replacements-fixed th.col-reason {
+  width: 120px;
+}
+html body .replacements-fixed th.col-since {
+  width: 100px;
+}
 /* One KPI look everywhere: one-line label (truncated with a tooltip-free ellipsis), number on the right. */
 html body .kpis > * small {
   min-width: 0;
@@ -2351,6 +2466,22 @@ html body .kpis > *.active {
     0 1px 3px rgba(16, 42, 67, 0.08);
 }
 /* Replacement rows: same-size buttons, right-aligned, never stretched or cut off. */
+html body .replacements-fixed .row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  width: auto;
+}
+html body .replacements-fixed .row-actions button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0 10px;
+  font-size: 12px;
+}
 /* Surgical count: the Set picker has its label clear of the field and a sensible width. */
 /* Department page on the same standard: KPI cards, slim user pill, one-line rows. */
 html body .department-kpis > * {
@@ -2434,6 +2565,17 @@ html body .replacements > section {
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+html body .replacements-fixed th.col-status {
+  width: 190px;
+}
+html body .replacements-fixed .replacement-status {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
 }
 /* Set composition rows: the "Uses" label is repeated on every row, so only the value is shown. */
 html body .asset-detail-body .set-tool-uses > span {
@@ -2900,6 +3042,12 @@ html body .movement-clean-error {
   font-weight: 600;
 }
 /* Issues: columns sized by name (the photos column comes and goes); actions read as words. */
+html body .issues-fixed th.col-status {
+  width: 150px;
+}
+html body .issues-fixed .issue-actions-row {
+  justify-content: flex-end;
+}
 /* Sets list: an expiry column after the state. */
 html body .sets-registry th:nth-child(8) {
   width: 40px;
@@ -2938,6 +3086,9 @@ html body .dash-activity-stats small {
 }
 /* Traceability: the last searches on this device, one tap to repeat. */
 /* Issues: room for «Επίλυση» and the icon actions beside it (order, open, delete), and no more. */
+html body .issues-fixed th.col-actions {
+  width: 160px;
+}
 /* Sets list: the name keeps its width next to the new expiry column. */
 html body .sets-registry th:nth-child(3) {
   width: 132px;
@@ -2965,7 +3116,8 @@ html body .expiry-table td:first-child .row-title-link {
 /* Tablet (landscape, laid out at 1280px, portrait ≤900px): every list keeps its key columns, names get two lines. */
 @media (max-width: 1280px) {
   html body .registry-fixed td:first-child .row-title-link,
-  html body .registry-fixed td:first-child .registry-asset-name strong {
+  html body .registry-fixed td:first-child .registry-asset-name strong,
+  html body .issues-fixed .issue-asset {
     white-space: normal;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -3028,6 +3180,13 @@ html body .expiry-table td:first-child .row-title-link {
   }
   html body .sets-registry th:nth-child(6) {
     width: 132px;
+  }
+  html body .issues-fixed th.col-actions {
+    width: 236px;
+  }
+  html body .issues-fixed .issue-actions-row {
+    flex-wrap: wrap;
+    gap: 6px;
   }
   html body .studio-manager-nav button {
     flex: 0 0 auto;
@@ -3359,6 +3518,53 @@ html body .sets-registry .set-count-short .muted {
 }
 
 /* Issues and Replacements on a phone: each row is a card (the tables ran 100-370 px past the edge). */
+@media (max-width: 700px) {
+  html body .issues-fixed thead,
+  html body .replacements-fixed thead {
+    display: none;
+  }
+  html body .issues-fixed,
+  html body .issues-fixed tbody,
+  html body .replacements-fixed,
+  html body .replacements-fixed tbody {
+    display: block;
+    width: 100%;
+  }
+  html body .issues-fixed tbody tr,
+  html body .replacements-fixed tbody tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--c-gray-95);
+  }
+  html body .issues-fixed tbody td,
+  html body .replacements-fixed tbody td {
+    display: block;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+    border: 0;
+    font-size: 12.5px;
+  }
+  html body .issues-fixed tbody td:first-child {
+    flex: 1 0 100%;
+  }
+  html body .replacements-fixed tbody td:nth-child(2) {
+    flex: 1 0 calc(100% - 40px);
+  }
+  html body .issues-fixed tbody td.issue-actions,
+  html body .replacements-fixed tbody td.row-actions {
+    flex: 1 0 100%;
+  }
+  html body .issues-fixed .issue-actions-row,
+  html body .replacements-fixed .row-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
 
 /* Reports on phone: every report type visible, result rows as cards */
 
@@ -4554,7 +4760,31 @@ html body .hospital-overview .dash-depts-list .dash-dept {
 
 /* Replacements: every row on two short lines. The instrument and the Set on one line each (the whole name in the
    tooltip), the department and the codes under them; the status on one line with its date under it. */
+html body .replacements-table .replacements-fixed td > strong,
+html body .replacements-table .replacements-fixed td > small,
+html body .replacements-table .replacements-fixed td > .replacement-set {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .replacements-fixed td > .replacement-set b {
+  margin-right: 4px;
+}
+html body .replacements-fixed .replacement-status,
+html body .replacements-fixed .replacement-reason,
+html body .replacements-fixed .replacement-stock {
+  white-space: nowrap;
+}
 /* The state on one line («Προς αντικατάσταση»), its date under it. */
+@media (min-width: 1100px) {
+  html body .issues-layout:not(.solo) .replacements-table .replacements-fixed th.col-status {
+    width: 150px;
+  }
+  html body .issues-layout:not(.solo) .replacements-table .replacements-fixed .replacement-status {
+    white-space: nowrap;
+  }
+}
 
 /* The Filters panel: a small grey title over each list, and the choices in the regular weight. */
 html body .asset-filter-panel .asset-filter-field {
@@ -4625,6 +4855,15 @@ html body .issues-layout:not(.solo) {
 }
 /* A record on two short lines: what it is on one line (the whole name in the tooltip), its kind, department and
    note under it. */
+html body .issues-fixed td > .issue-asset {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html body .issues-fixed .issue-age {
+  white-space: nowrap;
+}
 
 /* Every search box the same: 38 px high, a thin frame, the same type as the lists' search bar (13 px); the one in
    «Αντικαταστάσεις» as wide as the bar so «Φίλτρα» and «Λήψη» sit on its right as above every other list. */

@@ -1,8 +1,20 @@
-import {ClipboardList, PackageX, Truck} from 'lucide-react';
-import {useSearchParams} from 'react-router-dom';
+import {
+  CheckCircle2,
+  ClipboardList,
+  ExternalLink,
+  Images,
+  MoreHorizontal,
+  PackageX,
+  Pencil,
+  ShoppingCart,
+  Trash2,
+  Truck,
+} from 'lucide-react';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {lazy, Suspense, useMemo, useState} from 'react';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
+import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
 import {ListEmpty} from '../../components/ui/EmptyState';
 import PageHeader from '../../components/ui/PageHeader';
 import {tr, trData} from '../../i18n';
@@ -17,6 +29,7 @@ import QuickFilters from '../../components/ui/QuickFilters';
 import {isReceivable} from '../../core/purchaseReceipt';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
+import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {daysSince, parseDisplayDate} from '../../core/displayDate';
 import {useHasModule} from '../../data/cloud/modulesContext';
@@ -40,18 +53,9 @@ const issueAge = (created: string) => {
   return days <= 0 ? tr('Από σήμερα') : days === 1 ? tr('1 ημέρα') : tr('{0} ημέρες', days);
 };
 
-/** «S000334 · ΥΣΤΕΡΟΣΚΟΠΗΣΗΣ» → its barcode and its name. */
-const assetParts = (asset: string) => {
-  const [barcode, ...rest] = asset.split(' · ');
-  return {barcode, name: rest.join(' · ') || asset};
-};
-/** «21/11/2026 10:20» → «21/11 10:20»: the year is the list's own. */
-const shortDate = (at: string) => at.replace(/^(\d{1,2}\/\d{1,2})\/\d{4}/, '$1');
-
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
-import IssueCard from './IssueCard';
-import {SplitEmpty} from '../traceability/InfoList';
 import {askDeleteIssue, askEditIssueNote} from '../../components/assets/issueDialogs';
+import ActionMenu from '../../components/ui/ActionMenu';
 import ResolveIssueDialog from '../../components/assets/ResolveIssueDialog';
 
 export default function IssuesPage() {
@@ -74,6 +78,7 @@ export default function IssuesPage() {
   const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
   const [confirm, ask] = useConfirm();
   const [resolving, setResolving] = useState<Issue | null>(null);
+  const navigate = useNavigate();
   // Sterilization and admins also see the instruments to replace, as a second tab (in a hospital the platform
   // owner gave the Replacements & Orders module).
   const hasReplacements = useHasModule('REPLACEMENTS');
@@ -126,9 +131,8 @@ export default function IssuesPage() {
     order.rows,
     [q, department, type, status, age, order.sort?.key, order.sort?.dir].join('|'),
   );
-  // The report open in the card: the one picked, while it is in the list; otherwise the first of the list.
-  const [openId, setOpenId] = useState('');
-  const open = filtered.find(i => i.id === openId) || order.rows[0];
+  // The photos column shows only when some listed issue has photos.
+  const withPhotos = filtered.some(i => i.photos?.length);
   /** What an issue is about: the instrument or Set named by its barcode, to open it or order it. */
   const toolsByBarcode = useMemo(
     () => new Map([...tools, ...retiredTools].map(t => [t.barcode, t] as const)),
@@ -231,115 +235,208 @@ export default function IssuesPage() {
                   },
                 ]}
               />
-              {/* The reports on the left, the one picked on the right: picking another changes only the card. */}
-              <div className="trace-split issues-split">
-                <aside className="trace-split-list" aria-label={tr('Λίστα εκκρεμοτήτων')}>
-                  <AssetFilterBar
-                    query={q}
-                    onQueryChange={setQ}
-                    placeholder={tr('Εργαλείο/Σετ, barcode, τύπος ή σημείωση...')}
-                    filters={[
-                      ...(role === 'DEPARTMENT'
-                        ? []
-                        : [
-                            {
-                              key: 'department',
-                              value: department,
-                              placeholder: tr('Όλα τα τμήματα'),
-                              options: values('department').map(value => ({value, label: value})),
-                              onChange: setDepartment,
-                            },
-                          ]),
-                      {
-                        key: 'type',
-                        value: type,
-                        placeholder: tr('Όλοι οι τύποι'),
-                        options: values('type').map(value => ({value, label: value})),
-                        onChange: setType,
-                      },
-                    ]}
+              <AssetFilterBar
+                query={q}
+                onQueryChange={setQ}
+                placeholder={tr('Εργαλείο/Σετ, barcode, τύπος ή σημείωση...')}
+                filters={[
+                  ...(role === 'DEPARTMENT'
+                    ? []
+                    : [
+                        {
+                          key: 'department',
+                          value: department,
+                          placeholder: tr('Όλα τα τμήματα'),
+                          options: values('department').map(value => ({value, label: value})),
+                          onChange: setDepartment,
+                        },
+                      ]),
+                  {
+                    key: 'type',
+                    value: type,
+                    placeholder: tr('Όλοι οι τύποι'),
+                    options: values('type').map(value => ({value, label: value})),
+                    onChange: setType,
+                  },
+                ]}
+              />
+              <ScrollableListPanel ariaLabel={tr('Λίστα εκκρεμοτήτων')}>
+                {filtered.length === 0 ? (
+                  <ListEmpty
+                    total={scopedIssues.length}
+                    none={{
+                      title: tr('Δεν υπάρχουν εκκρεμότητες'),
+                      description: tr(
+                        'Όταν κάποιος αναφέρει φθορά, έλλειψη ή απώλεια σε Σετ ή εργαλείο, θα εμφανιστεί εδώ.',
+                      ),
+                    }}
+                    onClear={() => {
+                      setQ('');
+                      setDepartment('');
+                      setType('');
+                      setStatus('');
+                      setAge('');
+                    }}
                   />
-                  {filtered.length === 0 ? (
-                    <ListEmpty
-                      total={scopedIssues.length}
-                      none={{
-                        title: tr('Δεν υπάρχουν εκκρεμότητες'),
-                        description: tr(
-                          'Όταν κάποιος αναφέρει φθορά, έλλειψη ή απώλεια σε Σετ ή εργαλείο, θα εμφανιστεί εδώ.',
-                        ),
-                      }}
-                      onClear={() => {
-                        setQ('');
-                        setDepartment('');
-                        setType('');
-                        setStatus('');
-                        setAge('');
-                      }}
-                    />
-                  ) : (
-                    <section className="trace-recent-list issues-list">
-                      <ul>
-                        {rows.visible.map(i => {
-                          const {barcode, name} = assetParts(i.asset);
-                          return (
-                            <li key={i.id}>
-                              <button
-                                type="button"
-                                className={open?.id === i.id ? 'selected' : undefined}
-                                aria-current={open?.id === i.id ? 'true' : undefined}
-                                onClick={() => setOpenId(i.id)}
-                              >
-                                <b className="issue-row-name">{name}</b>
-                                <span className={`issue-row-when${isOld(i) ? ' old' : ''}`}>
-                                  {i.status === 'OPEN' && isOld(i) ? issueAge(i.created) : shortDate(i.created)}
-                                </span>
-                                <small>
-                                  <span className="mono">{barcode}</span>
-                                  {i.department && ` · ${trData(i.department)}`}
-                                </small>
-                                <span className={`issue-dot ${i.status === 'OPEN' ? issueTone(i.type) : 'done'}`}>
-                                  {i.status === 'OPEN' ? trData(i.type) || tr('Πρόβλημα') : tr('Επιλυμένη')}
-                                </span>
-                              </button>
-                            </li>
-                          );
-                        })}
-                        {rows.hasMore && (
-                          <li>
-                            <MoreRows onVisible={rows.showMore} />
-                          </li>
+                ) : (
+                  <table className="asset-registry-table issues-registry-table issues-fixed">
+                    <thead>
+                      <tr>
+                        <SortTh label={tr('Αντικείμενο')} sortKey="asset" sort={order.sort} onSort={order.toggle} />
+                        <SortTh label={tr('Σημείωση')} sortKey="note" sort={order.sort} onSort={order.toggle} />
+                        <SortTh
+                          className="col-created"
+                          label={tr('Δηλώθηκε')}
+                          sortKey="created"
+                          sort={order.sort}
+                          onSort={order.toggle}
+                        />
+                        {withPhotos && <th className="col-photos">{tr('Φωτογραφίες')}</th>}
+                        <SortTh
+                          className="col-status"
+                          label={tr('Κατάσταση')}
+                          sortKey="status"
+                          sort={order.sort}
+                          onSort={order.toggle}
+                        />
+                        {(withReplacements || canDelete) && (
+                          <th className="col-actions">
+                            <span className="visually-hidden">{tr('Ενέργειες')}</span>
+                          </th>
                         )}
-                      </ul>
-                    </section>
-                  )}
-                </aside>
-                <section className="trace-split-card" aria-label={tr('Πρόβλημα')}>
-                  {open ? (
-                    <IssueCard
-                      issue={open}
-                      kind={subject(open).set ? tr('Σετ') : subject(open).tool ? tr('Εργαλείο') : ''}
-                      to={subject(open).to}
-                      age={issueAge(open.created)}
-                      old={isOld(open)}
-                      tone={issueTone(open.type)}
-                      onResolve={withReplacements && open.status === 'OPEN' ? () => setResolving(open) : undefined}
-                      onOrder={
-                        withReplacements && subject(open).tool
-                          ? () => setOrdering([orderLineFromTool(subject(open).tool!, trData(open.type))])
-                          : undefined
-                      }
-                      onEdit={canDelete ? () => askEditIssueNote(open, ask, editIssueNote) : undefined}
-                      onDelete={canDelete ? () => askDeleteIssue(open, ask, deleteIssue) : undefined}
-                    />
-                  ) : (
-                    <SplitEmpty
-                      icon={ClipboardList}
-                      title={tr('Εκκρεμότητες')}
-                      text={tr('Διαλέξτε ένα πρόβλημα από τη λίστα για να δείτε τι αναφέρθηκε και τι μπορεί να γίνει.')}
-                    />
-                  )}
-                </section>
-              </div>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.visible.map(i => (
+                        <tr key={i.id}>
+                          <td>
+                            {subject(i).to ? (
+                              <Link className="issue-asset" to={subject(i).to!}>
+                                {i.asset}
+                              </Link>
+                            ) : (
+                              <strong className="issue-asset">{i.asset}</strong>
+                            )}
+                            <small className="row-sub">
+                              {i.type && (
+                                <span className={`issue-type-chip ${issueTone(i.type)}`}>{trData(i.type)}</span>
+                              )}
+                              {i.department && <span>{trData(i.department)}</span>}
+                            </small>
+                            {i.note && <small className="issue-note-inline">{i.note}</small>}
+                          </td>
+                          <td className="issue-note" title={i.note}>
+                            <span>{i.note}</span>
+                          </td>
+                          <td>
+                            {i.created}
+                            {i.reportedBy && <small className="row-sub">{i.reportedBy}</small>}
+                          </td>
+                          {withPhotos && (
+                            <td>
+                              {i.photos?.length ? (
+                                <div className="issue-table-photos">
+                                  {i.photos.slice(0, 3).map(photo => (
+                                    <img key={photo.id} src={photo.dataUrl} alt={photo.name} />
+                                  ))}
+                                  {i.photos.length > 3 && <span>+{i.photos.length - 3}</span>}
+                                </div>
+                              ) : (
+                                <span className="issue-no-photo">
+                                  <Images size={14} />—
+                                </span>
+                              )}
+                            </td>
+                          )}
+                          <td>
+                            {/* An open issue says how long it has waited (orange after a week); a resolved one says so. */}
+                            {i.status === 'OPEN' ? (
+                              <span className={`issue-age${isOld(i) ? ' old' : ''}`}>
+                                {tr('Ανοικτή')} · {issueAge(i.created)}
+                              </span>
+                            ) : (
+                              <span className="badge">{tr('Επιλυμένη')}</span>
+                            )}
+                          </td>
+                          {(withReplacements || canDelete) && (
+                            <td className="issue-actions">
+                              <div className="issue-actions-row">
+                                {withReplacements && i.status === 'OPEN' && (
+                                  <button
+                                    type="button"
+                                    className="issue-action wide slot-resolve"
+                                    title={tr('Επίλυση')}
+                                    aria-label={tr('Επίλυση')}
+                                    onClick={() => setResolving(i)}
+                                  >
+                                    <CheckCircle2 size={14} />
+                                    {tr('Επίλυση')}
+                                  </button>
+                                )}
+                                {/* The other actions of the row in one ⋯ menu, so the row keeps one button in view. */}
+                                <span className="slot-more">
+                                  <ActionMenu
+                                    compact
+                                    align="right"
+                                    icon={<MoreHorizontal size={16} />}
+                                    label={tr('Περισσότερα')}
+                                    items={[
+                                      ...(subject(i).to
+                                        ? [
+                                            {
+                                              key: 'open',
+                                              icon: <ExternalLink size={15} />,
+                                              label: tr('Άνοιγμα καρτέλας'),
+                                              onSelect: () => navigate(subject(i).to!),
+                                            },
+                                          ]
+                                        : []),
+                                      ...(withReplacements && subject(i).tool
+                                        ? [
+                                            {
+                                              key: 'order',
+                                              icon: <ShoppingCart size={15} />,
+                                              label: tr('Παραγγελία αγοράς'),
+                                              onSelect: () =>
+                                                setOrdering([orderLineFromTool(subject(i).tool!, trData(i.type))]),
+                                            },
+                                          ]
+                                        : []),
+                                      ...(canDelete
+                                        ? [
+                                            {
+                                              key: 'edit',
+                                              icon: <Pencil size={15} />,
+                                              label: tr('Διόρθωση σημείωσης'),
+                                              onSelect: () => askEditIssueNote(i, ask, editIssueNote),
+                                            },
+                                            {
+                                              key: 'delete',
+                                              icon: <Trash2 size={15} />,
+                                              label: tr('Διαγραφή αναφοράς'),
+                                              danger: true,
+                                              onSelect: () => askDeleteIssue(i, ask, deleteIssue),
+                                            },
+                                          ]
+                                        : []),
+                                    ]}
+                                  />
+                                </span>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                      {rows.hasMore && (
+                        <MoreRows
+                          colSpan={4 + (withPhotos ? 1 : 0) + (withReplacements || canDelete ? 1 : 0)}
+                          onVisible={rows.showMore}
+                        />
+                      )}
+                    </tbody>
+                  </table>
+                )}
+              </ScrollableListPanel>
             </>
           )}
         </div>
