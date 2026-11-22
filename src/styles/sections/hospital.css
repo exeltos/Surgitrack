@@ -2047,34 +2047,3 @@ html body .department-home .dash-most-used > .dept-cols {
 
 /* Beside the column of «Εκκρεμότητες», the instruments to replace have less room than the window: their compact
    columns (actions as icons, the main one kept) up to a wide screen. */
-@media (min-width: 1100px) and (max-width: 1699px) {
-  html body .issues-layout:not(.solo) .replacements-fixed th.col-set {
-    width: 16%;
-  }
-  html body .issues-layout:not(.solo) .replacements-fixed th.col-reason {
-    width: 100px;
-  }
-  html body .issues-layout:not(.solo) .replacements-fixed th.col-stock {
-    width: 92px;
-  }
-  html body .issues-layout:not(.solo) .replacements-fixed th.col-status {
-    width: 130px;
-  }
-  /* The state in full, on two lines, instead of cut. */
-  html body .issues-layout:not(.solo) .replacements-fixed .replacement-status {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    line-height: 1.25;
-  }
-  html body .issues-layout:not(.solo) .replacements-fixed {
-    --w-replace: 34px;
-    --w-other: 34px;
-  }
-  html body .issues-layout:not(.solo) .replacements-fixed .replacement-actions > button {
-    padding: 0;
-  }
-  html body .issues-layout:not(.solo) .replacements-table .row-actions button .btn-label {
-    display: none;
-  }
-}

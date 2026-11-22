@@ -6,8 +6,9 @@ import ReplacementsPage from '../ReplacementsPage';
 const kpi = (label: string) =>
   screen.getAllByRole('button').find(b => b.closest('.quick-filters') && b.textContent?.startsWith(label))!;
 const kpiValue = (label: string) => Number(kpi(label).querySelector('b')!.textContent);
-const table = () => screen.getByRole('table');
-const rows = () => within(table()).queryAllByRole('row').slice(1);
+/** The instruments listed on the left, one line each. */
+const rows = () => [...document.querySelectorAll<HTMLElement>('.replacements-list li.pickable')];
+const card = () => screen.getByRole('region', {name: 'Αντικατάσταση'});
 
 describe('Replacements', () => {
   it('splits what needs replacing into what Stock has and what it lacks', () => {
@@ -19,8 +20,8 @@ describe('Replacements', () => {
 
   it.each([
     ['Προς αντικατάσταση', null],
-    ['Με απόθεμα', /^Ναι · \d+$/],
-    ['Χωρίς απόθεμα', /^Όχι$/],
+    ['Με απόθεμα', /^Απόθεμα \d+$/],
+    ['Χωρίς απόθεμα', /^Χωρίς απόθεμα$/],
   ] as const)('lists exactly what «%s» counts', (label, stock) => {
     renderPage(<ReplacementsPage />, {path: '/replacements'});
     fireEvent.click(kpi(label));
@@ -33,12 +34,14 @@ describe('Replacements', () => {
     renderPage(<ReplacementsPage />, {path: '/replacements'});
     fireEvent.click(kpi('Με απόθεμα'));
     const before = kpiValue('Προς αντικατάσταση');
-    fireEvent.click(within(rows()[0]).getByRole('button', {name: /Αντικατάσταση/}));
+    // The first instrument opens in the card beside the list, with its replacement from Stock.
+    fireEvent.click(within(rows()[0]).getByRole('button'));
+    fireEvent.click(within(card()).getByRole('button', {name: /Αντικατάσταση από Απόθεμα/}));
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByText('Αντικατάσταση από το Απόθεμα;')).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole('button', {name: 'Ακύρωση'}));
     expect(kpiValue('Προς αντικατάσταση')).toBe(before);
-    fireEvent.click(within(rows()[0]).getByRole('button', {name: /Αντικατάσταση/}));
+    fireEvent.click(within(card()).getByRole('button', {name: /Αντικατάσταση από Απόθεμα/}));
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', {name: 'Αντικατάσταση'}));
     expect(kpiValue('Προς αντικατάσταση')).toBe(before - 1);
   });

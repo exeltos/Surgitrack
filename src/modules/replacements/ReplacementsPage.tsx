@@ -1,7 +1,7 @@
-import type {CSSProperties, ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import {useMemo, useState} from 'react';
-import {Link, useSearchParams} from 'react-router-dom';
-import {CheckCircle2, ClipboardList, PackageCheck, RefreshCcw, ShoppingCart, Undo2, X} from 'lucide-react';
+import {useSearchParams} from 'react-router-dom';
+import {ClipboardList, PackageCheck, RefreshCcw, ShoppingCart, X} from 'lucide-react';
 import PageHeader from '../../components/ui/PageHeader';
 import AppButton from '../../components/ui/AppButton';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
@@ -12,7 +12,6 @@ import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import {MoreRows} from '../../components/ui/ProgressiveList';
 import {useProgressiveList} from '../../core/useProgressiveList';
-import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {
   REASON_LABEL,
@@ -32,6 +31,8 @@ import {pieces} from './pieces';
 import {purchaseOrderHtml, replacementListHtml} from './replacementPrint';
 import {tr, trData} from '../../i18n';
 import QuickFilters from '../../components/ui/QuickFilters';
+import {SplitEmpty} from '../traceability/InfoList';
+import ReplacementCard from './ReplacementCard';
 
 type Tab = 'ITEMS' | 'ORDERS';
 type StatusFilter = '' | 'NEEDED' | 'IN_ORDER' | 'REPLACED';
@@ -123,11 +124,9 @@ export default function ReplacementsPage({
   // The kinds of action any listed row has: only those take a column, so no row carries empty slots.
   const canReplaceItem = (item: ReplacementItem) => item.status !== 'REPLACED' && !!item.set && item.stock.length > 0;
   const canReturnItem = (item: ReplacementItem) => item.reason === 'SERVICE' && item.status !== 'REPLACED';
-  const slots = {
-    replace: shown.some(canReplaceItem),
-    order: shown.some(item => item.status === 'NEEDED'),
-    back: shown.some(canReturnItem),
-  };
+  // The instrument open in the card: the one picked, while listed; otherwise the first of the list.
+  const [openId, setOpenId] = useState('');
+  const openItem = shown.find(item => item.tool.id === openId) || order.rows[0];
 
   const filters: SelectFilter[] = [
     {
@@ -318,228 +317,133 @@ export default function ReplacementsPage({
               },
             ]}
           />
-          {/* The search, Filters and the download on the bar every list has, above the list. */}
-          <AssetFilterBar
-            query={query}
-            onQueryChange={setQuery}
-            placeholder={tr('Αναζήτηση barcode, ονομασίας, κωδικού ή Σετ…')}
-            filters={filters}
-            extra={
-              <DownloadMenu
-                table={listTable}
-                onPrint={printList}
-                printLabel={picked.length ? tr('PDF / Εκτύπωση επιλεγμένων') : undefined}
-              />
-            }
-          />
-          <section className="replacements-card">
-            {editable && picked.length > 0 && (
-              <div className="replacements-bulk">
-                <b>{tr('{0} επιλεγμένα', picked.length)}</b>
-                <AppButton
-                  variant="primary"
-                  icon={<PackageCheck size={15} />}
-                  disabled={!fromStock.length}
-                  onClick={() => replace(picked)}
-                >
-                  {tr('Αντικατάσταση από Απόθεμα ({0})', fromStock.length)}
-                </AppButton>
-                <AppButton
-                  icon={<ShoppingCart size={15} />}
-                  onClick={() => setOrdering(orderLines(picked.filter(item => item.status !== 'REPLACED')))}
-                >
-                  {tr('Παραγγελία αγοράς')}
-                </AppButton>
-                <button type="button" className="replacements-clear" onClick={() => setSelected(new Set())}>
-                  <X size={14} /> {tr('Καθαρισμός επιλογής')}
-                </button>
-              </div>
-            )}
-            <div className="replacements-table">
-              <table
-                className="replacements-fixed"
-                style={
-                  {
-                    '--slot-replace': Number(slots.replace),
-                    '--slot-order': Number(slots.order),
-                    '--slot-return': Number(slots.back),
-                  } as CSSProperties
+          {/* The instruments on the left (search, filters and the download above them), the one picked on the right. */}
+          <div className="trace-split issues-split">
+            <aside className="trace-split-list" aria-label={tr('Εργαλεία προς αντικατάσταση')}>
+              <AssetFilterBar
+                query={query}
+                onQueryChange={setQuery}
+                placeholder={tr('Αναζήτηση barcode, ονομασίας, κωδικού ή Σετ…')}
+                filters={filters}
+                extra={
+                  <DownloadMenu
+                    table={listTable}
+                    onPrint={printList}
+                    printLabel={picked.length ? tr('PDF / Εκτύπωση επιλεγμένων') : undefined}
+                  />
                 }
-              >
-                <thead>
-                  <tr>
-                    {editable && (
-                      <th className="pick">
-                        <input
-                          type="checkbox"
-                          checked={allShown}
-                          onChange={toggleAll}
-                          aria-label={tr('Επιλογή όλων')}
-                        />
-                      </th>
-                    )}
-                    <SortTh label={tr('Εργαλείο')} sortKey="tool" sort={order.sort} onSort={order.toggle} />
-                    <SortTh
-                      className="col-set"
-                      label={tr('Σετ / τμήμα')}
-                      sortKey="set"
-                      sort={order.sort}
-                      onSort={order.toggle}
-                    />
-                    <SortTh
-                      className="col-reason"
-                      label={tr('Αιτία')}
-                      sortKey="reason"
-                      sort={order.sort}
-                      onSort={order.toggle}
-                    />
-                    <SortTh
-                      className="col-stock"
-                      label={tr('Απόθεμα')}
-                      sortKey="stock"
-                      sort={order.sort}
-                      onSort={order.toggle}
-                    />
-                    <SortTh
-                      className="col-status"
-                      label={tr('Κατάσταση')}
-                      sortKey="status"
-                      sort={order.sort}
-                      onSort={order.toggle}
-                    />
-                    {editable && <th className="col-actions">{tr('Ενέργειες')}</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.visible.map(item => {
-                    const canReplace = canReplaceItem(item);
-                    return (
-                      <tr key={item.tool.id} className={selected.has(item.tool.id) ? 'selected' : ''}>
+              />
+              {editable && picked.length > 0 && (
+                <div className="replacements-bulk">
+                  <b>{tr('{0} επιλεγμένα', picked.length)}</b>
+                  <AppButton
+                    variant="primary"
+                    icon={<PackageCheck size={15} />}
+                    disabled={!fromStock.length}
+                    onClick={() => replace(picked)}
+                  >
+                    {tr('Αντικατάσταση από Απόθεμα ({0})', fromStock.length)}
+                  </AppButton>
+                  <AppButton
+                    icon={<ShoppingCart size={15} />}
+                    onClick={() => setOrdering(orderLines(picked.filter(item => item.status !== 'REPLACED')))}
+                  >
+                    {tr('Παραγγελία αγοράς')}
+                  </AppButton>
+                  <button type="button" className="replacements-clear" onClick={() => setSelected(new Set())}>
+                    <X size={14} /> {tr('Καθαρισμός επιλογής')}
+                  </button>
+                </div>
+              )}
+              {shown.length ? (
+                <section className="trace-recent-list issues-list replacements-list">
+                  {editable && (
+                    <label className="replacements-pick-all">
+                      <input type="checkbox" checked={allShown} onChange={toggleAll} /> {tr('Επιλογή όλων')}
+                    </label>
+                  )}
+                  <ul>
+                    {rows.visible.map(item => (
+                      <li key={item.tool.id} className={editable ? 'pickable' : undefined}>
                         {editable && (
-                          <td className="pick">
-                            <input
-                              type="checkbox"
-                              checked={selected.has(item.tool.id)}
-                              onChange={() => toggle(item.tool.id)}
-                              aria-label={item.tool.barcode}
-                            />
-                          </td>
+                          <input
+                            type="checkbox"
+                            checked={selected.has(item.tool.id)}
+                            onChange={() => toggle(item.tool.id)}
+                            aria-label={item.tool.barcode}
+                          />
                         )}
-                        <td>
-                          <strong title={item.tool.name}>
-                            <Link to={`/tools/${item.tool.id}`}>{item.tool.name}</Link>
-                          </strong>
+                        <button
+                          type="button"
+                          className={openItem?.tool.id === item.tool.id ? 'selected' : undefined}
+                          aria-current={openItem?.tool.id === item.tool.id ? 'true' : undefined}
+                          onClick={() => setOpenId(item.tool.id)}
+                        >
+                          <b className="issue-row-name">{item.tool.name}</b>
+                          <span className={`issue-dot ${REASON_TONE[item.reason]}`}>
+                            {tr(REASON_LABEL[item.reason])}
+                          </span>
                           <small>
                             <span className="mono">{item.tool.barcode}</span>
-                            {item.tool.code ? ` · ${item.tool.code}` : ''}
-                            {item.tool.manufacturer ? ` · ${item.tool.manufacturer}` : ''}
+                            {item.set ? ` · ${item.set.name}` : item.department ? ` · ${trData(item.department)}` : ''}
                           </small>
-                        </td>
-                        <td>
-                          {item.set ? (
-                            <Link
-                              className="replacement-set"
-                              to={`/sets/${item.set.id}`}
-                              title={`${item.set.barcode} · ${item.set.name}`}
-                            >
-                              <b className="mono">{item.set.barcode}</b> {item.set.name}
-                            </Link>
-                          ) : (
-                            '—'
-                          )}
-                          <small>{trData(item.department || '')}</small>
-                        </td>
-                        <td>
-                          <span className={`replacement-reason r-${item.reason}`}>{tr(REASON_LABEL[item.reason])}</span>
-                          {item.reason === 'DAMAGED' && item.issueTypes.length > 0 && (
-                            <small>{item.issueTypes.map(trData).join(' · ')}</small>
-                          )}
-                        </td>
-                        <td>
-                          {item.stock.length ? (
-                            <span className="replacement-stock yes" title={item.stock.map(s => s.barcode).join(', ')}>
-                              <CheckCircle2 size={13} /> {tr('Ναι · {0}', item.stock.length)}
-                            </span>
-                          ) : (
-                            <span className="replacement-stock no">{tr('Όχι')}</span>
-                          )}
-                        </td>
-                        <td>
-                          <span className={`replacement-status s-${item.status}`}>{statusText(item)}</span>
-                          {item.since && <small title={tr('Από')}>{item.since}</small>}
-                        </td>
-                        {editable && (
-                          <td className="row-actions">
-                            <div className="replacement-actions">
-                              {canReplace ? (
-                                <button
-                                  type="button"
-                                  className="primary slot-replace"
-                                  title={tr('Αντικατάσταση')}
-                                  aria-label={tr('Αντικατάσταση')}
-                                  onClick={() => replace([item])}
-                                >
-                                  <PackageCheck size={13} /> <span className="btn-label">{tr('Αντικατάσταση')}</span>
-                                </button>
-                              ) : (
-                                slots.replace && <span className="slot-replace" aria-hidden="true" />
-                              )}
-                              {item.status === 'NEEDED' ? (
-                                <button
-                                  type="button"
-                                  className="slot-order"
-                                  title={tr('Παραγγελία')}
-                                  aria-label={tr('Παραγγελία')}
-                                  onClick={() => setOrdering(orderLines([item]))}
-                                >
-                                  <ShoppingCart size={13} /> <span className="btn-label">{tr('Παραγγελία')}</span>
-                                </button>
-                              ) : (
-                                slots.order && <span className="slot-order" aria-hidden="true" />
-                              )}
-                              {canReturnItem(item) ? (
-                                <button
-                                  type="button"
-                                  className="slot-return"
-                                  title={tr('Επέστρεψε επισκευασμένο: πάει στο Απόθεμα')}
-                                  aria-label={tr('Επιστροφή')}
-                                  onClick={() =>
-                                    ask({
-                                      title: tr('Επιστροφή από Service;'),
-                                      message: tr(
-                                        'Το εργαλείο {0} επέστρεψε επισκευασμένο και μπαίνει στο Απόθεμα.',
-                                        item.tool.barcode,
-                                      ),
-                                      confirmLabel: tr('Επιστροφή στο Απόθεμα'),
-                                      onConfirm: () => store.returnToService('TOOL', item.tool.id),
-                                    })
-                                  }
-                                >
-                                  <Undo2 size={13} /> <span className="btn-label">{tr('Επιστροφή')}</span>
-                                </button>
-                              ) : (
-                                slots.back && <span className="slot-return" aria-hidden="true" />
-                              )}
-                            </div>
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
-                  {!shown.length && (
-                    <tr>
-                      <td colSpan={editable ? 7 : 5} className="empty">
-                        {items.length
-                          ? tr('Κανένα εργαλείο δεν ταιριάζει στα φίλτρα.')
-                          : tr('Δεν υπάρχουν εργαλεία σε Service, με βλάβη, χαμένα ή εκτός χρήσης.')}
-                      </td>
-                    </tr>
-                  )}
-                  {rows.hasMore && <MoreRows colSpan={editable ? 7 : 5} onVisible={rows.showMore} />}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                          <span className={`issue-row-when replacement-row-stock${item.stock.length ? ' yes' : ''}`}>
+                            {item.status !== 'NEEDED'
+                              ? statusText(item)
+                              : item.stock.length
+                                ? tr('Απόθεμα {0}', item.stock.length)
+                                : tr('Χωρίς απόθεμα')}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                    {rows.hasMore && (
+                      <li>
+                        <MoreRows onVisible={rows.showMore} />
+                      </li>
+                    )}
+                  </ul>
+                </section>
+              ) : (
+                <p className="trace-hint">
+                  {items.length
+                    ? tr('Κανένα εργαλείο δεν ταιριάζει στα φίλτρα.')
+                    : tr('Δεν υπάρχουν εργαλεία σε Service, με βλάβη, χαμένα ή εκτός χρήσης.')}
+                </p>
+              )}
+            </aside>
+            <section className="trace-split-card" aria-label={tr('Αντικατάσταση')}>
+              {openItem ? (
+                <ReplacementCard
+                  item={openItem}
+                  status={statusText(openItem)}
+                  editable={editable}
+                  onReplace={canReplaceItem(openItem) ? () => replace([openItem]) : undefined}
+                  onOrder={openItem.status === 'NEEDED' ? () => setOrdering(orderLines([openItem])) : undefined}
+                  onReturn={
+                    canReturnItem(openItem)
+                      ? () =>
+                          ask({
+                            title: tr('Επιστροφή από Service;'),
+                            message: tr(
+                              'Το εργαλείο {0} επέστρεψε επισκευασμένο και μπαίνει στο Απόθεμα.',
+                              openItem.tool.barcode,
+                            ),
+                            confirmLabel: tr('Επιστροφή στο Απόθεμα'),
+                            onConfirm: () => store.returnToService('TOOL', openItem.tool.id),
+                          })
+                      : undefined
+                  }
+                />
+              ) : (
+                <SplitEmpty
+                  icon={RefreshCcw}
+                  title={tr('Αντικαταστάσεις')}
+                  text={tr('Διαλέξτε ένα εργαλείο από τη λίστα για να το αντικαταστήσετε ή να το παραγγείλετε.')}
+                />
+              )}
+            </section>
+          </div>
         </>
       ) : (
         <OrdersPanel
@@ -623,6 +527,14 @@ export default function ReplacementsPage({
     </div>
   );
 }
+
+/** The colour of a reason: damaged amber, lost red, at Service or out of use grey. */
+const REASON_TONE: Record<ReplacementReason, string> = {
+  DAMAGED: 'warn',
+  LOST: 'bad',
+  SERVICE: 'neutral',
+  RETIRED: 'neutral',
+};
 
 const statusText = (item: ReplacementItem) =>
   item.status === 'REPLACED'

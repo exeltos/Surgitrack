@@ -1,13 +1,16 @@
 import {useState} from 'react';
 import {ClipboardList, PackageCheck, Plus, Printer} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
+import AssetFilterBar from '../../components/assets/AssetFilterBar';
+import QuickFilters from '../../components/ui/QuickFilters';
+import InfoList, {SplitEmpty} from '../traceability/InfoList';
 import type {PurchaseOrder} from '../../types/domain';
 import {isReceivable} from '../../core/purchaseReceipt';
 import {pieces} from './pieces';
 import {orderStatusLabel} from './replacementPrint';
 import {tr} from '../../i18n';
 
-/** The purchase orders, newest first, with their status and print. */
+/** The purchase orders: their counts, the list on the left and the one open on the right. */
 export default function OrdersPanel({
   orders,
   editable,
@@ -23,7 +26,31 @@ export default function OrdersPanel({
   onNew: () => void;
   onPrint: (order: PurchaseOrder) => void;
 }) {
-  const [open, setOpen] = useState<string | null>(orders[0]?.id || null);
+  const [filter, setFilter] = useState<'' | 'WAITING' | 'RECEIVED' | 'CANCELLED'>('');
+  const [query, setQuery] = useState('');
+  const [openId, setOpenId] = useState('');
+  const waiting = (order: PurchaseOrder) => isReceivable(order);
+  const q = query.trim().toLowerCase();
+  const found = orders.filter(
+    order =>
+      !q ||
+      [order.number, order.supplier, order.createdByName, order.note, ...order.lines.map(l => `${l.name} ${l.code}`)]
+        .join(' ')
+        .toLowerCase()
+        .includes(q),
+  );
+  const shown = found.filter(order =>
+    filter === 'WAITING'
+      ? waiting(order)
+      : filter === 'RECEIVED'
+        ? order.status === 'RECEIVED'
+        : filter === 'CANCELLED'
+          ? order.status === 'CANCELLED'
+          : true,
+  );
+  const open = shown.find(order => order.id === openId) || shown[0];
+  const tone = (status: PurchaseOrder['status']) =>
+    status === 'RECEIVED' ? 'done' : status === 'CANCELLED' ? 'neutral' : status === 'PARTIAL' ? 'warn' : 'open';
   if (!orders.length)
     return (
       <section className="replacements-card replacements-empty">
@@ -37,104 +64,203 @@ export default function OrdersPanel({
         )}
       </section>
     );
-  const active = orders.filter(o => o.status !== 'CANCELLED');
-  const cancelled = orders.filter(o => o.status === 'CANCELLED');
-  const card = (order: PurchaseOrder) => {
-    const total = order.lines.reduce((sum, line) => sum + line.quantity, 0);
-    const expanded = open === order.id;
-    return (
-      <article key={order.id} className={`replacements-order o-${order.status}`}>
-        <header onClick={() => setOpen(expanded ? null : order.id)}>
-          <div>
-            <strong className="mono">{order.number}</strong>
-            <small>
-              {order.createdAt} · {order.createdByName}
-              {order.supplier ? ` · ${order.supplier}` : ''}
-            </small>
-          </div>
-          <span className="replacements-order-count">
-            {order.lines.length === 1 ? tr('1 είδος') : tr('{0} είδη', order.lines.length)} · {pieces(total)}
-          </span>
-          <span className={`replacement-order-status o-${order.status}`}>{orderStatusLabel(order.status)}</span>
-        </header>
-        {expanded && (
-          <div className="replacements-order-body">
-            <table>
-              <tbody>
-                {order.lines.map(line => (
-                  <tr key={`${line.code}-${line.name}`}>
-                    <td className="mono">{line.code || '—'}</td>
-                    <td>
-                      <strong>{line.name}</strong>
-                      <small>{line.manufacturer || ''}</small>
-                    </td>
-                    <td className="qty">{line.received ? `${line.received}/${line.quantity}` : line.quantity}</td>
-                    <td>{line.reason}</td>
-                    <td className="mono barcodes">{line.barcodes.join(', ')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {order.note && <p className="replacements-order-note">{order.note}</p>}
-            <div className="replacements-order-actions">
-              <AppButton icon={<Printer size={15} />} onClick={() => onPrint(order)}>
-                {tr('Εκτύπωση')}
-              </AppButton>
-              {editable && order.status === 'OPEN' && (
-                <AppButton variant="primary" onClick={() => onStatus(order, 'ORDERED')}>
-                  {tr('Σημείωση ως παραγγελθείσα')}
-                </AppButton>
-              )}
-              {editable && isReceivable(order) && (
-                <>
-                  <AppButton
-                    variant={order.status === 'OPEN' ? undefined : 'primary'}
-                    icon={<PackageCheck size={15} />}
-                    onClick={() => onReceive(order)}
-                  >
-                    {order.status === 'PARTIAL' ? tr('Παραλαβή υπολοίπων') : tr('Παραλαβή στο Απόθεμα')}
-                  </AppButton>
-                  <AppButton onClick={() => onStatus(order, 'CANCELLED')}>
-                    {order.status === 'PARTIAL' ? tr('Ακύρωση υπολοίπων') : tr('Ακύρωση παραγγελίας')}
-                  </AppButton>
-                </>
-              )}
-              {order.status === 'PARTIAL' && order.receivedBarcodes?.length ? (
-                <small>{tr('Έχουν παραληφθεί: {0}', order.receivedBarcodes.join(', '))}</small>
-              ) : null}
-              {order.status === 'RECEIVED' && (
-                <small>
-                  {order.receivedBarcodes?.length
-                    ? tr(
-                        'Παραλήφθηκε {0} · Νέα εργαλεία στο Απόθεμα: {1}',
-                        order.receivedAt || '',
-                        order.receivedBarcodes.join(', '),
-                      )
-                    : tr('Παραλήφθηκε {0}', order.receivedAt || '')}
-                </small>
-              )}
-            </div>
-          </div>
-        )}
-      </article>
-    );
-  };
   return (
-    <section className="replacements-orders">
-      {editable && (
-        <div className="replacements-orders-bar">
-          <AppButton icon={<Plus size={15} />} onClick={onNew}>
-            {tr('Νέα παραγγελία')}
-          </AppButton>
+    <>
+      {/* The counts on top, the search under them, then the orders and the one open beside them. */}
+      <QuickFilters
+        items={[
+          {key: 'all', label: tr('Όλες'), count: found.length, active: !filter, onClick: () => setFilter('')},
+          {
+            key: 'waiting',
+            label: tr('Σε αναμονή'),
+            count: found.filter(waiting).length,
+            tone: 'warn',
+            active: filter === 'WAITING',
+            onClick: () => setFilter(filter === 'WAITING' ? '' : 'WAITING'),
+          },
+          {
+            key: 'received',
+            label: tr('Παραλήφθηκαν'),
+            count: found.filter(o => o.status === 'RECEIVED').length,
+            tone: 'good',
+            active: filter === 'RECEIVED',
+            onClick: () => setFilter(filter === 'RECEIVED' ? '' : 'RECEIVED'),
+          },
+          {
+            key: 'cancelled',
+            label: tr('Ακυρώθηκαν'),
+            count: found.filter(o => o.status === 'CANCELLED').length,
+            active: filter === 'CANCELLED',
+            onClick: () => setFilter(filter === 'CANCELLED' ? '' : 'CANCELLED'),
+          },
+        ]}
+      />
+      <div className="trace-split issues-split">
+        <aside className="trace-split-list" aria-label={tr('Παραγγελίες')}>
+          <AssetFilterBar
+            query={query}
+            onQueryChange={setQuery}
+            placeholder={tr('Αριθμός, προμηθευτής, εργαλείο…')}
+            extra={
+              editable ? (
+                <AppButton icon={<Plus size={15} />} onClick={onNew}>
+                  {tr('Νέα')}
+                </AppButton>
+              ) : undefined
+            }
+          />
+          {shown.length ? (
+            <section className="trace-recent-list issues-list">
+              <ul>
+                {shown.map(order => (
+                  <li key={order.id}>
+                    <button
+                      type="button"
+                      className={open?.id === order.id ? 'selected' : undefined}
+                      aria-current={open?.id === order.id ? 'true' : undefined}
+                      onClick={() => setOpenId(order.id)}
+                    >
+                      <b className="issue-row-name mono">{order.number}</b>
+                      <span className={`issue-dot ${tone(order.status)}`}>{orderStatusLabel(order.status)}</span>
+                      <small>
+                        {order.lines.length === 1 ? tr('1 είδος') : tr('{0} είδη', order.lines.length)} ·{' '}
+                        {pieces(order.lines.reduce((sum, line) => sum + line.quantity, 0))}
+                        {order.supplier ? ` · ${order.supplier}` : ''}
+                      </small>
+                      <span className="issue-row-when">{order.createdAt.split(' ')[0]}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : (
+            <p className="trace-hint">{tr('Καμία παραγγελία δεν ταιριάζει.')}</p>
+          )}
+        </aside>
+        <section className="trace-split-card" aria-label={tr('Παραγγελία')}>
+          {open ? (
+            <OrderCard order={open} editable={editable} onStatus={onStatus} onReceive={onReceive} onPrint={onPrint} />
+          ) : (
+            <SplitEmpty
+              icon={ClipboardList}
+              title={tr('Παραγγελίες')}
+              text={tr('Διαλέξτε μια παραγγελία από τη λίστα.')}
+            />
+          )}
+        </section>
+      </div>
+    </>
+  );
+}
+
+/** One purchase order: what it holds, its status and dates, and what can be done with it. */
+function OrderCard({
+  order,
+  editable,
+  onStatus,
+  onReceive,
+  onPrint,
+}: {
+  order: PurchaseOrder;
+  editable: boolean;
+  onStatus: (order: PurchaseOrder, status: PurchaseOrder['status']) => void;
+  onReceive: (order: PurchaseOrder) => void;
+  onPrint: (order: PurchaseOrder) => void;
+}) {
+  const total = order.lines.reduce((sum, line) => sum + line.quantity, 0);
+  return (
+    <article className="issue-card">
+      <div className="trace-item-head">
+        <div>
+          <small>{tr('Παραγγελία αγοράς')}</small>
+          <h2 className="mono">{order.number}</h2>
+        </div>
+      </div>
+      <InfoList
+        label={tr('Παραγγελία')}
+        rows={[
+          {label: tr('Κατάσταση'), value: <b>{orderStatusLabel(order.status)}</b>},
+          {
+            label: tr('Καταχωρήθηκε'),
+            value: (
+              <>
+                <b>{order.createdAt}</b>
+                <small>{order.createdByName}</small>
+              </>
+            ),
+          },
+          {label: tr('Προμηθευτής'), value: <b>{order.supplier || '—'}</b>},
+          {
+            label: tr('Είδη'),
+            value: (
+              <>
+                <b>{order.lines.length === 1 ? tr('1 είδος') : tr('{0} είδη', order.lines.length)}</b>
+                <small>{pieces(total)}</small>
+              </>
+            ),
+          },
+        ]}
+      />
+      <ul className="order-card-lines">
+        {order.lines.map(line => (
+          <li key={`${line.code}-${line.name}`}>
+            <span>
+              <b>{line.name}</b>
+              <small>
+                {[line.code, line.manufacturer, line.reason].filter(Boolean).join(' · ')}
+                {line.barcodes.length ? ` · ${line.barcodes.join(', ')}` : ''}
+              </small>
+            </span>
+            <span className="order-card-qty">
+              {line.received ? `${line.received}/${line.quantity}` : line.quantity}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {order.note && (
+        <div className="issue-card-note">
+          <span>{tr('Σημείωση')}</span>
+          <p>{order.note}</p>
         </div>
       )}
-      {active.map(card)}
-      {cancelled.length > 0 && (
-        <details className="replacements-cancelled">
-          <summary>{tr('Ακυρωμένες παραγγελίες ({0})', cancelled.length)}</summary>
-          {cancelled.map(card)}
-        </details>
+      {order.status === 'PARTIAL' && order.receivedBarcodes?.length ? (
+        <p className="trace-hint">{tr('Έχουν παραληφθεί: {0}', order.receivedBarcodes.join(', '))}</p>
+      ) : null}
+      {order.status === 'RECEIVED' && (
+        <p className="trace-hint">
+          {order.receivedBarcodes?.length
+            ? tr(
+                'Παραλήφθηκε {0} · Νέα εργαλεία στο Απόθεμα: {1}',
+                order.receivedAt || '',
+                order.receivedBarcodes.join(', '),
+              )
+            : tr('Παραλήφθηκε {0}', order.receivedAt || '')}
+        </p>
       )}
-    </section>
+      <div className="issue-card-actions">
+        {editable && isReceivable(order) && (
+          <AppButton
+            variant={order.status === 'OPEN' ? undefined : 'primary'}
+            icon={<PackageCheck size={15} />}
+            onClick={() => onReceive(order)}
+          >
+            {order.status === 'PARTIAL' ? tr('Παραλαβή υπολοίπων') : tr('Παραλαβή στο Απόθεμα')}
+          </AppButton>
+        )}
+        {editable && order.status === 'OPEN' && (
+          <AppButton variant="primary" onClick={() => onStatus(order, 'ORDERED')}>
+            {tr('Σημείωση ως παραγγελθείσα')}
+          </AppButton>
+        )}
+        <AppButton icon={<Printer size={15} />} onClick={() => onPrint(order)}>
+          {tr('Εκτύπωση')}
+        </AppButton>
+        {editable && isReceivable(order) && (
+          <AppButton onClick={() => onStatus(order, 'CANCELLED')}>
+            {order.status === 'PARTIAL' ? tr('Ακύρωση υπολοίπων') : tr('Ακύρωση παραγγελίας')}
+          </AppButton>
+        )}
+      </div>
+    </article>
   );
 }
