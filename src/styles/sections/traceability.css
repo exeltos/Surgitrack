@@ -254,35 +254,29 @@ html body .trace-head-actions {
   align-items: center;
   gap: 8px;
 }
-/* What is known, as low cards in a row (the look of the Indicators' figures): the label on top, the value under it. */
+/* What is known, as one light strip: the facts side by side, divided by thin lines, the label over its value. */
 html body .trace-info {
   display: grid;
-  /* One row, always: every card shares the width. */
+  /* One row, always: every fact shares the width. */
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;
-  gap: 10px;
   margin: 0 0 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--c-gray-90);
+  border-bottom: 1px solid var(--c-gray-90);
 }
 html body .trace-info > div {
-  position: relative;
   display: grid;
   align-content: start;
   gap: 3px;
   min-width: 0;
-  padding: 8px 8px 9px 13px;
+  padding: 0 12px;
+  border-left: 1px solid var(--c-gray-90);
   overflow-wrap: break-word;
-  overflow: hidden;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 12px;
-  background: var(--c-white);
-  box-shadow: 0 1px 3px rgb(16 42 52 / 5%);
 }
-html body .trace-info > div::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  background: #1f7a93;
+html body .trace-info > div:first-child {
+  padding-left: 0;
+  border-left: 0;
 }
 html body .trace-info dt {
   color: var(--c-gray-45);
@@ -293,19 +287,39 @@ html body .trace-info dt {
 html body .trace-info dd {
   margin: 0;
   color: var(--c-blue-15-2);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.4;
 }
-/* A badge in a narrow card goes on two lines rather than out of it. */
+/* A status is a coloured dot and word, not a badge. */
 html body .trace-info dd .trace-tone {
-  max-width: 100%;
-  padding: 1px 6px;
-  font-size: 11px;
+  position: relative;
+  display: inline-block;
+  padding: 0 0 0 13px;
+  background: none;
+  font-size: 13.5px;
   white-space: normal;
 }
-/* Its value first, on its own line; what follows flows as text, a badge or a link inline. */
+/* The dot stays with the word's first line when the word goes on two. */
+html body .trace-info dd .trace-tone::before {
+  content: '';
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+/* The patient's verdict, the same way: coloured text, no box. */
+html body .trace-info dd .trace-verdict {
+  padding: 0;
+  background: none;
+  font-size: 13.5px;
+}
+/* Its value first, on its own line; what follows flows as text or a link inline. */
 html body .trace-info dd > b:first-child,
-html body .trace-info dd > .trace-link:first-child {
+html body .trace-info dd > .trace-link:first-child,
+html body .trace-info dd > .trace-tone:first-child {
   display: block;
 }
 html body .trace-info dd > small {
@@ -314,7 +328,6 @@ html body .trace-info dd > small {
   color: var(--c-gray-45);
   font-size: 12px;
 }
-html body .trace-info dd .trace-tone,
 html body .trace-info dd .trace-link {
   margin-right: 6px;
 }
@@ -805,7 +818,7 @@ html body .trace-split-empty p {
 html body .trace-missing {
   display: block;
   color: #a36a12;
-  font-size: 12.5px;
+  font-size: 13px;
   font-style: italic;
 }
 /* The last searches, in the empty search field. */
@@ -866,16 +879,25 @@ html body .trace-split-list .trace-recent-list button.selected {
     overflow: visible;
   }
 }
-/* On a phone the cards cannot share one row: two per row there. */
+/* On a phone the facts cannot share one row: two per row there. */
 @media (max-width: 720px) {
   html body .trace-info {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-flow: row;
+    row-gap: 10px;
+  }
+  html body .trace-info > div:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
   }
 }
 /* In the narrow list the search keeps room to be read: the buttons go under it when they leave too little. */
 html body .trace-split-list .asset-filter-bar {
   flex-wrap: wrap;
+}
+/* The patients' search is a line of its own, its buttons under it. */
+html body .trace-split-list .trace-patients .asset-filter-bar > .asset-filter-search {
+  flex-basis: 100%;
 }
 html body .trace-split-list .asset-filter-bar > .asset-filter-search {
   flex: 1 1 150px;
