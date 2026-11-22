@@ -4,6 +4,7 @@ import {useFitWidth} from '../../components/ui/useFitWidth';
 import {AlertTriangle, FileText, Printer} from 'lucide-react';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {type SelectFilter} from '../../components/assets/FilterMenu';
+import QuickFilters from '../../components/ui/QuickFilters';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import type {ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
@@ -391,10 +392,11 @@ export default function ReportsPage() {
             {key: 'releasedInfo', label: tr('Αποδέσμευση')},
           ]
         : reportData.columns;
-    // A report with a barcode and a name shows the barcode under the name, not in a column of its own.
-    const underName = columns.some(c => c.key === 'barcode') && columns.some(c => c.key === 'name');
+    // A report with a barcode and a name shows the barcode, and whether it is a Set or an instrument, under the name,
+    // not in columns of their own.
+    const hasName = columns.some(c => c.key === 'name');
     return columns
-      .filter(c => !(underName && c.key === 'barcode'))
+      .filter(c => !(hasName && (c.key === 'barcode' || c.key === 'kind')))
       .filter(c =>
         reportData.rows.some((row: Row) => {
           const value = String(row[c.key] ?? '').trim();
@@ -420,11 +422,32 @@ export default function ReportsPage() {
   const groupKey =
     firstKey && (firstKey === 'department' || firstKey === 'specialty') && !order.sort ? firstKey : undefined;
   const tableColumns = groupKey ? screenColumns.slice(1) : screenColumns;
+  // Each group's size, and how many of it are Sets and how many instruments («53», «4 Σετ», «49 εργαλεία»).
   const groupSizes = useMemo(() => {
-    const sizes = new Map<string, number>();
-    if (groupKey)
-      for (const row of viewRows)
-        sizes.set(String(row[groupKey] ?? ''), (sizes.get(String(row[groupKey] ?? '')) || 0) + 1);
+    const sizes = new Map<string, {total: number; parts: string[]}>();
+    if (!groupKey) return sizes;
+    const tally = new Map<string, {total: number; kinds: Map<string, number>}>();
+    for (const row of viewRows) {
+      const key = String(row[groupKey] ?? '');
+      const entry = tally.get(key) || {total: 0, kinds: new Map<string, number>()};
+      entry.total += 1;
+      if (row.kind) entry.kinds.set(String(row.kind), (entry.kinds.get(String(row.kind)) || 0) + 1);
+      tally.set(key, entry);
+    }
+    const kindCount = (kind: string, count: number) =>
+      kind === 'Εργαλείο'
+        ? count === 1
+          ? tr('1 εργαλείο')
+          : tr('{0} εργαλεία', count)
+        : kind === 'Σετ'
+          ? tr('{0} Σετ', count)
+          : `${count} ${cellText('kind', kind)}`;
+    tally.forEach(({total, kinds}, key) =>
+      sizes.set(key, {
+        total,
+        parts: kinds.size > 1 ? [...kinds].map(([kind, count]) => kindCount(kind, count)) : [],
+      }),
+    );
     return sizes;
   }, [groupKey, viewRows]);
   const shownRows = useProgressiveList(
@@ -451,6 +474,8 @@ export default function ReportsPage() {
       query,
     ].join('|'),
   );
+  // «Σετ» or «Εργαλείο» under a name only where the report holds both.
+  const mixedKinds = new Set(reportData.rows.map((row: Row) => row.kind).filter(Boolean)).size > 1;
   const resultBody = useFitWidth<HTMLDivElement>([reportData, shownRows.visible.length]);
   const reportTable = (): ExportTable => ({
     title: tr(activeMeta.title),
@@ -505,22 +530,20 @@ export default function ReportsPage() {
             </div>
           </header>
           <div className="reports-overview">
-            <ul className="reports-summary" aria-label={tr('Σύνολα')}>
-              {summary.map(chip => (
-                <li key={chip.label}>
-                  <button
-                    type="button"
-                    className={`${chip.tone && chip.value > 0 ? chip.tone : ''} ${view?.label === chip.label ? 'active' : ''}`}
-                    aria-pressed={view?.label === chip.label}
-                    disabled={chip.value === 0}
-                    onClick={() => setView({label: chip.label, test: chip.test})}
-                  >
-                    <b>{chip.value}</b>
-                    <span>{chip.label}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {/* The report's figures as the same small cards above every list: each narrows the list, pressed again
+                shows all. */}
+            <QuickFilters
+              label={tr('Σύνολα')}
+              items={summary.map(chip => ({
+                key: chip.label,
+                label: chip.label,
+                count: chip.value,
+                tone: chip.tone,
+                active: view?.label === chip.label,
+                onClick: () =>
+                  view?.label === chip.label ? setView(null) : setView({label: chip.label, test: chip.test}),
+              }))}
+            />
           </div>
           {/* The search, Filters and the download on one bar, as above every other list. */}
           <AssetFilterBar
@@ -597,7 +620,19 @@ export default function ReportsPage() {
                             <tr className="report-group-row">
                               <th colSpan={tableColumns.length} scope="rowgroup">
                                 {cellText(groupKey!, row[groupKey!]) || '—'}
-                                <span>{groupSizes.get(String(row[groupKey!] ?? ''))}</span>
+                                {(() => {
+                                  const size = groupSizes.get(String(row[groupKey!] ?? ''));
+                                  return (
+                                    <>
+                                      <span className="report-group-total">{size?.total}</span>
+                                      {size?.parts.map(part => (
+                                        <small key={part} className="report-group-part">
+                                          {part}
+                                        </small>
+                                      ))}
+                                    </>
+                                  );
+                                })()}
                               </th>
                             </tr>
                           )}
@@ -634,8 +669,13 @@ export default function ReportsPage() {
                                     <Printer size={13} aria-hidden="true" />
                                   </button>
                                 ) : null}
-                                {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
-                                  <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
+                                {c.key === 'name' && (row.barcode || (mixedKinds && row.kind)) ? (
+                                  <small className="row-sub registry-row-barcode">
+                                    {row.barcode ? <span className="mono">{String(row.barcode)}</span> : null}
+                                    {mixedKinds && row.kind
+                                      ? `${row.barcode ? ' · ' : ''}${cellText('kind', row.kind)}`
+                                      : ''}
+                                  </small>
                                 ) : null}
                               </td>
                             ))}

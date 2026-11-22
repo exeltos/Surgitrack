@@ -37,7 +37,7 @@ describe('Αναφορές and the browser’s «Πίσω»', () => {
       {path: '/reports'},
     );
     fireEvent.click(screen.getByRole('button', {name: /Ιστορικό βλαβών & απωλειών/}));
-    const summary = screen.getByRole('list', {name: 'Σύνολα'});
+    const summary = screen.getByRole('group', {name: 'Σύνολα'});
     const chip = within(summary)
       .getAllByRole('button')
       .find(button => !(button as HTMLButtonElement).disabled)!;

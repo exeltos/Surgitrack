@@ -54,7 +54,6 @@ const issueAge = (created: string) => {
 };
 
 const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
-import EquipmentProblems from './EquipmentProblems';
 import {askDeleteIssue, askEditIssueNote} from '../../components/assets/issueDialogs';
 import ActionMenu from '../../components/ui/ActionMenu';
 import ResolveIssueDialog from '../../components/assets/ResolveIssueDialog';
@@ -77,7 +76,6 @@ export default function IssuesPage() {
   // Only the hospital admin (or the owner acting as one) deletes a report someone wrote.
   const canDelete = role === 'ADMIN';
   const [ordering, setOrdering] = useState<PurchaseOrderLine[] | null>(null);
-  const [figureOpened, setFigureOpened] = useState(0);
   const [confirm, ask] = useConfirm();
   const [resolving, setResolving] = useState<Issue | null>(null);
   const navigate = useNavigate();
@@ -192,25 +190,15 @@ export default function IssuesPage() {
   const goToOrders = () => setParams({tab: 'orders'});
   return (
     <div className="tools-list-workspace">
-      <PageHeader
-        eyebrow={tr('Παρακολούθηση')}
-        title={tr('Εκκρεμότητες')}
-        description={
-          role === 'DEPARTMENT'
-            ? tr('Προβλήματα και εκκρεμότητες του τμήματος {0}.', trData(currentUser.department))
-            : tr('Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.')
-        }
-      />
+      <PageHeader eyebrow={tr('Παρακολούθηση')} title={tr('Εκκρεμότητες')} />
       {/* The records in the middle, with the whole height; beside them, on the right, the instruments out of order
           (the same on every tab), each opening the instruments to replace by it. */}
-      <div className={`issues-layout${withReplacements ? '' : ' solo'}`}>
+      <div className="issues-layout solo">
         {/* A workspace of its own: its header and filters stay still and only its list scrolls, as on the page. */}
         <div className="issues-main tools-list-workspace">
           {tab !== 'REPORTS' ? (
             <Suspense fallback={<Spinner />}>
               <ReplacementsPage
-                // A figure clicked opens the list afresh: its other filters back to the instruments to replace, as counted.
-                key={figureOpened}
                 reason={params.get('reason') || ''}
                 onReason={reason => setParams(reason ? {tab: 'replacements', reason} : {tab: 'replacements'})}
                 embedded
@@ -452,15 +440,6 @@ export default function IssuesPage() {
             </>
           )}
         </div>
-        {withReplacements && (
-          <EquipmentProblems
-            reason={tab === 'REPLACEMENTS' ? params.get('reason') || undefined : undefined}
-            onReason={reason => {
-              setFigureOpened(n => n + 1);
-              setParams({tab: 'replacements', reason});
-            }}
-          />
-        )}
       </div>
       {ordering && (
         <OrderDialog

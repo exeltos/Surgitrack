@@ -299,28 +299,30 @@ export function tableReportHtml(source: ExportTable, lang: string) {
   const table = markTable(source);
   return markPrintHtml(`<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><title>${html(table.title)}</title>
 <style>
-@page { size: A4 landscape; margin: 14mm 12mm; }
-* { box-sizing: border-box; }
-body { font-family: "Segoe UI", Arial, sans-serif; color: #1c2b33; margin: 0; padding: 0; font-size: 10px; }
-header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #1d6b7a; padding-bottom: 8px; margin-bottom: 12px; }
-h1 { margin: 0; font-size: 19px; }
-header p { margin: 4px 0 0; color: #5b6b75; }
-header small { color: #5b6b75; text-align: right; }
+@page { size: A4 landscape; margin: 11mm 10mm 13mm; @bottom-right { content: counter(page) " / " counter(pages); font: 7pt Arial, sans-serif; color: #667; } }
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: Arial, Helvetica, sans-serif; color: #15232b; margin: 0; padding: 0; font-size: 8.5pt; }
+/* The same head as every other print: the hospital, the title, when and by whom it was printed. */
+.top { display: flex; justify-content: space-between; align-items: flex-end; gap: 6mm; padding-bottom: 3mm; border-bottom: .6mm solid #1d6b7a; margin-bottom: 4mm; }
+.brand { font-size: 12pt; font-weight: 800; color: #1d6b7a; letter-spacing: .03em; }
+h1 { margin: 1.5mm 0 0; font-size: 15pt; }
+.top p { margin: 1mm 0 0; color: #5f707b; }
+.when { text-align: right; color: #5f707b; font-size: 7.5pt; }
 table { width: 100%; border-collapse: collapse; }
 thead { display: table-header-group; }
 /* The totals once, after the last row (a table's foot would repeat on every page with a page's part of them). */
 tfoot { display: table-row-group; }
-th { background: #1d6b7a; color: #fff; text-align: left; padding: 4px 6px; font-size: 9.5px; }
-td { padding: 3px 6px; border-bottom: 1px solid #dde5ea; vertical-align: top; }
-tr:nth-child(even) td { background: #f5f8fa; }
-tr { page-break-inside: avoid; }
-tr.band th { background: #eef4f6; color: #15232b; border-top: 2px solid #1d6b7a; font-size: 11px; }
-tfoot th.total { background: #eef4f6; color: #15232b; border-top: 2px solid #1d6b7a; }
-footer { margin-top: 10px; color: #5b6b75; font-size: 10px; }
-@media screen { body { padding: 18px; } }
+th { font-size: 6.8pt; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #4b5d68; text-align: left; padding: 1.8mm 1.6mm; background: #eef4f6; border-bottom: .35mm solid #9fb3bd; }
+td { padding: 1.6mm; border-bottom: .2mm solid #dde4e8; vertical-align: top; }
+tbody tr:nth-child(even) td { background: #f8fafb; }
+tr { break-inside: avoid; page-break-inside: avoid; }
+tr.band th { background: #eef4f6; color: #15232b; border-top: .5mm solid #1d6b7a; font-size: 8.5pt; text-transform: none; letter-spacing: 0; }
+tfoot th.total { background: #eef4f6; color: #15232b; border-top: .5mm solid #1d6b7a; }
+.footer { margin-top: 5mm; padding-top: 2mm; border-top: .2mm solid #d7e0e5; display: flex; justify-content: space-between; font-size: 7pt; color: #6a7a84; }
+@media screen { html { background: #e9eef1; } body { max-width: 297mm; margin: 0 auto; padding: 11mm 10mm; background: #fff; min-height: 210mm; } }
 </style></head><body>
-<header><div><h1>${html(table.title)}</h1>${table.subtitle ? `<p>${html(table.subtitle)}</p>` : ''}</div>
-<small><b>${html(printHospital())}</b><br>${html(printedLine())}</small></header>
+<div class="top"><div><div class="brand">${html(printHospital())}</div><h1>${html(table.title)}</h1>${table.subtitle ? `<p>${html(table.subtitle)}</p>` : ''}</div>
+<div class="when">${html(printedLine())}</div></div>
 <table><thead><tr>${table.headers.map(h => `<th>${html(h)}</th>`).join('')}</tr></thead>
 <tbody>${table.rows
     .map((row, r) => {
@@ -333,6 +335,6 @@ footer { margin-top: 10px; color: #5b6b75; font-size: 10px; }
     .join(
       '',
     )}</tbody>${table.totals ? `<tfoot><tr>${table.totals.map(v => `<th class="total">${html(v ?? '')}</th>`).join('')}</tr></tfoot>` : ''}</table>
-<footer>${table.rows.length} ${lang === 'el' ? (table.rows.length === 1 ? 'εγγραφή' : 'εγγραφές') : table.rows.length === 1 ? 'record' : 'records'}</footer>
+<div class="footer"><span>SurgiTrack</span><span>${table.rows.length} ${lang === 'el' ? (table.rows.length === 1 ? 'εγγραφή' : 'εγγραφές') : table.rows.length === 1 ? 'record' : 'records'}</span></div>
 </body></html>`);
 }

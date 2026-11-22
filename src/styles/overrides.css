@@ -2789,9 +2789,32 @@ html body .release-actions .release-print {
 html body .sidebar-bin {
   flex: 0 0 auto;
   margin-top: auto;
+  overflow: visible;
 }
-html body .sidebar-bin .nav-badge.muted {
-  background: rgba(255, 255, 255, 0.18);
+html body .sidebar .sidebar-bin .sidebar-bin-icon {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  margin-right: 4px;
+  overflow: visible;
+}
+html body .sidebar-bin-count {
+  position: absolute;
+  top: -8px;
+  right: -9px;
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border: 2px solid var(--c-blue-15-2);
+  border-radius: 999px;
+  background: #d64541;
+  color: #fff;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
 }
 /* Phone: title and Filters on the first line, the search field on its own full-width line. */
 /* Composition & preparation: one compact line for who/when/how many, checks as tidy cards, the accepted
@@ -3020,7 +3043,7 @@ html body .movement-clean-error {
 }
 /* Issues: columns sized by name (the photos column comes and goes); actions read as words. */
 html body .issues-fixed th.col-status {
-  width: 104px;
+  width: 150px;
 }
 html body .issues-fixed .issue-actions-row {
   justify-content: flex-end;
@@ -4829,43 +4852,6 @@ html body .issues-layout:not(.solo) {
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   gap: 10px;
-}
-html body .issues-layout > .problem-aside {
-  order: -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
-  margin-top: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-}
-html body .problem-aside h2 {
-  margin: 0;
-  color: var(--c-gray-45);
-  font-size: 12px;
-  font-weight: 500;
-}
-html body .problem-aside .problem-kpis {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-html body .problem-aside .problem-kpi {
-  gap: 6px;
-  width: auto;
-  padding: 3px 10px;
-  border: 1px solid var(--c-gray-90);
-  border-left-width: 3px;
-  border-radius: 999px;
-  background: var(--c-white);
-}
-html body .problem-aside .problem-kpi span {
-  font-size: 12.5px;
-}
-html body .problem-aside .problem-kpi b {
-  font-size: 13px;
 }
 /* A record on two short lines: what it is on one line (the whole name in the tooltip), its kind, department and
    note under it. */

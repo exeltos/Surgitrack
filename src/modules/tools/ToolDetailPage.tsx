@@ -3,7 +3,6 @@ import {useState} from 'react';
 import BrowseArrows from '../../components/assets/BrowseArrows';
 import {Link, useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {
-  ArrowLeft,
   ArrowRightLeft,
   Barcode,
   Copy,
@@ -127,9 +126,7 @@ export default function ToolDetailPage() {
     <div className="asset-detail-workspace tool-detail-workspace legacy-inspired-workspace">
       <div className="asset-workbench-actions">
         <div className="asset-action-group">
-          <BackLink fallback={backTo} className="asset-action-link">
-            <ArrowLeft size={18} /> {tr('Πίσω στη λίστα')}
-          </BackLink>
+          <BackLink fallback={backTo} className="asset-action-link" />
           {!departmentView && <BrowseArrows base="/tools" id={tool.id} />}
         </div>
         <div className="asset-action-group">

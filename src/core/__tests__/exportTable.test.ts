@@ -16,7 +16,7 @@ describe('tableReportHtml', () => {
     expect(html).toContain('<h1>Ιστορικό κινήσεων</h1>');
     expect(html).toContain('<th>Ενέργεια</th>');
     expect(html).toContain('&lt;Παραλαβή&gt;');
-    expect(html).toContain('<footer>1 εγγραφή</footer>');
+    expect(html).toContain('<span>1 εγγραφή</span>');
   });
 
   it('escapes quotes and apostrophes in cells', () => {

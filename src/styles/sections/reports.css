@@ -73,39 +73,6 @@
     grid-template-columns: 1fr;
   }
 }
-html body .reports-summary {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-html body .reports-summary button {
-  text-align: left;
-  border: 1px solid var(--line, #d8e1e5);
-  background: var(--panel, #fff);
-  cursor: pointer;
-}
-html body .reports-summary button b {
-  line-height: 1.1;
-}
-html body .reports-summary button span {
-  font-size: 0.8rem;
-  color: var(--muted, #6b7f8a);
-}
-html body .reports-summary button.warn {
-  border-color: #e0a63a;
-}
-html body .reports-summary button.bad {
-  border-color: #d0503f;
-}
-html body .reports-summary button.active {
-  outline: 2px solid var(--primary, #0f6bb8);
-}
-html body .reports-summary button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
 html body .reports-close-list {
   border: 0;
   background: none;
@@ -158,16 +125,6 @@ html body .reports-stage-head {
 }
 html body .reports-overview {
   grid-template-columns: minmax(0, 1fr);
-}
-html body .reports-summary {
-  gap: 8px;
-}
-html body .reports-summary button {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-  border-radius: 999px;
 }
 
 /* Fewer frames: the report choices sit on the page itself, and inside the report there is one card, not cards in cards. */
@@ -260,16 +217,6 @@ html body .reports-overview {
   gap: 6px 10px;
   padding: 4px 16px 6px;
 }
-html body .reports-overview .reports-summary {
-  flex: 1 1 auto;
-  margin: 0;
-}
-html body .reports-summary button {
-  padding: 3px 10px;
-}
-html body .reports-summary button b {
-  font-size: 0.95rem;
-}
 
 /* Reports in two levels: the category (Εξοπλισμός · Αποστείρωση · Παραδόσεις) as tabs, and under them only the
    reports of that category. Nothing from different categories sits side by side. */
@@ -347,22 +294,39 @@ html body .reports-table tbody tr:hover {
 
 /* The inventory by department or specialty: each group opens with its own line — the name and how many — and its
    rows follow without a group column. */
+/* A group (a department, a specialty) opens with a band of its own: its name, how many, and of which kind. */
 html body .reports-table tr.report-group-row th {
-  padding: 14px 12px 6px;
-  border-top: 1px solid var(--c-gray-90);
-  background: none;
-  color: var(--c-cyan-20);
-  font-size: 13px;
+  padding: 9px 12px;
+  border-top: 10px solid var(--c-white);
+  border-left: 3px solid #1f7a93;
+  background: #eef6f8;
+  color: var(--c-blue-15-2);
+  font-size: 14px;
   font-weight: 600;
   text-align: left;
   text-transform: none;
   letter-spacing: 0;
 }
 html body .reports-table tr.report-group-row:first-child th {
-  border-top: 0;
+  border-top-width: 0;
 }
-html body .reports-table tr.report-group-row th span {
+html body .reports-table tr.report-group-row .report-group-total,
+html body .reports-table tr.report-group-row .report-group-part {
+  display: inline-block;
   margin-left: 8px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  vertical-align: 1px;
+}
+html body .reports-table tr.report-group-row .report-group-total {
+  background: #1f7a93;
+  color: #fff;
+  font-weight: 700;
+}
+html body .reports-table tr.report-group-row .report-group-part {
+  margin-left: 6px;
+  background: var(--c-white);
   color: var(--c-gray-45);
   font-weight: 500;
 }
@@ -494,63 +458,6 @@ html body .reports-page-workspace .reports-overview {
   gap: 8px;
   padding-top: 12px;
 }
-html body .reports-page-workspace .reports-overview .reports-summary {
-  display: flex;
-  flex: 1 1 auto;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-html body .reports-page-workspace .reports-summary li {
-  display: flex;
-  flex: 1 1 0;
-  min-width: 0;
-}
-html body .reports-page-workspace .reports-summary button {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-  min-height: 40px;
-  padding: 7px 14px 6px;
-  border: 1px solid var(--c-gray-90);
-  border-bottom-width: 2px;
-  border-radius: 10px;
-  background: var(--c-white);
-  color: var(--st-muted);
-  font: inherit;
-  font-size: 13px;
-  text-align: left;
-}
-html body .reports-page-workspace .reports-summary button b {
-  color: var(--c-blue-15-2);
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-  font-weight: 650;
-  line-height: 1;
-}
-html body .reports-page-workspace .reports-summary button.warn b {
-  color: var(--c-orange-45-3);
-}
-html body .reports-page-workspace .reports-summary button.bad b {
-  color: var(--c-red-40-2);
-}
-html body .reports-page-workspace .reports-summary button.active {
-  border-color: var(--c-gray-90);
-  border-bottom-color: var(--c-cyan-35);
-  background: var(--c-gray-100-2);
-  color: var(--c-cyan-20);
-  font-weight: 600;
-}
-html body .reports-page-workspace .reports-summary button:disabled {
-  opacity: 1;
-  cursor: default;
-}
-html body .reports-page-workspace .reports-summary button:disabled b {
-  color: var(--c-gray-65);
-}
 
 /* Reports on the page itself, as every other list: no frame around the report (its tabs, figures and list sit on
    the page), Filters and the download on the right of the report's tabs. */
@@ -628,4 +535,30 @@ html body .reports-page-workspace .reports-table .badge-in_department::before {
     flex: none;
     white-space: nowrap;
   }
+}
+/* Room between the tabs, the figures, the search and the list: nothing touches. */
+html body .reports-page-workspace .reports-overview {
+  margin: 12px 0 10px;
+}
+/* A report of few columns: the name does not take most of the width, so what follows sits near it. */
+html body .reports-table:not(:has(thead th:nth-child(5))) th:first-child {
+  width: 40%;
+}
+html body .reports-page-workspace .reports-filter-bar {
+  margin-bottom: 14px;
+}
+/* Under the name: the barcode (in its colour), then whether it is a Set or an instrument, quietly. */
+html body .reports-table .registry-row-barcode {
+  color: var(--c-gray-45);
+  font-weight: 400;
+}
+html body .reports-table .registry-row-barcode .mono {
+  color: var(--c-cyan-35);
+  font-weight: 600;
+}
+/* The figures take the row's full width, as above every other list. */
+html body .reports-page-workspace .reports-overview > .quick-filters {
+  flex: 1 1 100%;
+  width: 100%;
+  margin: 0;
 }

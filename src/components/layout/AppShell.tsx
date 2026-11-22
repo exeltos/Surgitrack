@@ -1,6 +1,7 @@
 import {Fragment, Suspense, useCallback, useEffect, useRef, useState, type ReactNode} from 'react';
 import {personDepartment, personName} from '../../core/personName';
 import {NavLink, useLocation} from 'react-router-dom';
+import {rememberPath} from '../../core/backTarget';
 import {useGuardedNavigate, useLeave} from '../../app/UnsavedChanges';
 import {
   Accessibility,
@@ -216,6 +217,8 @@ export default function AppShell({
   // From the screen lock the user already chose to sign in as someone else: no second question.
   const switchUser = onLogout && (() => leave(() => onLogout(true)));
   const location = useLocation();
+  // Each step's address, so «Πίσω» on a record can say where it returns to.
+  useEffect(() => rememberPath(location.pathname + location.search), [location.pathname, location.search]);
   const contentRef = useRef<HTMLElement>(null);
   useListMemory(contentRef);
   const isDemo = getRuntimeDataMode() === 'DEMO';
@@ -405,9 +408,12 @@ export default function AppShell({
           aria-label={`${binLabel}${binCount ? ` · ${binCount}` : ''}`}
           title={binLabel}
         >
-          <Trash2 size={18} />
+          {/* How many it holds, on the bin's corner: seen also when the menu is folded. */}
+          <span className="sidebar-bin-icon">
+            <Trash2 size={20} />
+            {binCount > 0 && <em className="sidebar-bin-count">{binCount}</em>}
+          </span>
           <span className="nav-label">{binLabel}</span>
-          {binCount > 0 && <em className="nav-badge muted">{binCount}</em>}
         </NavLink>
       )}
       <div className="sidebar-foot">
