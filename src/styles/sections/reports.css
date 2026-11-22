@@ -294,22 +294,39 @@ html body .reports-table tbody tr:hover {
 
 /* The inventory by department or specialty: each group opens with its own line — the name and how many — and its
    rows follow without a group column. */
+/* A group (a department, a specialty) opens with a band of its own: its name, how many, and of which kind. */
 html body .reports-table tr.report-group-row th {
-  padding: 14px 12px 6px;
-  border-top: 1px solid var(--c-gray-90);
-  background: none;
-  color: var(--c-cyan-20);
-  font-size: 13px;
+  padding: 9px 12px;
+  border-top: 10px solid var(--c-white);
+  border-left: 3px solid #1f7a93;
+  background: #eef6f8;
+  color: var(--c-blue-15-2);
+  font-size: 14px;
   font-weight: 600;
   text-align: left;
   text-transform: none;
   letter-spacing: 0;
 }
 html body .reports-table tr.report-group-row:first-child th {
-  border-top: 0;
+  border-top-width: 0;
 }
-html body .reports-table tr.report-group-row th span {
+html body .reports-table tr.report-group-row .report-group-total,
+html body .reports-table tr.report-group-row .report-group-part {
+  display: inline-block;
   margin-left: 8px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  vertical-align: 1px;
+}
+html body .reports-table tr.report-group-row .report-group-total {
+  background: #1f7a93;
+  color: #fff;
+  font-weight: 700;
+}
+html body .reports-table tr.report-group-row .report-group-part {
+  margin-left: 6px;
+  background: var(--c-white);
   color: var(--c-gray-45);
   font-weight: 500;
 }

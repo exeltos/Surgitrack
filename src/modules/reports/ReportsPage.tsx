@@ -422,9 +422,9 @@ export default function ReportsPage() {
   const groupKey =
     firstKey && (firstKey === 'department' || firstKey === 'specialty') && !order.sort ? firstKey : undefined;
   const tableColumns = groupKey ? screenColumns.slice(1) : screenColumns;
-  // Each group's size, and how many of it are Sets and how many instruments: «53 · 4 Σετ, 49 εργαλεία».
+  // Each group's size, and how many of it are Sets and how many instruments («53», «4 Σετ», «49 εργαλεία»).
   const groupSizes = useMemo(() => {
-    const sizes = new Map<string, string>();
+    const sizes = new Map<string, {total: number; parts: string[]}>();
     if (!groupKey) return sizes;
     const tally = new Map<string, {total: number; kinds: Map<string, number>}>();
     for (const row of viewRows) {
@@ -443,12 +443,10 @@ export default function ReportsPage() {
           ? tr('{0} Σετ', count)
           : `${count} ${cellText('kind', kind)}`;
     tally.forEach(({total, kinds}, key) =>
-      sizes.set(
-        key,
-        kinds.size > 1
-          ? `${total} · ${[...kinds].map(([kind, count]) => kindCount(kind, count)).join(', ')}`
-          : String(total),
-      ),
+      sizes.set(key, {
+        total,
+        parts: kinds.size > 1 ? [...kinds].map(([kind, count]) => kindCount(kind, count)) : [],
+      }),
     );
     return sizes;
   }, [groupKey, viewRows]);
@@ -622,7 +620,19 @@ export default function ReportsPage() {
                             <tr className="report-group-row">
                               <th colSpan={tableColumns.length} scope="rowgroup">
                                 {cellText(groupKey!, row[groupKey!]) || '—'}
-                                <span>{groupSizes.get(String(row[groupKey!] ?? ''))}</span>
+                                {(() => {
+                                  const size = groupSizes.get(String(row[groupKey!] ?? ''));
+                                  return (
+                                    <>
+                                      <span className="report-group-total">{size?.total}</span>
+                                      {size?.parts.map(part => (
+                                        <small key={part} className="report-group-part">
+                                          {part}
+                                        </small>
+                                      ))}
+                                    </>
+                                  );
+                                })()}
                               </th>
                             </tr>
                           )}
