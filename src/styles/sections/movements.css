@@ -56,9 +56,6 @@ html body .ledger-user small.ledger-account-differs {
   color: var(--c-orange-45-2);
   font-weight: 600;
 }
-html body .movement-detail-grid .movement-account.differs strong {
-  color: var(--c-orange-45-2);
-}
 @media (max-width: 1280px) {
   html body .ledger-columns,
   html body .ledger-row {
@@ -115,16 +112,12 @@ html body .movement-detail-grid .movement-account.differs strong {
   }
 }
 /* Movement details: the patient row has no icon; its label and value sit in the text column. */
-html body .movement-detail-grid .movement-patient > span,
-html body .movement-detail-grid .movement-patient > strong {
-  grid-column: 2;
-}
 /* Movement details: straight to the item's card or its trail. */
 html body .movement-detail-links {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px 24px 0;
+  padding: 14px 24px 18px;
 }
 html body .movement-detail-links .app-button {
   text-decoration: none;
@@ -229,4 +222,34 @@ html body .ledger-row .ledger-route svg {
   flex: 0 0 auto;
   width: 13px;
   height: 13px;
+}
+/* Movement details: the item in the head, what was done under it, then the facts as one light strip. */
+html body .movement-detail-head small {
+  color: var(--c-gray-45);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+html body .movement-detail-action {
+  display: grid;
+  gap: 3px;
+  padding: 16px 24px 4px;
+}
+html body .movement-detail-action > span {
+  color: var(--c-gray-45);
+  font-size: 11.5px;
+}
+html body .movement-detail-action > strong {
+  color: var(--c-blue-15-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+html body .movement-detail-action > small {
+  color: var(--c-gray-45);
+  font-size: 13px;
+}
+html body .movement-detail .trace-info {
+  margin: 12px 24px 4px;
+}
+html body .movement-detail .movement-account-differs {
+  color: var(--c-orange-45-2);
 }
