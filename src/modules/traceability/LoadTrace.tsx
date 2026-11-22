@@ -110,9 +110,10 @@ export default function LoadTrace({
         </form>
         <section className="trace-recent-list trace-loads">
           <h3 className="trace-section-title">{filtered ? tr('Βρέθηκαν {0}', shown.length) : tr('Πρόσφατα φορτία')}</h3>
+          {/* Unfiltered, the last 30; once narrowed, every load found, however many days back. */}
           {shown.length ? (
             <ul>
-              {shown.slice(0, filtered ? 100 : 30).map(l => (
+              {(filtered ? shown : shown.slice(0, 30)).map(l => (
                 <li key={l.id}>
                   <button
                     type="button"
