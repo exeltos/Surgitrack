@@ -26,7 +26,7 @@ const bodyRows = () =>
 const groups = () =>
   within(results())
     .queryAllByRole('rowheader')
-    .map(h => ({name: h.firstChild!.textContent, size: Number(h.querySelector('span')!.textContent)}));
+    .map(h => ({name: h.firstChild!.textContent, size: parseInt(h.querySelector('span')!.textContent!, 10)}));
 const column = (label: string) => {
   const headers = within(results())
     .getAllByRole('columnheader')
@@ -84,7 +84,7 @@ describe('Reports', () => {
   it('a sort shows the plain table, the group column too, both ways; a third click brings the groups back', () => {
     renderPage(<ReportsPage />);
     const header = (name: string) => within(results()).getByRole('columnheader', {name: new RegExp(`^${name}`)});
-    fireEvent.click(within(header('Τύπος')).getByRole('button'));
+    fireEvent.click(within(header('Ονομασία')).getByRole('button'));
     expect(groups()).toEqual([]);
     const department = () => within(header('Τμήμα')).getByRole('button');
     fireEvent.click(department());
@@ -142,10 +142,13 @@ describe('Reports', () => {
     const everything = bodyRows().length;
     expect(everything).toBeGreaterThan(0);
     fireEvent.click(within(screen.getByRole('list', {name: 'Σύνολα'})).getByRole('button', {name: /Σετ/}));
-    expect(new Set(column('Τύπος'))).toEqual(new Set(['Σετ']));
+    // Set or instrument is said under each name, after its barcode.
+    const kinds = () =>
+      new Set([...results().querySelectorAll('.registry-row-barcode')].map(sub => sub.textContent!.split(' · ').pop()));
+    expect(kinds()).toEqual(new Set(['Σετ']));
     expect(bodyRows().length).toBeLessThan(everything);
     fireEvent.click(screen.getByRole('button', {name: 'Εμφάνιση όλων'}));
-    expect(new Set(column('Τύπος')).size).toBeGreaterThan(1);
+    expect(kinds().size).toBeGreaterThan(1);
     // The split by department is gone: the Filters cover it.
     expect(screen.queryByRole('group', {name: 'Ανά τμήμα'})).not.toBeInTheDocument();
     // Every row of the demo data, rendered three times: slow on a busy CI runner.

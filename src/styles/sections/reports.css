@@ -262,7 +262,6 @@ html body .reports-overview {
 }
 html body .reports-overview .reports-summary {
   flex: 1 1 auto;
-  margin: 0;
 }
 html body .reports-summary button {
   padding: 3px 10px;
@@ -628,4 +627,86 @@ html body .reports-page-workspace .reports-table .badge-in_department::before {
     flex: none;
     white-space: nowrap;
   }
+}
+/* The report's figures: one light strip on top, as in Traceability — label over value, thin dividers. Each still
+   narrows the list when pressed. */
+html body .reports-overview .reports-summary {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 0;
+  width: 100%;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--c-gray-90);
+  border-bottom: 1px solid var(--c-gray-90);
+}
+html body .reports-overview .reports-summary li + li {
+  border-left: 1px solid var(--c-gray-90);
+}
+html body .reports-overview .reports-summary button {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  margin: 0;
+  padding: 3px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  box-shadow: none;
+  outline: 0;
+}
+html body .reports-overview .reports-summary li:first-child button {
+  padding-left: 4px;
+}
+html body .reports-overview .reports-summary button:hover:not(:disabled) {
+  background: var(--c-gray-95);
+}
+html body .reports-overview .reports-summary button b {
+  color: var(--c-blue-15-2);
+  font-size: 18px;
+  font-weight: 600;
+}
+html body .reports-overview .reports-summary button span {
+  color: var(--c-gray-45);
+  font-size: 11.5px;
+}
+html body .reports-overview .reports-summary button.warn b {
+  color: #a36a12;
+}
+html body .reports-overview .reports-summary button.bad b {
+  color: #b3261e;
+}
+html body .reports-overview .reports-summary button.active {
+  box-shadow: inset 0 -2px 0 #1f7a93;
+}
+html body .reports-overview .reports-summary button.active b {
+  color: #1f7a93;
+}
+html body .reports-overview .reports-summary button:focus-visible {
+  outline: 2px solid #1f7a93;
+}
+@media (max-width: 720px) {
+  html body .reports-overview .reports-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+  }
+}
+/* Room between the tabs, the figures, the search and the list: nothing touches. */
+html body .reports-page-workspace .reports-overview {
+  margin: 12px 0 14px;
+}
+html body .reports-page-workspace .reports-filter-bar {
+  margin-bottom: 14px;
+}
+/* Under the name: the barcode (in its colour), then whether it is a Set or an instrument, quietly. */
+html body .reports-table .registry-row-barcode {
+  color: var(--c-gray-45);
+  font-weight: 400;
+}
+html body .reports-table .registry-row-barcode .mono {
+  color: var(--c-cyan-35);
+  font-weight: 600;
 }

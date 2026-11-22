@@ -1,5 +1,9 @@
-import {SortTh} from '../../components/ui/SortHeader';
-import {useTableSort} from '../../components/ui/useTableSort';
+import AssetFilterBar from '../../components/assets/AssetFilterBar';
+import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
+import DownloadMenu from '../../components/ui/DownloadMenu';
+import QuickFilters from '../../components/ui/QuickFilters';
+import {tableReportHtml, type ExportTable} from '../../core/exportTable';
+import {SplitEmpty} from '../traceability/InfoList';
 import {useEffect, useState} from 'react';
 import {Cable, Layers3, Palette, RotateCcw, Tags, Trash2, TriangleAlert, Wrench} from 'lucide-react';
 import {deviceClockTrusted} from '../../data/cloud/clockCheck';
@@ -15,7 +19,7 @@ import type {ColorTape} from '../../core/colorTapes';
 import type {LibraryItem} from '../../core/libraries';
 import type {LibraryKey} from '../../core/libraryTypes';
 import type {BinEntry} from '../../types/domain';
-import {tr, trData} from '../../i18n';
+import {getI18nLang, tr, trData} from '../../i18n';
 import {formatDateTime} from '../../core/displayDate';
 
 const when = (iso: string) => formatDateTime(iso);
@@ -38,6 +42,17 @@ const KIND: Record<BinEntry['kind'], {label: string; icon: typeof Layers3}> = {
   DEVICE: {label: 'Συσκευή', icon: Cable},
   ISSUE: {label: 'Αναφορά προβλήματος', icon: TriangleAlert},
 };
+
+/** The quick filters name the kinds in the plural, as lists. */
+const pluralOf = (kind: BinEntry['kind']) =>
+  ({
+    SET: tr('Σετ'),
+    TOOL: tr('Εργαλεία'),
+    LIBRARY: tr('Βιβλιοθήκες Studio'),
+    COLOR_TAPE: tr('Ταινίες χρώματος'),
+    DEVICE: tr('Συσκευές'),
+    ISSUE: tr('Αναφορές προβλημάτων'),
+  })[kind];
 
 const detailOf = (entry: BinEntry) =>
   entry.kind === 'LIBRARY'
@@ -66,13 +81,36 @@ export default function BinPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const entries = recycleBin.filter(entry => !isExpired(entry));
-  const order = useTableSort(entries, {
-    kind: entry => tr(KIND[entry.kind].label),
-    label: entry => entry.label,
-    detail: entry => detailOf(entry),
-    deletedAt: entry => Date.parse(entry.deletedAt),
-    left: entry => daysLeft(entry),
+  const entries = recycleBin
+    .filter(entry => !isExpired(entry))
+    .sort((x, y) => Date.parse(y.deletedAt) - Date.parse(x.deletedAt));
+  const [query, setQuery] = useState('');
+  const [kind, setKind] = useState<BinEntry['kind'] | ''>('');
+  const [report, setReport] = useState<string | null>(null);
+  const needle = query.trim().toLowerCase();
+  const matches = (entry: BinEntry) =>
+    !needle ||
+    [entry.label, detailOf(entry), entry.deletedByName, tr(KIND[entry.kind].label)].some(text =>
+      String(text || '')
+        .toLowerCase()
+        .includes(needle),
+    );
+  const found = entries.filter(matches);
+  const shown = found.filter(entry => !kind || entry.kind === kind);
+  // One quick filter per kind the bin holds, with how many of each the search finds.
+  const kinds = (Object.keys(KIND) as BinEntry['kind'][]).filter(k => entries.some(entry => entry.kind === k));
+  const table = (): ExportTable => ({
+    title: tr('Κάδος'),
+    subtitle: tr('{0} εγγραφές', shown.length),
+    headers: [tr('Τύπος'), tr('Αντικείμενο'), tr('Λεπτομέρεια'), tr('Διαγράφηκε'), tr('Από'), tr('Λήγει σε')],
+    rows: shown.map(entry => [
+      tr(KIND[entry.kind].label),
+      entry.label,
+      detailOf(entry),
+      when(entry.deletedAt),
+      entry.deletedByName || '',
+      tr('{0} ημέρες', daysLeft(entry)),
+    ]),
   });
 
   // Studio libraries are saved by the hospital admin only, so only an admin can put one back.
@@ -124,96 +162,134 @@ export default function BinPage() {
           {notice.text}
         </div>
       )}
+      {entries.length > 0 && (
+        <>
+          {/* The counts on top, the search under them, as on every list. */}
+          <QuickFilters
+            items={[
+              {key: 'all', label: tr('Όλα'), count: found.length, active: !kind, onClick: () => setKind('')},
+              ...kinds.map(k => ({
+                key: k,
+                label: pluralOf(k),
+                count: found.filter(entry => entry.kind === k).length,
+                active: kind === k,
+                onClick: () => setKind(kind === k ? '' : k),
+              })),
+            ]}
+          />
+          <AssetFilterBar
+            query={query}
+            onQueryChange={setQuery}
+            placeholder={tr('Αναζήτηση: όνομα, barcode, ποιος το διέγραψε…')}
+            extra={
+              <>
+                <DownloadMenu table={table} onPrint={() => setReport(tableReportHtml(table(), getI18nLang()))} />
+                <button
+                  type="button"
+                  className="bin-empty-all"
+                  onClick={() =>
+                    ask({
+                      title: tr('Άδειασμα κάδου;'),
+                      message: tr(
+                        'Διαγράφονται για πάντα {0} εγγραφές και δεν θα μπορούν να επανέλθουν.',
+                        entries.length,
+                      ),
+                      confirmLabel: tr('Άδειασμα κάδου'),
+                      danger: true,
+                      onConfirm: () => entries.forEach(entry => purgeFromBin(entry.id)),
+                    })
+                  }
+                >
+                  <Trash2 size={15} /> {tr('Άδειασμα κάδου')}
+                </button>
+              </>
+            }
+          />
+        </>
+      )}
       <ScrollableListPanel ariaLabel={tr('Κάδος')} className={entries.length ? undefined : 'bin-empty-panel'}>
-        {entries.length ? (
-          <table className="asset-registry-table bin-table">
-            <thead>
-              <tr>
-                <SortTh label={tr('Τύπος')} sortKey="kind" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Αντικείμενο')} sortKey="label" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Λεπτομέρεια')} sortKey="detail" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Διαγράφηκε')} sortKey="deletedAt" sort={order.sort} onSort={order.toggle} />
-                <SortTh label={tr('Λήγει σε')} sortKey="left" sort={order.sort} onSort={order.toggle} />
-                <th>
-                  <span className="visually-hidden">{tr('Ενέργειες')}</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {order.rows.map(entry => {
-                const Icon = KIND[entry.kind].icon;
-                return (
-                  <tr key={entry.id}>
-                    <td>
-                      <span className="bin-kind">
-                        <Icon size={14} />
-                        {tr(KIND[entry.kind].label)}
-                      </span>
-                    </td>
-                    <td>
-                      <strong>{entry.label}</strong>
-                    </td>
-                    <td>{detailOf(entry)}</td>
-                    <td>
-                      {when(entry.deletedAt)}
-                      <small className="bin-by">{entry.deletedByName}</small>
-                    </td>
-                    <td>{tr('{0} ημέρες', daysLeft(entry))}</td>
-                    <td>
-                      <div className="bin-actions">
-                        <button
-                          type="button"
-                          className="issue-action wide"
-                          disabled={!canRestore(entry)}
-                          title={
-                            canRestore(entry) ? undefined : tr('Μόνο ο Διαχειριστής επαναφέρει εγγραφές βιβλιοθηκών.')
-                          }
-                          onClick={() =>
-                            ask({
-                              title: tr('Επαναφορά;'),
-                              message: tr('Το «{0}» επανέρχεται όπως ήταν πριν τη διαγραφή.', entry.label),
-                              confirmLabel: tr('Επαναφορά'),
-                              onConfirm: () => void restore(entry),
-                            })
-                          }
-                        >
-                          <RotateCcw size={14} /> {tr('Επαναφορά')}
-                        </button>
-                        <button
-                          type="button"
-                          className="issue-action danger"
-                          title={tr('Οριστική διαγραφή')}
-                          aria-label={tr('Οριστική διαγραφή')}
-                          onClick={() =>
-                            ask({
-                              title: tr('Οριστική διαγραφή;'),
-                              message: tr(
-                                'Το «{0}» διαγράφεται για πάντα και δεν θα μπορεί να επανέλθει.',
-                                entry.label,
-                              ),
-                              confirmLabel: tr('Οριστική διαγραφή'),
-                              danger: true,
-                              onConfirm: () => purgeFromBin(entry.id),
-                            })
-                          }
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ) : (
+        {shown.length ? (
+          <ul className="bin-list">
+            {shown.map(entry => {
+              const Icon = KIND[entry.kind].icon;
+              const left = daysLeft(entry);
+              return (
+                <li key={entry.id}>
+                  <span className="bin-icon" aria-hidden="true">
+                    <Icon size={17} />
+                  </span>
+                  <span className="bin-name">
+                    <b>{entry.label}</b>
+                    <small>
+                      {tr(KIND[entry.kind].label)}
+                      {detailOf(entry) !== '—' && ` · ${detailOf(entry)}`}
+                    </small>
+                  </span>
+                  <span className="bin-when">
+                    {when(entry.deletedAt)}
+                    {entry.deletedByName && <small>{tr('Διαγράφηκε από {0}', entry.deletedByName)}</small>}
+                  </span>
+                  {/* How long it stays: amber in its last days. */}
+                  <span className={`bin-left${left <= 5 ? ' soon' : ''}`}>
+                    {left === 1 ? tr('Σε 1 ημέρα') : tr('Σε {0} ημέρες', left)}
+                    <span className="bin-track" aria-hidden="true">
+                      <i style={{width: `${Math.max(4, Math.min(100, (left / BIN_DAYS) * 100))}%`}} />
+                    </span>
+                  </span>
+                  <span className="bin-actions">
+                    <button
+                      type="button"
+                      className="bin-restore"
+                      disabled={!canRestore(entry)}
+                      title={canRestore(entry) ? undefined : tr('Μόνο ο Διαχειριστής επαναφέρει εγγραφές βιβλιοθηκών.')}
+                      onClick={() =>
+                        ask({
+                          title: tr('Επαναφορά;'),
+                          message: tr('Το «{0}» επανέρχεται όπως ήταν πριν τη διαγραφή.', entry.label),
+                          confirmLabel: tr('Επαναφορά'),
+                          onConfirm: () => void restore(entry),
+                        })
+                      }
+                    >
+                      <RotateCcw size={14} /> {tr('Επαναφορά')}
+                    </button>
+                    <button
+                      type="button"
+                      className="bin-purge"
+                      title={tr('Οριστική διαγραφή')}
+                      aria-label={tr('Οριστική διαγραφή')}
+                      onClick={() =>
+                        ask({
+                          title: tr('Οριστική διαγραφή;'),
+                          message: tr('Το «{0}» διαγράφεται για πάντα και δεν θα μπορεί να επανέλθει.', entry.label),
+                          confirmLabel: tr('Οριστική διαγραφή'),
+                          danger: true,
+                          onConfirm: () => purgeFromBin(entry.id),
+                        })
+                      }
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        ) : entries.length ? (
           <EmptyState
             icon={<Trash2 size={22} />}
+            title={tr('Δεν βρέθηκε τίποτα')}
+            description={tr('Αλλάξτε ή καθαρίστε την αναζήτηση.')}
+          />
+        ) : (
+          <SplitEmpty
+            icon={Trash2}
             title={tr('Ο Κάδος είναι άδειος')}
-            description={tr('Ό,τι διαγράφεις θα εμφανίζεται εδώ.')}
+            text={tr('Ό,τι διαγράφεται θα εμφανίζεται εδώ για {0} ημέρες.', BIN_DAYS)}
           />
         )}
       </ScrollableListPanel>
+      {report && <PrintPreviewModal title={tr('Κάδος')} html={report} onClose={() => setReport(null)} />}
       {confirm}
     </div>
   );

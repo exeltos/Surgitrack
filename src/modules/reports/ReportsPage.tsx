@@ -391,10 +391,11 @@ export default function ReportsPage() {
             {key: 'releasedInfo', label: tr('Αποδέσμευση')},
           ]
         : reportData.columns;
-    // A report with a barcode and a name shows the barcode under the name, not in a column of its own.
-    const underName = columns.some(c => c.key === 'barcode') && columns.some(c => c.key === 'name');
+    // A report with a barcode and a name shows the barcode, and whether it is a Set or an instrument, under the name,
+    // not in columns of their own.
+    const hasName = columns.some(c => c.key === 'name');
     return columns
-      .filter(c => !(underName && c.key === 'barcode'))
+      .filter(c => !(hasName && (c.key === 'barcode' || c.key === 'kind')))
       .filter(c =>
         reportData.rows.some((row: Row) => {
           const value = String(row[c.key] ?? '').trim();
@@ -420,11 +421,34 @@ export default function ReportsPage() {
   const groupKey =
     firstKey && (firstKey === 'department' || firstKey === 'specialty') && !order.sort ? firstKey : undefined;
   const tableColumns = groupKey ? screenColumns.slice(1) : screenColumns;
+  // Each group's size, and how many of it are Sets and how many instruments: «53 · 4 Σετ, 49 εργαλεία».
   const groupSizes = useMemo(() => {
-    const sizes = new Map<string, number>();
-    if (groupKey)
-      for (const row of viewRows)
-        sizes.set(String(row[groupKey] ?? ''), (sizes.get(String(row[groupKey] ?? '')) || 0) + 1);
+    const sizes = new Map<string, string>();
+    if (!groupKey) return sizes;
+    const tally = new Map<string, {total: number; kinds: Map<string, number>}>();
+    for (const row of viewRows) {
+      const key = String(row[groupKey] ?? '');
+      const entry = tally.get(key) || {total: 0, kinds: new Map<string, number>()};
+      entry.total += 1;
+      if (row.kind) entry.kinds.set(String(row.kind), (entry.kinds.get(String(row.kind)) || 0) + 1);
+      tally.set(key, entry);
+    }
+    const kindCount = (kind: string, count: number) =>
+      kind === 'Εργαλείο'
+        ? count === 1
+          ? tr('1 εργαλείο')
+          : tr('{0} εργαλεία', count)
+        : kind === 'Σετ'
+          ? tr('{0} Σετ', count)
+          : `${count} ${cellText('kind', kind)}`;
+    tally.forEach(({total, kinds}, key) =>
+      sizes.set(
+        key,
+        kinds.size > 1
+          ? `${total} · ${[...kinds].map(([kind, count]) => kindCount(kind, count)).join(', ')}`
+          : String(total),
+      ),
+    );
     return sizes;
   }, [groupKey, viewRows]);
   const shownRows = useProgressiveList(
@@ -451,6 +475,8 @@ export default function ReportsPage() {
       query,
     ].join('|'),
   );
+  // «Σετ» or «Εργαλείο» under a name only where the report holds both.
+  const mixedKinds = new Set(reportData.rows.map((row: Row) => row.kind).filter(Boolean)).size > 1;
   const resultBody = useFitWidth<HTMLDivElement>([reportData, shownRows.visible.length]);
   const reportTable = (): ExportTable => ({
     title: tr(activeMeta.title),
@@ -634,8 +660,13 @@ export default function ReportsPage() {
                                     <Printer size={13} aria-hidden="true" />
                                   </button>
                                 ) : null}
-                                {c.key === 'name' && screenColumns.every(x => x.key !== 'barcode') && row.barcode ? (
-                                  <small className="row-sub mono registry-row-barcode">{String(row.barcode)}</small>
+                                {c.key === 'name' && (row.barcode || (mixedKinds && row.kind)) ? (
+                                  <small className="row-sub registry-row-barcode">
+                                    {row.barcode ? <span className="mono">{String(row.barcode)}</span> : null}
+                                    {mixedKinds && row.kind
+                                      ? `${row.barcode ? ' · ' : ''}${cellText('kind', row.kind)}`
+                                      : ''}
+                                  </small>
                                 ) : null}
                               </td>
                             ))}
