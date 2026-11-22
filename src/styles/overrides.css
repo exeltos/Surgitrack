@@ -2322,42 +2322,7 @@ html body .registry-fixed .badge {
   }
 }
 /* Issues table: object + type/department on two lines, note takes the free width, actions never cut off. */
-html body .issues-fixed {
-  table-layout: fixed;
-  width: 100%;
-  min-width: 0;
-}
-html body .issues-fixed th:nth-child(1) {
-  width: 30%;
-}
-html body .issues-fixed th:nth-child(2) {
-  width: auto;
-}
-html body .issues-fixed th:nth-child(3) {
-  width: 150px;
-}
-html body .issues-fixed th:nth-child(4) {
-  width: 110px;
-}
-html body .issues-fixed th:nth-child(5) {
-  width: 100px;
-}
-html body .issues-fixed th:nth-child(6) {
-  width: 132px;
-}
-html body .issues-fixed td {
-  min-width: 0;
-}
 /* The item and the note (what is wrong) read in up to two lines instead of ending in «…». */
-html body .issues-fixed .issue-asset,
-html body .issues-fixed td.issue-note > span {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  white-space: normal;
-  line-height: 1.3;
-}
 /* Replacements table: fixed layout, the tool name takes the free width, actions are always fully visible. */
 html body .replacements-fixed {
   table-layout: fixed;
@@ -3042,12 +3007,6 @@ html body .movement-clean-error {
   font-weight: 600;
 }
 /* Issues: columns sized by name (the photos column comes and goes); actions read as words. */
-html body .issues-fixed th.col-status {
-  width: 104px;
-}
-html body .issues-fixed .issue-actions-row {
-  justify-content: flex-end;
-}
 /* Sets list: an expiry column after the state. */
 html body .sets-registry th:nth-child(8) {
   width: 40px;
@@ -3086,9 +3045,6 @@ html body .dash-activity-stats small {
 }
 /* Traceability: the last searches on this device, one tap to repeat. */
 /* Issues: room for «Επίλυση» and the icon actions beside it (order, open, delete), and no more. */
-html body .issues-fixed th.col-actions {
-  width: 160px;
-}
 /* Sets list: the name keeps its width next to the new expiry column. */
 html body .sets-registry th:nth-child(3) {
   width: 132px;
@@ -3116,8 +3072,7 @@ html body .expiry-table td:first-child .row-title-link {
 /* Tablet (landscape, laid out at 1280px, portrait ≤900px): every list keeps its key columns, names get two lines. */
 @media (max-width: 1280px) {
   html body .registry-fixed td:first-child .row-title-link,
-  html body .registry-fixed td:first-child .registry-asset-name strong,
-  html body .issues-fixed .issue-asset {
+  html body .registry-fixed td:first-child .registry-asset-name strong {
     white-space: normal;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -3180,13 +3135,6 @@ html body .expiry-table td:first-child .row-title-link {
   }
   html body .sets-registry th:nth-child(6) {
     width: 132px;
-  }
-  html body .issues-fixed th.col-actions {
-    width: 236px;
-  }
-  html body .issues-fixed .issue-actions-row {
-    flex-wrap: wrap;
-    gap: 6px;
   }
   html body .studio-manager-nav button {
     flex: 0 0 auto;
@@ -3519,18 +3467,14 @@ html body .sets-registry .set-count-short .muted {
 
 /* Issues and Replacements on a phone: each row is a card (the tables ran 100-370 px past the edge). */
 @media (max-width: 700px) {
-  html body .issues-fixed thead,
   html body .replacements-fixed thead {
     display: none;
   }
-  html body .issues-fixed,
-  html body .issues-fixed tbody,
   html body .replacements-fixed,
   html body .replacements-fixed tbody {
     display: block;
     width: 100%;
   }
-  html body .issues-fixed tbody tr,
   html body .replacements-fixed tbody tr {
     display: flex;
     flex-wrap: wrap;
@@ -3539,7 +3483,6 @@ html body .sets-registry .set-count-short .muted {
     padding: 10px 12px;
     border-bottom: 1px solid var(--c-gray-95);
   }
-  html body .issues-fixed tbody td,
   html body .replacements-fixed tbody td {
     display: block;
     width: auto !important;
@@ -3549,17 +3492,12 @@ html body .sets-registry .set-count-short .muted {
     border: 0;
     font-size: 12.5px;
   }
-  html body .issues-fixed tbody td:first-child {
-    flex: 1 0 100%;
-  }
   html body .replacements-fixed tbody td:nth-child(2) {
     flex: 1 0 calc(100% - 40px);
   }
-  html body .issues-fixed tbody td.issue-actions,
   html body .replacements-fixed tbody td.row-actions {
     flex: 1 0 100%;
   }
-  html body .issues-fixed .issue-actions-row,
   html body .replacements-fixed .row-actions {
     justify-content: flex-start;
     flex-wrap: wrap;
@@ -4853,54 +4791,8 @@ html body .issues-layout:not(.solo) {
   grid-template-rows: auto minmax(0, 1fr);
   gap: 10px;
 }
-html body .issues-layout > .problem-aside {
-  order: -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 10px;
-  margin-top: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-}
-html body .problem-aside h2 {
-  margin: 0;
-  color: var(--c-gray-45);
-  font-size: 12px;
-  font-weight: 500;
-}
-html body .problem-aside .problem-kpis {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-html body .problem-aside .problem-kpi {
-  gap: 6px;
-  width: auto;
-  padding: 3px 10px;
-  border: 1px solid var(--c-gray-90);
-  border-left-width: 3px;
-  border-radius: 999px;
-  background: var(--c-white);
-}
-html body .problem-aside .problem-kpi span {
-  font-size: 12.5px;
-}
-html body .problem-aside .problem-kpi b {
-  font-size: 13px;
-}
 /* A record on two short lines: what it is on one line (the whole name in the tooltip), its kind, department and
    note under it. */
-html body .issues-fixed td > .issue-asset {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-html body .issues-fixed .issue-age {
-  white-space: nowrap;
-}
 
 /* Every search box the same: 38 px high, a thin frame, the same type as the lists' search bar (13 px); the one in
    «Αντικαταστάσεις» as wide as the bar so «Φίλτρα» and «Λήψη» sit on its right as above every other list. */

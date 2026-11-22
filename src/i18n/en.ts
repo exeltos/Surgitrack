@@ -351,7 +351,6 @@ export const en: Record<string, string> = {
   'Αναφορά Σετ': 'Report set',
   'Αναφορά απόκλισης': 'Report deviation',
   Αναφορές: 'Reports',
-  'Προβλήματα και εκκρεμότητες του τμήματος {0}.': 'Problems and issues of department {0}.',
   Ανοικτές: 'Open',
   'Ανοιχτά προβλήματα': 'Open problems',
   'Ανοικτές εκκρεμότητες': 'Open issues',
@@ -438,8 +437,6 @@ export const en: Record<string, string> = {
   εκκρεμεί: 'due',
   εντάξει: 'up to date',
   ποτέ: 'never',
-  'Εξοπλισμός με πρόβλημα': 'Equipment with a problem',
-  'Κοντά στο όριο χρήσεων': 'Near the use limit',
   'Προηγούμενος σήμερα: {0} · {1}': 'Previous today: {0} · {1}',
   'Πρώτος κύκλος της ημέρας': 'First cycle of the day',
   '1 αντικείμενο': '1 item',
@@ -961,6 +958,10 @@ export const en: Record<string, string> = {
   Παρακολούθηση: 'Monitoring',
   'Πίσω στα Σετ & Εργαλεία': 'Back to Sets & Instruments',
   'Πίσω στη λίστα': 'Back to list',
+  Πρόβλημα: 'Problem',
+  'Διορθώθηκε από {0} στις {1}': 'Corrected by {0} on {1}',
+  'Διαλέξτε ένα πρόβλημα από τη λίστα για να δείτε τι αναφέρθηκε και τι μπορεί να γίνει.':
+    'Pick a problem from the list to see what was reported and what can be done.',
   'Αναζήτηση: όνομα, barcode, ποιος το διέγραψε…': 'Search: name, barcode, who deleted it…',
   'Άδειασμα κάδου;': 'Empty the recycle bin?',
   'Διαγράφονται για πάντα {0} εγγραφές και δεν θα μπορούν να επανέλθουν.':
@@ -1758,8 +1759,6 @@ export const en: Record<string, string> = {
   Προβλήματα: 'Problems',
   Δήλωσε: 'Reported by',
   'Αντικαταστάσεις & Παραγγελίες': 'Replacements & orders',
-  'Προβλήματα που αναφέρθηκαν και εργαλεία που πρέπει να αντικατασταθούν.':
-    'Reported problems and instruments that need replacing.',
   'Δείκτες στο φορτίο': 'Indicators in the load',
   Χημικός: 'Chemical',
   Βιολογικός: 'Biological',

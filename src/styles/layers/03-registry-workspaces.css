@@ -439,42 +439,6 @@
   display: grid;
   place-items: center;
 }
-.issue-table-photos {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 100px;
-}
-.issue-table-photos img {
-  width: 38px;
-  height: 32px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid var(--c-gray-90);
-}
-.issue-table-photos span {
-  font-size: 11px;
-  font-weight: 650;
-  color: var(--c-cyan-50-4);
-  background: var(--c-gray-95);
-  border-radius: 999px;
-  padding: 4px 6px;
-}
-.issue-no-photo {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--st-muted);
-}
-.issues-registry-table th:nth-child(5) {
-  min-width: 260px;
-}
-.issues-registry-table .issue-actions-row {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 6px;
-  min-width: 112px;
-}
 .issue-action {
   display: inline-flex;
   align-items: center;
