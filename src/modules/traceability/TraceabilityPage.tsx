@@ -209,6 +209,12 @@ export default function TraceabilityPage() {
             {/* The same search bar as above every other list; Enter or «Αναζήτηση» opens what was typed. */}
             <form
               className="asset-filter-bar trace-search-bar"
+              // The last searches stay open while the focus is anywhere in the bar (Tab reaches them), and close
+              // once it leaves.
+              onFocus={() => setRecentOpen(true)}
+              onBlur={e => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setRecentOpen(false);
+              }}
               onSubmit={e => {
                 e.preventDefault();
                 commit(q);
@@ -221,11 +227,7 @@ export default function TraceabilityPage() {
                   value={q}
                   onChange={e => setQ(e.target.value)}
                   onKeyDown={suggest.onKeyDown}
-                  onFocus={() => setRecentOpen(true)}
-                  onBlur={() => {
-                    setRecentOpen(false);
-                    if (needle) commit(q);
-                  }}
+                  onBlur={() => needle && commit(q)}
                   placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
                   aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
                 />

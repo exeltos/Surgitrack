@@ -34,6 +34,10 @@ describe('TraceabilityPage search', () => {
     expect(screen.queryByRole('list', {name: 'Πρόσφατες αναζητήσεις'})).toBeNull();
     fireEvent.focus(field());
     const menu = screen.getByRole('list', {name: 'Πρόσφατες αναζητήσεις'});
+    // Tab from the field to a recent search keeps the menu open.
+    const button = within(menu).getByRole('button', {name: /S000341/});
+    fireEvent.blur(field(), {relatedTarget: button});
+    expect(screen.getByRole('list', {name: 'Πρόσφατες αναζητήσεις'})).toBeInTheDocument();
     fireEvent.click(within(menu).getByRole('button', {name: /S000341/}));
     expect(document.querySelector('.trace-item-head .mono')?.textContent).toBe('S000341');
   });
