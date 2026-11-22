@@ -17,6 +17,23 @@ describe('Ιχνηλάτηση › Φορτίο κλιβάνου', () => {
     expect(screen.getByRole('button', {name: /Ανάκληση φορτίου/})).toBeInTheDocument();
   });
 
+  it('narrows the list as the sterilizer is chosen and the number typed', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?tab=load'});
+    const list = () => screen.getByRole('complementary', {name: 'Φορτία'}).querySelectorAll('.trace-loads li');
+    const all = list().length;
+    fireEvent.change(screen.getByLabelText('Κλίβανος'), {target: {value: 'Κλίβανος Ατμού 01'}});
+    expect(list().length).toBeLessThan(all);
+    [...list()].forEach(row => expect(row.textContent).toContain('Κλίβανος Ατμού 01'));
+    fireEvent.change(screen.getByLabelText('Κύκλος'), {target: {value: '2026-0928'}});
+    expect(list()).toHaveLength(1);
+    expect(screen.getByText('Βρέθηκαν 1')).toBeInTheDocument();
+  });
+
+  it('always shows the six cards, saying what was not recorded', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?tab=load&load=L-DEMO-0928'});
+    expect(document.querySelectorAll('.trace-info > div')).toHaveLength(6);
+  });
+
   it('says so when no such cycle was recorded', () => {
     renderPage(<TraceabilityPage />, {path: '/traceability?tab=load'});
     fireEvent.change(screen.getByLabelText('Κύκλος'), {target: {value: '9999'}});

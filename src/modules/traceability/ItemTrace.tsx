@@ -7,7 +7,7 @@ import {formatDate} from '../../core/displayDate';
 import {tr, trData} from '../../i18n';
 import {statusLabel} from '../../components/ui/statusLabel';
 import type {Movement, SetAsset, Tool} from '../../types/domain';
-import InfoList from './InfoList';
+import InfoList, {Missing} from './InfoList';
 import ItemHistory from './ItemHistory';
 import {daysUntil, isSetAsset, time, type CycleEntry, type Round} from './traceModel';
 
@@ -42,8 +42,6 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
   const daysLeft = daysUntil(sterileUntil);
   const uses = tool ? tool.uses : (asset as SetAsset).uses;
   const maxUses = tool?.maxUses;
-  const currentCycle = rounds[0]?.cycle;
-  const currentPatient = rounds[0]?.moves.some(m => m.patientCode && !undone.has(m.id));
 
   return (
     <>
@@ -77,8 +75,8 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               </>
             ),
           },
-          // What the current round already shows (its cycle, its patient) is not said again here.
-          !currentCycle && {
+          // Always the same cards, in the same places: what was never recorded says so.
+          {
             label: tr('Τελευταίος κύκλος'),
             value: lastCycle ? (
               <>
@@ -94,10 +92,10 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                 )}
               </>
             ) : (
-              '—'
+              <Missing />
             ),
           },
-          !currentPatient && {
+          {
             label: tr('Τελευταίος ασθενής'),
             value: lastPatient ? (
               <>
@@ -109,11 +107,10 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                 </small>
               </>
             ) : (
-              '—'
+              <Missing />
             ),
           },
-          // Uses and expiry only when there is something to say.
-          (!!maxUses || !!uses) && {
+          {
             label: tr('Χρήσεις'),
             value: maxUses ? (
               <>
@@ -122,11 +119,13 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                 </b>
                 <small>{tr('Απομένουν {0}', Math.max(0, maxUses - (uses ?? 0)))}</small>
               </>
+            ) : uses !== undefined && uses !== null ? (
+              <b>{uses}</b>
             ) : (
-              <b>{uses ?? '—'}</b>
+              <Missing />
             ),
           },
-          !!sterileUntil && {
+          {
             label: tr('Αποστειρωμένο έως'),
             value: sterileUntil ? (
               <>
@@ -138,10 +137,10 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                 )}
               </>
             ) : (
-              '—'
+              <Missing />
             ),
           },
-        ].filter(<T,>(row: T | false): row is T => row !== false)}
+        ]}
       />
 
       <ItemHistory key={asset.id} rounds={rounds} onPatient={onPatient} onLoad={onLoad} />

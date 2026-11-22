@@ -1,7 +1,7 @@
 import PageHeader from '../../components/ui/PageHeader';
 import {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
-import {Search, History, Flame, Users, Package, Layers3, Wrench} from 'lucide-react';
+import {Search, History, Flame, Users, Package, Layers3, Wrench, ScanSearch, UserSearch} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -18,6 +18,7 @@ import {useAssetSuggest} from '../../components/barcode/AssetSuggest';
 import ItemTrace from './ItemTrace';
 import PatientTrace from './PatientTrace';
 import LoadTrace from './LoadTrace';
+import {SplitEmpty} from './InfoList';
 import {barcodeOf, time, traceOf} from './traceModel';
 
 type Tab = 'SEARCH' | 'PATIENTS' | 'LOAD' | 'HISTORY';
@@ -40,6 +41,7 @@ export default function TraceabilityPage() {
   const [q, setQ] = useState(() => params.get('q') || '');
   const urlQuery = params.get('q');
   const [recent, setRecent] = useState<string[]>(readRecentSearches);
+  const [recentOpen, setRecentOpen] = useState(false);
   const [report, setReport] = useState<string | null>(null);
   const remember = (value: string) => {
     const term = value.trim();
@@ -189,7 +191,11 @@ export default function TraceabilityPage() {
             {patient ? (
               <PatientTrace patient={patient} onItem={openItem} onLoad={openLoad} />
             ) : (
-              <p className="trace-split-empty">{tr('Διαλέξτε έναν ασθενή από τη λίστα, ή γράψτε τον κωδικό του.')}</p>
+              <SplitEmpty
+                icon={UserSearch}
+                title={tr('Ιχνηλάτηση ασθενούς')}
+                text={tr('Διαλέξτε έναν ασθενή από τη λίστα, ή γράψτε τον κωδικό του.')}
+              />
             )}
           </section>
         </div>
@@ -215,7 +221,11 @@ export default function TraceabilityPage() {
                   value={q}
                   onChange={e => setQ(e.target.value)}
                   onKeyDown={suggest.onKeyDown}
-                  onBlur={() => needle && commit(q)}
+                  onFocus={() => setRecentOpen(true)}
+                  onBlur={() => {
+                    setRecentOpen(false);
+                    if (needle) commit(q);
+                  }}
                   placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
                   aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
                 />
@@ -224,18 +234,21 @@ export default function TraceabilityPage() {
                 {tr('Αναζήτηση')}
               </button>
               {suggest.listbox}
+              {/* The last searches, in the field while it is empty and in use: they do not fill the list. */}
+              {recentOpen && !needle && recent.length > 0 && (
+                <ul className="barcode-suggest trace-recent-menu" aria-label={tr('Πρόσφατες αναζητήσεις')}>
+                  <li className="trace-recent-menu-title">{tr('Πρόσφατες αναζητήσεις')}</li>
+                  {recent.map(term => (
+                    <li key={term}>
+                      <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => commit(term)}>
+                        <History size={14} aria-hidden="true" />
+                        <b>{term}</b>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </form>
-            {recent.length > 0 && (
-              <div className="trace-recent">
-                <History size={15} />
-                <span>{tr('Πρόσφατες αναζητήσεις')}</span>
-                {recent.map(term => (
-                  <button key={term} type="button" onClick={() => commit(term)}>
-                    {term}
-                  </button>
-                ))}
-              </div>
-            )}
             {typedPatient && (
               <div className="trace-pick">
                 <strong>{tr('Το «{0}» είναι κωδικός ασθενούς.', typedPatient)}</strong>
@@ -327,9 +340,11 @@ export default function TraceabilityPage() {
                 <span>{tr('Δοκιμάστε άλλο barcode ή όνομα.')}</span>
               </div>
             ) : (
-              <p className="trace-split-empty">
-                {tr('Διαλέξτε ένα Σετ ή εργαλείο από τη λίστα, ή γράψτε το barcode του.')}
-              </p>
+              <SplitEmpty
+                icon={ScanSearch}
+                title={tr('Ιχνηλάτηση Σετ ή εργαλείου')}
+                text={tr('Διαλέξτε ένα Σετ ή εργαλείο από τη λίστα, ή γράψτε το barcode του.')}
+              />
             )}
           </section>
         </div>

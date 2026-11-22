@@ -24,4 +24,17 @@ describe('TraceabilityPage search', () => {
     expect(recent.querySelectorAll('li').length).toBeGreaterThan(0);
     expect(screen.queryByRole('region', {name: 'Ιστορικό'})).toBeNull();
   });
+
+  it('keeps the last searches in the empty field, not in the list', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability'});
+    fireEvent.change(field(), {target: {value: 'S000341'}});
+    fireEvent.submit(field().closest('form')!);
+    fireEvent.change(field(), {target: {value: ''}});
+    fireEvent.blur(field());
+    expect(screen.queryByRole('list', {name: 'Πρόσφατες αναζητήσεις'})).toBeNull();
+    fireEvent.focus(field());
+    const menu = screen.getByRole('list', {name: 'Πρόσφατες αναζητήσεις'});
+    fireEvent.click(within(menu).getByRole('button', {name: /S000341/}));
+    expect(document.querySelector('.trace-item-head .mono')?.textContent).toBe('S000341');
+  });
 });

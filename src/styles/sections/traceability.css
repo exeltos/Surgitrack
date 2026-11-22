@@ -257,7 +257,9 @@ html body .trace-head-actions {
 /* What is known, as low cards in a row (the look of the Indicators' figures): the label on top, the value under it. */
 html body .trace-info {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  /* One row, always: every card shares the width. */
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
   gap: 10px;
   margin: 0 0 16px;
 }
@@ -267,7 +269,8 @@ html body .trace-info > div {
   align-content: start;
   gap: 3px;
   min-width: 0;
-  padding: 9px 14px 10px 17px;
+  padding: 8px 8px 9px 13px;
+  overflow-wrap: break-word;
   overflow: hidden;
   border: 1px solid var(--c-gray-90);
   border-radius: 12px;
@@ -283,14 +286,22 @@ html body .trace-info > div::before {
 }
 html body .trace-info dt {
   color: var(--c-gray-45);
-  font-size: 12px;
+  font-size: 11.5px;
+  line-height: 1.3;
   font-weight: 400;
 }
 html body .trace-info dd {
   margin: 0;
   color: var(--c-blue-15-2);
-  font-size: 13.5px;
-  line-height: 1.45;
+  font-size: 13px;
+  line-height: 1.4;
+}
+/* A badge in a narrow card goes on two lines rather than out of it. */
+html body .trace-info dd .trace-tone {
+  max-width: 100%;
+  padding: 1px 6px;
+  font-size: 11px;
+  white-space: normal;
 }
 /* Its value first, on its own line; what follows flows as text, a badge or a link inline. */
 html body .trace-info dd > b:first-child,
@@ -301,7 +312,7 @@ html body .trace-info dd > small {
   display: block;
   margin-bottom: 2px;
   color: var(--c-gray-45);
-  font-size: 12.5px;
+  font-size: 12px;
 }
 html body .trace-info dd .trace-tone,
 html body .trace-info dd .trace-link {
@@ -696,7 +707,7 @@ html body .trace-page:has(> .trace-split) {
 html body .trace-split {
   display: grid;
   flex: 1 1 auto;
-  grid-template-columns: minmax(300px, 400px) minmax(0, 1fr);
+  grid-template-columns: minmax(260px, 28%) minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
 }
@@ -731,8 +742,16 @@ html body .trace-split-list .trace-loads button > span {
   grid-column: 1 / -1;
   justify-self: start;
 }
+/* In the narrow list the sterilizer takes a line of its own, the cycle's number and «Αναζήτηση» the next. */
+html body .trace-split-list .trace-load-search {
+  flex-wrap: wrap;
+}
 html body .trace-split-list .trace-load-search .trace-load-sterilizer {
-  flex: 0 1 150px;
+  flex: 1 0 100%;
+  min-width: 0;
+}
+html body .trace-split-list .trace-load-search .asset-filter-search {
+  flex: 1 1 0;
   min-width: 0;
 }
 /* A patient: the code with the date, the department and how many items under it. */
@@ -753,10 +772,55 @@ html body .trace-split-card .trace-item-head {
   margin-top: 0;
 }
 html body .trace-split-empty {
-  margin: 40px auto;
-  max-width: 320px;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  max-width: 360px;
+  margin: 72px auto 40px;
   color: var(--c-gray-45);
   text-align: center;
+}
+html body .trace-split-empty-art {
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  margin-bottom: 10px;
+  border: 1px dashed #9cc9d6;
+  border-radius: 50%;
+  background: radial-gradient(circle, #e3f1f5 0 52%, #f3f9fb 53% 100%);
+  color: #1f7a93;
+}
+html body .trace-split-empty strong {
+  color: var(--c-blue-15-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+html body .trace-split-empty p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+/* A card whose fact was never recorded. */
+html body .trace-missing {
+  display: block;
+  color: #a36a12;
+  font-size: 12.5px;
+  font-style: italic;
+}
+/* The last searches, in the empty search field. */
+html body .trace-recent-menu .trace-recent-menu-title {
+  padding: 6px 10px 4px;
+  color: var(--c-gray-45);
+  font-size: 12px;
+}
+html body .trace-recent-menu button {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  cursor: pointer;
+}
+html body .trace-recent-menu button svg {
+  color: var(--c-gray-45);
 }
 /* In the narrow list: the barcode with the date, the name, then what happened — on lines of their own. */
 html body .trace-split-list .trace-recent-list button {
@@ -801,4 +865,19 @@ html body .trace-split-list .trace-recent-list button.selected {
   html body .trace-split-list .trace-recent-list > ul {
     overflow: visible;
   }
+}
+/* On a phone the cards cannot share one row: two per row there. */
+@media (max-width: 720px) {
+  html body .trace-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+  }
+}
+/* In the narrow list the search keeps room to be read: the buttons go under it when they leave too little. */
+html body .trace-split-list .asset-filter-bar {
+  flex-wrap: wrap;
+}
+html body .trace-split-list .asset-filter-bar > .asset-filter-search {
+  flex: 1 1 150px;
+  min-width: 0;
 }
