@@ -7,7 +7,7 @@ import {formatDate} from '../../core/displayDate';
 import {tr, trData} from '../../i18n';
 import {statusLabel} from '../../components/ui/statusLabel';
 import type {Movement, SetAsset, Tool} from '../../types/domain';
-import InfoList from './InfoList';
+import InfoList, {Missing} from './InfoList';
 import ItemHistory from './ItemHistory';
 import {daysUntil, isSetAsset, time, type CycleEntry, type Round} from './traceModel';
 
@@ -75,6 +75,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
               </>
             ),
           },
+          // Always the same cards, in the same places: what was never recorded says so.
           {
             label: tr('Τελευταίος κύκλος'),
             value: lastCycle ? (
@@ -91,7 +92,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                 )}
               </>
             ) : (
-              '—'
+              <Missing />
             ),
           },
           {
@@ -106,7 +107,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                 </small>
               </>
             ) : (
-              '—'
+              <Missing />
             ),
           },
           {
@@ -118,8 +119,10 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                 </b>
                 <small>{tr('Απομένουν {0}', Math.max(0, maxUses - (uses ?? 0)))}</small>
               </>
+            ) : uses !== undefined && uses !== null ? (
+              <b>{uses}</b>
             ) : (
-              <b>{uses ?? '—'}</b>
+              <Missing />
             ),
           },
           {
@@ -134,7 +137,7 @@ export default function ItemTrace({asset, carrierSet, moves, cycles, rounds, onP
                 )}
               </>
             ) : (
-              '—'
+              <Missing />
             ),
           },
         ]}

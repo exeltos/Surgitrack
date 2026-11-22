@@ -1,19 +1,7 @@
 import SortHeader from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {useMemo, useState} from 'react';
-import {
-  BadgeCheck,
-  ChevronRight,
-  Clock3,
-  Eraser,
-  ExternalLink,
-  MapPin,
-  Route,
-  ShieldCheck,
-  Trash2,
-  UserRound,
-  X,
-} from 'lucide-react';
+import {ChevronRight, Eraser, ExternalLink, Route, ShieldCheck, Trash2, UserRound, X} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import {supabase} from '../../lib/supabase';
 import {actingAsPlatformOwner, getRealIdentity} from '../../data/cloud/identity';
@@ -33,6 +21,7 @@ import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
 import {tableReportHtml, type ExportTable} from '../../core/exportTable';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import LedgerAsset from './LedgerAsset';
+import InfoList from '../traceability/InfoList';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
 import {parseDisplayDate} from '../../core/displayDate';
@@ -431,60 +420,56 @@ export default function MovementsPage({embedded = false}: {embedded?: boolean}) 
           <div className="movement-detail" role="dialog" aria-modal="true">
             <div className="movement-detail-head">
               <div>
-                <small>{tr('ΙΧΝΗΛΑΣΙΜΟΤΗΤΑ')}</small>
-                <h2>{tr('Λεπτομέρειες κίνησης')}</h2>
-                <span>{selected.asset}</span>
+                <small>
+                  <span className="mono">{assetParts(selected.asset).barcode}</span> ·{' '}
+                  {selected.assetKind === 'SET' ? tr('Σετ') : tr('Εργαλείο')}
+                </small>
+                <h2>{assetParts(selected.asset).name || selected.asset}</h2>
               </div>
               <button onClick={() => setSelected(null)} aria-label={tr('Κλείσιμο')}>
                 <X />
               </button>
             </div>
-            <div className="movement-detail-grid">
-              <div>
-                <Clock3 />
-                <span>{tr('Ημερομηνία & ώρα')}</span>
-                <strong>{selected.at}</strong>
-              </div>
-              <div>
-                <Route />
-                <span>{tr('Ενέργεια')}</span>
-                <strong>{movementText(selected.status)}</strong>
-              </div>
-              <div>
-                <MapPin />
-                <span>{tr('Από')}</span>
-                <strong>{trData(selected.from)}</strong>
-              </div>
-              <div>
-                <MapPin />
-                <span>{tr('Προς')}</span>
-                <strong>{trData(selected.to)}</strong>
-              </div>
-              <div>
-                <UserRound />
-                <span>{tr('Καταχώρηση από')}</span>
-                <strong>{trData(selected.by)}</strong>
-              </div>
-              {/* The signed-in account only matters when it is not the person named on the entry. */}
-              {accountDiffers(selected.by, accountOf(selected)) && (
-                <div className="movement-account differs">
-                  <BadgeCheck />
-                  <span>{tr('Λογαριασμός που την καταχώρησε')}</span>
-                  <strong>{accountOf(selected)}</strong>
+            {/* What was done, then its details: who and where are said once, below, not again in the text. */}
+            {(() => {
+              const [action, ...details] = movementText(selected.status).split(' · ');
+              const said = [trData(selected.by), trData(selected.to), trData(selected.from)]
+                .filter(Boolean)
+                .map(x => x!.toLowerCase());
+              const rest = details.filter(d => !said.some(x => d.toLowerCase().endsWith(` ${x}`)));
+              return (
+                <div className="movement-detail-action">
+                  <span>{tr('Ενέργεια')}</span>
+                  <strong>{action}</strong>
+                  {rest.length > 0 && <small>{rest.join(' · ')}</small>}
                 </div>
-              )}
-              <div>
-                <ShieldCheck />
-                <span>{tr('Τύπος αντικειμένου')}</span>
-                <strong>{selected.assetKind === 'SET' ? tr('Σετ') : tr('Εργαλείο')}</strong>
-              </div>
-              {selected.patientCode && (
-                <div className="movement-patient">
-                  <span>{tr('Κωδικός ασθενούς')}</span>
-                  <strong>{selected.patientCode}</strong>
-                </div>
-              )}
-            </div>
+              );
+            })()}
+            <InfoList
+              label={tr('Λεπτομέρειες κίνησης')}
+              rows={[
+                {label: tr('Ημερομηνία & ώρα'), value: <b>{selected.at}</b>},
+                {label: tr('Από'), value: <b>{trData(selected.from) || '—'}</b>},
+                {label: tr('Προς'), value: <b>{trData(selected.to) || '—'}</b>},
+                {
+                  label: tr('Καταχώρηση από'),
+                  value: (
+                    <>
+                      <b>{trData(selected.by)}</b>
+                      {/* The signed-in account only matters when it is not the person named on the entry. */}
+                      {accountDiffers(selected.by, accountOf(selected)) && (
+                        <small className="movement-account-differs">
+                          {tr('Λογαριασμός: {0}', accountOf(selected) || '')}
+                        </small>
+                      )}
+                    </>
+                  ),
+                },
+                ...(selected.patientCode
+                  ? [{label: tr('Κωδικός ασθενούς'), value: <b>{selected.patientCode}</b>}]
+                  : []),
+              ]}
+            />
             {(() => {
               const code = assetParts(selected.asset).barcode;
               const set = sets.find(x => x.barcode === code);

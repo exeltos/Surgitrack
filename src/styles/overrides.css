@@ -3062,27 +3062,6 @@ html body .dash-activity-stats small {
   font-weight: 600;
 }
 /* Traceability: the last searches on this device, one tap to repeat. */
-html body .trace-recent {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 8px;
-  margin: -4px 0 12px;
-  color: var(--c-blue-35);
-  font-size: 13px;
-  font-weight: 600;
-}
-html body .trace-recent button {
-  padding: 4px 10px;
-  border: 1px solid var(--c-gray-90);
-  border-radius: 999px;
-  background: var(--c-white);
-  color: var(--c-cyan-35);
-  font: inherit;
-  font-family: ui-monospace, monospace;
-  font-size: 12.5px;
-  cursor: pointer;
-}
 /* Issues: room for «Επίλυση» and the icon actions beside it (order, open, delete), and no more. */
 html body .issues-fixed th.col-actions {
   width: 160px;

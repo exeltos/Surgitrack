@@ -1,6 +1,6 @@
 import {useState} from 'react';
-import {Search, TriangleAlert} from 'lucide-react';
-import InfoList from './InfoList';
+import {Flame, Search, TriangleAlert} from 'lucide-react';
+import InfoList, {Missing, SplitEmpty} from './InfoList';
 import {foldCycleNumber, normalizeCycleNumber, shortCycleNumber} from '../../core/cycleNumber';
 import {askConfirm} from '../../components/ui/confirmService';
 import {useUndoneMovements} from '../../components/assets/useUndoneMovements';
@@ -47,148 +47,127 @@ export default function LoadTrace({
   const uses = movements.filter(m => m.patientCode && !m.undoes && !undone.has(m.id));
   const sterilizers = [...new Set(loads.map(l => l.equipment))].sort();
   const load = loads.find(l => l.id === loadId);
-  const [sterilizer, setSterilizer] = useState(load?.equipment || sterilizers[0] || '');
-  const [cycle, setCycle] = useState(load ? shortCycleNumber(load.cycleNumber) : '');
-  const [missing, setMissing] = useState('');
+  // The list narrows as the sterilizer is chosen and the cycle's number typed; «Όλοι οι κλίβανοι» is every one.
+  const [sterilizer, setSterilizer] = useState('');
+  const [cycle, setCycle] = useState('');
   const recent = [...loads].sort((a, b) => time(b.completedAt || b.createdAt) - time(a.completedAt || a.createdAt));
-
-  // A cycle number comes back every day (A1, A2…): one load opens; more, and the day is chosen from them.
-  const [matches, setMatches] = useState<ProcessLoadRecord[]>([]);
+  const number = normalizeCycleNumber(cycle.replace(/^\s*#/, ''));
+  const shown = recent.filter(
+    l =>
+      (!sterilizer || l.equipment === sterilizer) &&
+      (!number ||
+        // The number only (the sterilizer gives the letter); a full number (Α4, a device's 2026-0932) also matches.
+        shortCycleNumber(l.cycleNumber) === number ||
+        foldCycleNumber(l.cycleNumber) === foldCycleNumber(number) ||
+        // A device's number with letters (P-2026-0214), typed with its digits only.
+        (!!digitsOf(number) && digitsOf(l.cycleNumber) === digitsOf(number))),
+  );
+  const filtered = !!sterilizer || !!number;
+  // Enter opens the one load found; with more (a cycle number comes back every day), the list shows them.
   const find = () => {
-    const number = normalizeCycleNumber(cycle.replace(/^\s*#/, ''));
-    if (!number) return;
-    const hits = loads
-      // The number only (the sterilizer gives the letter); a full number (Α4, a device's 2026-0932) also matches.
-      .filter(
-        l =>
-          l.equipment === sterilizer &&
-          (shortCycleNumber(l.cycleNumber) === number ||
-            foldCycleNumber(l.cycleNumber) === foldCycleNumber(number) ||
-            // A device's number with letters (P-2026-0214), typed with its digits only.
-            digitsOf(l.cycleNumber) === digitsOf(number)),
-      )
-      .sort((a, b) => time(b.completedAt || b.createdAt) - time(a.completedAt || a.createdAt));
-    setMissing(hits.length ? '' : tr('Δεν βρέθηκε κύκλος {0} στο {1}.', number, sterilizer));
-    setMatches(hits.length > 1 ? hits : []);
-    if (hits.length === 1) onOpen(hits[0].id);
+    if (shown.length === 1) onOpen(shown[0].id);
   };
 
   return (
-    <>
-      {/* The same bar as above every other list: the sterilizer, the cycle's number, «Αναζήτηση». */}
-      <form
-        className="asset-filter-bar trace-load-search"
-        onSubmit={e => {
-          e.preventDefault();
-          find();
-        }}
-      >
-        <select
-          className="trace-load-sterilizer"
-          value={sterilizer}
-          onChange={e => setSterilizer(e.target.value)}
-          aria-label={tr('Κλίβανος')}
+    // The search and the loads on the left, the one open on the right, as for the Sets and instruments.
+    <div className="trace-split">
+      <aside className="trace-split-list trace-load-list" aria-label={tr('Φορτία')}>
+        {/* The same bar as above every other list: the sterilizer, the cycle's number, «Αναζήτηση». */}
+        <form
+          className="asset-filter-bar trace-load-search"
+          onSubmit={e => {
+            e.preventDefault();
+            find();
+          }}
         >
-          {sterilizers.map(s => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <div className="asset-filter-search">
-          <Search size={17} />
-          <input
-            value={cycle}
-            inputMode="numeric"
-            placeholder={tr('Αριθμός κύκλου')}
-            aria-label={tr('Κύκλος')}
-            // The number only: the sterilizer chosen gives the letter.
-            onChange={e => setCycle(e.target.value.replace(/[^\d\-/]/g, ''))}
-          />
-        </div>
-        <button className="asset-filter-toggle" type="submit">
-          {tr('Αναζήτηση')}
-        </button>
-      </form>
-      {missing && <p className="trace-hint">{missing}</p>}
-      {matches.length > 1 ? (
-        <section className="trace-recent-list trace-loads" aria-label={tr('Φορτία με αυτόν τον κύκλο')}>
-          <h3 className="trace-section-title">
-            {tr(
-              'Ο κύκλος {0} του {1} υπάρχει σε {2} ημέρες: διαλέξτε ποιον.',
-              shortCycleNumber(matches[0].cycleNumber),
-              sterilizer,
-              matches.length,
-            )}
-          </h3>
-          <div className="trace-list-head" aria-hidden="true">
-            <span>{tr('Κλίβανος · κύκλος')}</span>
-            <span>{tr('Ημερομηνία')}</span>
-            <span>{tr('Αντικείμενα')}</span>
-            <span>{tr('Κατάσταση')}</span>
-          </div>
-          <ul>
-            {matches.map(l => (
-              <li key={l.id}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    // The day chosen: the search's list gives way to its load.
-                    setMatches([]);
-                    onOpen(l.id);
-                  }}
-                >
-                  <b>
-                    {l.equipment} · #{shortCycleNumber(l.cycleNumber)}
-                  </b>
-                  <span>{l.completedAt || l.createdAt}</span>
-                  <span>{tr('{0} αντικείμενα', l.items.length)}</span>
-                  <i className={`trace-tone ${LOAD_STATUS[l.status].tone}`}>{tr(LOAD_STATUS[l.status].label)}</i>
-                </button>
-              </li>
+          <select
+            className="trace-load-sterilizer"
+            value={sterilizer}
+            onChange={e => setSterilizer(e.target.value)}
+            aria-label={tr('Κλίβανος')}
+          >
+            <option value="">{tr('Όλοι οι κλίβανοι')}</option>
+            {sterilizers.map(s => (
+              <option key={s} value={s}>
+                {s}
+              </option>
             ))}
-          </ul>
-        </section>
-      ) : load ? (
-        <LoadView
-          load={load}
-          sets={sets}
-          tools={tools}
-          movements={uses}
-          loads={loads}
-          canRecall={can('sterilization.workspace') && load.status === 'RELEASED'}
-          onRecall={reason => recallProcessLoad(load.id, reason)}
-          onItem={onItem}
-          onPatient={onPatient}
-        />
-      ) : (
-        recent.length > 0 && (
-          <section className="trace-recent-list trace-loads" aria-label={tr('Πρόσφατα φορτία')}>
-            <h3 className="trace-section-title">{tr('Πρόσφατα φορτία')}</h3>
-            <div className="trace-list-head" aria-hidden="true">
-              <span>{tr('Κλίβανος · κύκλος')}</span>
-              <span>{tr('Ημερομηνία')}</span>
-              <span>{tr('Αντικείμενα')}</span>
-              <span>{tr('Κατάσταση')}</span>
-            </div>
+          </select>
+          <div className="asset-filter-search">
+            <Search size={17} />
+            <input
+              value={cycle}
+              inputMode="numeric"
+              placeholder={tr('Αριθμός κύκλου')}
+              aria-label={tr('Κύκλος')}
+              // The number only: the sterilizer chosen gives the letter.
+              onChange={e => setCycle(e.target.value.replace(/[^\d\-/]/g, ''))}
+            />
+          </div>
+          <button className="asset-filter-toggle" type="submit">
+            {tr('Αναζήτηση')}
+          </button>
+        </form>
+        <section className="trace-recent-list trace-loads">
+          <h3 className="trace-section-title">{filtered ? tr('Βρέθηκαν {0}', shown.length) : tr('Πρόσφατα φορτία')}</h3>
+          {/* Unfiltered, the last 30; once narrowed, every load found, however many days back. */}
+          {shown.length ? (
             <ul>
-              {recent.slice(0, 10).map(l => (
+              {(filtered ? shown : shown.slice(0, 30)).map(l => (
                 <li key={l.id}>
-                  <button type="button" onClick={() => onOpen(l.id)}>
+                  <button
+                    type="button"
+                    className={l.id === loadId ? 'selected' : undefined}
+                    aria-current={l.id === loadId ? 'true' : undefined}
+                    onClick={() => onOpen(l.id)}
+                  >
                     <b>
                       {l.equipment} · #{shortCycleNumber(l.cycleNumber)}
                     </b>
-                    <span>{l.completedAt || l.createdAt}</span>
-                    <span>{tr('{0} αντικείμενα', l.items.length)}</span>
                     <i className={`trace-tone ${LOAD_STATUS[l.status].tone}`}>{tr(LOAD_STATUS[l.status].label)}</i>
+                    <span>
+                      {l.completedAt || l.createdAt} ·{' '}
+                      {l.items.length === 1 ? tr('1 αντικείμενο') : tr('{0} αντικείμενα', l.items.length)}
+                    </span>
                   </button>
                 </li>
               ))}
             </ul>
-          </section>
-        )
-      )}
-    </>
+          ) : (
+            <p className="trace-hint">
+              {!number
+                ? tr('Δεν υπάρχουν φορτία.')
+                : sterilizer
+                  ? tr('Δεν βρέθηκε κύκλος {0} στο {1}.', number, sterilizer)
+                  : tr('Δεν βρέθηκε κύκλος {0}.', number)}
+            </p>
+          )}
+        </section>
+      </aside>
+      <section className="trace-split-card" aria-label={tr('Φορτίο')}>
+        {load ? (
+          <LoadView
+            // The card's own state is the load's: a new one starts afresh; the list and its search stay.
+            key={load.id}
+            load={load}
+            sets={sets}
+            tools={tools}
+            movements={uses}
+            loads={loads}
+            canRecall={can('sterilization.workspace') && load.status === 'RELEASED'}
+            onRecall={reason => recallProcessLoad(load.id, reason)}
+            onItem={onItem}
+            onPatient={onPatient}
+          />
+        ) : (
+          <SplitEmpty
+            icon={Flame}
+            title={tr('Ιχνηλάτηση φορτίου κλιβάνου')}
+            text={tr('Διαλέξτε ένα φορτίο από τη λίστα, ή γράψτε τον αριθμό του κύκλου.')}
+          />
+        )}
+      </section>
+    </div>
   );
 }
 
@@ -218,7 +197,7 @@ function LoadView({
     {label: 'Φυσικές παράμετροι', value: physical(load.physicalParametersOk)},
     {label: 'Χημικός δείκτης', value: indicator(load.chemicalIndicatorResult)},
     {label: 'Βιολογικός δείκτης', value: biological(load.biologicalIndicatorResult)},
-  ].filter(i => i.value);
+  ];
   // Each item: where it is now, and the first patient it was used on after this cycle, before its next one.
   const rows = load.items.map(item => {
     const asset =
@@ -253,39 +232,56 @@ function LoadView({
         </div>
         {canRecall && (
           <button type="button" className="trace-recall" onClick={() => void recall()}>
-            <TriangleAlert size={17} aria-hidden="true" /> {tr('Ανάκληση φορτίου')}
+            <TriangleAlert size={15} aria-hidden="true" /> {tr('Ανάκληση φορτίου')}
           </button>
         )}
       </div>
+      {/* Always the same six cards: what was never recorded says so. */}
       <InfoList
         label={tr('Φορτίο')}
         rows={[
-          {label: tr('Κατάσταση'), value: <i className={`trace-tone ${status.tone}`}>{tr(status.label)}</i>},
-          ...(load.status === 'RECALLED'
-            ? [
-                {
-                  label: tr('Ανάκληση'),
-                  value: `${tr('Ανακλήθηκε στις {0}', load.recalledAt || '')}${load.recallReason ? ` · ${load.recallReason}` : ''}`,
-                },
-              ]
-            : []),
+          {
+            label: tr('Κατάσταση'),
+            value: (
+              <>
+                <i className={`trace-tone ${status.tone}`}>{tr(status.label)}</i>
+                {load.status === 'RECALLED' && (
+                  <small>
+                    {tr('Ανακλήθηκε στις {0}', load.recalledAt || '')}
+                    {load.recallReason ? ` · ${load.recallReason}` : ''}
+                  </small>
+                )}
+              </>
+            ),
+          },
           {
             label: tr('Κύκλος'),
-            value: [
-              load.completedAt
-                ? `${load.createdAt} – ${load.completedAt.split(' ')[1] || load.completedAt}`
-                : load.createdAt,
-              load.program,
-              trData(load.createdByName),
-            ]
-              .filter(Boolean)
-              .join(' · '),
+            // The day, then the hours and the program, then who ran it: short lines that fit a narrow card.
+            value: (
+              <>
+                <b>{load.createdAt.split(' ')[0]}</b>
+                <small>
+                  {[
+                    load.completedAt
+                      ? `${load.createdAt.split(' ')[1] || ''} – ${load.completedAt.split(' ')[1] || load.completedAt}`
+                      : load.createdAt.split(' ')[1],
+                    load.program,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </small>
+                {load.createdByName && <small>{trData(load.createdByName)}</small>}
+              </>
+            ),
           },
           ...indicators.map(i => ({
             label: tr(i.label),
-            value: <i className={`trace-tone ${i.value!.tone}`}>{tr(i.value!.label)}</i>,
+            value: i.value ? <i className={`trace-tone ${i.value.tone}`}>{tr(i.value.label)}</i> : <Missing />,
           })),
-          {label: tr('Τι ήταν στο φορτίο'), value: tr('{0} αντικείμενα', load.items.length)},
+          {
+            label: tr('Τι ήταν στο φορτίο'),
+            value: load.items.length === 1 ? tr('1 αντικείμενο') : tr('{0} αντικείμενα', load.items.length),
+          },
         ]}
       />
       <section className="trace-load-items">

@@ -1,8 +1,7 @@
 import PageHeader from '../../components/ui/PageHeader';
 import {useEffect, useState} from 'react';
-import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, Search, History, Flame, Users, Package, Layers3, Wrench} from 'lucide-react';
-import AppButton from '../../components/ui/AppButton';
+import {useSearchParams} from 'react-router-dom';
+import {Search, History, Flame, Users, Package, Layers3, Wrench, ScanSearch, UserSearch} from 'lucide-react';
 import {statusLabel} from '../../components/ui/statusLabel';
 import DownloadMenu from '../../components/ui/DownloadMenu';
 import PrintPreviewModal from '../../components/assets/PrintPreviewModal';
@@ -19,6 +18,7 @@ import {useAssetSuggest} from '../../components/barcode/AssetSuggest';
 import ItemTrace from './ItemTrace';
 import PatientTrace from './PatientTrace';
 import LoadTrace from './LoadTrace';
+import {SplitEmpty} from './InfoList';
 import {barcodeOf, time, traceOf} from './traceModel';
 
 type Tab = 'SEARCH' | 'PATIENTS' | 'LOAD' | 'HISTORY';
@@ -41,6 +41,7 @@ export default function TraceabilityPage() {
   const [q, setQ] = useState(() => params.get('q') || '');
   const urlQuery = params.get('q');
   const [recent, setRecent] = useState<string[]>(readRecentSearches);
+  const [recentOpen, setRecentOpen] = useState(false);
   const [report, setReport] = useState<string | null>(null);
   const remember = (value: string) => {
     const term = value.trim();
@@ -68,16 +69,6 @@ export default function TraceabilityPage() {
   const openTab = (next: Tab) => {
     if (next !== tab) setParams(TAB_PARAM[next] ? {tab: TAB_PARAM[next]!} : {});
   };
-  const navigate = useNavigate();
-  // A step to go back to inside the app: the browser's history index (a page reached by a redirect is at 0 too); where
-  // there is none (tests, in memory), the router's key, «default» on the first page.
-  const location = useLocation();
-  const historyIndex = (window.history.state as {idx?: number} | null)?.idx;
-  const canGoBack = typeof historyIndex === 'number' ? historyIndex > 0 : location.key !== 'default';
-  // Something open on the tab (a search, a patient, a load): with nothing before it, «Πίσω» returns to the tab's start.
-  const detailOpen = !!(urlQuery || patient || loadId);
-  const goBack = () =>
-    canGoBack ? navigate(-1) : setParams(TAB_PARAM[tab] ? {tab: TAB_PARAM[tab]!} : {}, {replace: true});
   const openPatient = (code: string) => setParams({tab: 'patients', patient: code});
   const openLoad = (id: string) => setParams({tab: 'load', load: id});
   const openItem = (barcode: string) => commit(barcode);
@@ -94,6 +85,9 @@ export default function TraceabilityPage() {
   const suggest = useAssetSuggest(q, picked => commit(picked), all);
   const asset = exact || (nameMatches.length === 1 ? nameMatches[0] : undefined);
   const choosing = !asset && nameMatches.length > 1;
+  // A load's own moves begin with its record id («Φορτίο L1795…-8wmny8 · ΚΛΙΒΑΝΟΣ Α · …»): the sterilizer and
+  // cycle say it, the id does not.
+  const withoutLoadId = (text: string) => text.replace(/^(Φορτίο|Load) L[\w-]+ · /, '');
   // A member instrument travels inside its Set: the Set's moves belong to its trail too.
   const {carrierSet, moves, cycles, rounds} = asset
     ? traceOf(asset, sets, movements, processLoads, sterilizationCycles)
@@ -105,7 +99,6 @@ export default function TraceabilityPage() {
       : undefined;
   // An empty search offers the Sets and instruments that moved last: one click opens their trail.
   const recentlyMoved = (() => {
-    if (needle) return [];
     const seen = new Set<string>();
     const out: Array<{item: SetAsset | Tool; at: string; status: string}> = [];
     for (const m of [...movements].sort((a, b) => time(b.at) - time(a.at))) {
@@ -114,10 +107,20 @@ export default function TraceabilityPage() {
       seen.add(code);
       const item = all.find(x => x.barcode === code);
       if (item) out.push({item, at: m.at, status: m.status});
-      if (out.length === 8) break;
+      if (out.length === 30) break;
     }
     return out;
   })();
+  // The item open in the card, shown in the list beside it (scrolled to, when further down).
+  const openId = asset?.id || patient || loadId;
+  useEffect(() => {
+    if (!openId) return;
+    // A newly opened card starts at its head, not where the one before was scrolled to.
+    const card = document.querySelector('.trace-split-card');
+    if (card) card.scrollTop = 0;
+    const row = document.querySelector('.trace-split-list .selected');
+    if (row && 'scrollIntoView' in row) row.scrollIntoView({block: 'nearest'});
+  }, [openId]);
   const traceTable = (): ExportTable => ({
     title: tr('Ιχνηλάτηση · {0}', asset ? `${asset.barcode} ${asset.name}` : q.trim()),
     subtitle: tr('{0} κινήσεις', moves.length),
@@ -173,91 +176,149 @@ export default function TraceabilityPage() {
             </button>
           ))}
         </div>
-        {detailOpen && (
-          <AppButton icon={<ArrowLeft size={16} />} onClick={goBack} className="trace-page-back">
-            {tr('Πίσω')}
-          </AppButton>
-        )}
       </div>
       {/* «Όλες οι κινήσεις» shows its own (with «Φόρτωση παλαιότερων»). */}
       {tab !== 'HISTORY' && <HistoryWindowNote auto />}
       {tab === 'HISTORY' ? (
         <MovementsPage embedded />
-      ) : tab === 'PATIENTS' && !patient ? (
-        <PatientUses movements={movements} onOpen={openPatient} />
       ) : tab === 'PATIENTS' ? (
-        <PatientTrace patient={patient} onItem={openItem} onLoad={openLoad} />
-      ) : tab === 'LOAD' ? (
-        <LoadTrace key={loadId} loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
-      ) : (
-        <>
-          {/* The same search bar as above every other list; Enter or «Αναζήτηση» opens what was typed. */}
-          <form
-            className="asset-filter-bar trace-search-bar"
-            onSubmit={e => {
-              e.preventDefault();
-              commit(q);
-            }}
-          >
-            <div className="asset-filter-search">
-              <Search size={17} />
-              <input
-                type="search"
-                value={q}
-                onChange={e => setQ(e.target.value)}
-                onKeyDown={suggest.onKeyDown}
-                onBlur={() => needle && commit(q)}
-                placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
-                aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+        // The patients on the left, the one open on the right, as for the Sets and instruments.
+        <div className="trace-split">
+          <aside className="trace-split-list" aria-label={tr('Ασθενείς')}>
+            <PatientUses movements={movements} onOpen={openPatient} selected={patient} />
+          </aside>
+          <section className="trace-split-card" aria-label={tr('Ασθενής')}>
+            {patient ? (
+              <PatientTrace patient={patient} onItem={openItem} onLoad={openLoad} />
+            ) : (
+              <SplitEmpty
+                icon={UserSearch}
+                title={tr('Ιχνηλάτηση ασθενούς')}
+                text={tr('Διαλέξτε έναν ασθενή από τη λίστα, ή γράψτε τον κωδικό του.')}
               />
-            </div>
-            <button className="asset-filter-toggle" type="submit">
-              {tr('Αναζήτηση')}
-            </button>
-            {suggest.listbox}
-          </form>
-          {!needle && recent.length > 0 && (
-            <div className="trace-recent">
-              <History size={15} />
-              <span>{tr('Πρόσφατες αναζητήσεις')}</span>
-              {recent.map(term => (
-                <button key={term} type="button" onClick={() => commit(term)}>
-                  {term}
-                </button>
-              ))}
-            </div>
-          )}
-          {/* The list above offers them while typing; this one is for when it was closed (Esc). */}
-          {choosing && !suggest.suggestions.length && (
-            <div className="trace-pick">
-              <strong>{tr('Βρέθηκαν {0} — διαλέξτε ένα:', nameMatches.length)}</strong>
-              <ul>
-                {nameMatches.slice(0, 30).map(x => (
-                  <li key={x.id}>
-                    <button type="button" onClick={() => commit(x.barcode)}>
-                      <b className="mono">{x.barcode}</b> {x.name}
-                      <small>
-                        {trData(x.department) || tr('Απόθεμα')} · {statusLabel(x.state)}
-                      </small>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              {nameMatches.length > 30 && (
-                <small>{tr('Εμφανίζονται τα πρώτα 30· γράψτε περισσότερα ή το barcode.')}</small>
-              )}
-            </div>
-          )}
-          {typedPatient && (
-            <div className="trace-pick">
-              <strong>{tr('Το «{0}» είναι κωδικός ασθενούς.', typedPatient)}</strong>
-              <button type="button" className="app-button" onClick={() => openPatient(typedPatient)}>
-                {tr('Άνοιγμα ασθενούς')}
+            )}
+          </section>
+        </div>
+      ) : tab === 'LOAD' ? (
+        <LoadTrace loadId={loadId} onOpen={openLoad} onItem={openItem} onPatient={openPatient} />
+      ) : (
+        // The list on the left (search, recent searches, the items that moved last or those a name fits), the open
+        // item's card on the right: picking another changes only the card. Each side scrolls on its own.
+        <div className="trace-split">
+          <aside className="trace-split-list" aria-label={tr('Σετ και εργαλεία')}>
+            {/* The same search bar as above every other list; Enter or «Αναζήτηση» opens what was typed. */}
+            <form
+              className="asset-filter-bar trace-search-bar"
+              // The last searches stay open while the focus is anywhere in the bar (Tab reaches them), and close
+              // once it leaves.
+              onFocus={() => setRecentOpen(true)}
+              onBlur={e => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setRecentOpen(false);
+              }}
+              onSubmit={e => {
+                e.preventDefault();
+                commit(q);
+              }}
+            >
+              <div className="asset-filter-search">
+                <Search size={17} />
+                <input
+                  type="search"
+                  value={q}
+                  onChange={e => setQ(e.target.value)}
+                  onKeyDown={suggest.onKeyDown}
+                  onBlur={() => needle && commit(q)}
+                  placeholder={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+                  aria-label={tr('Barcode (S..., T...) ή όνομα Σετ/εργαλείου')}
+                />
+              </div>
+              <button className="asset-filter-toggle" type="submit">
+                {tr('Αναζήτηση')}
               </button>
-            </div>
-          )}
-          {asset ? (
-            <>
+              {suggest.listbox}
+              {/* The last searches, in the field while it is empty and in use: they do not fill the list. */}
+              {recentOpen && !needle && recent.length > 0 && (
+                <ul className="barcode-suggest trace-recent-menu" aria-label={tr('Πρόσφατες αναζητήσεις')}>
+                  <li className="trace-recent-menu-title">{tr('Πρόσφατες αναζητήσεις')}</li>
+                  {recent.map(term => (
+                    <li key={term}>
+                      <button type="button" onMouseDown={e => e.preventDefault()} onClick={() => commit(term)}>
+                        <History size={14} aria-hidden="true" />
+                        <b>{term}</b>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </form>
+            {typedPatient && (
+              <div className="trace-pick">
+                <strong>{tr('Το «{0}» είναι κωδικός ασθενούς.', typedPatient)}</strong>
+                <button type="button" className="app-button" onClick={() => openPatient(typedPatient)}>
+                  {tr('Άνοιγμα ασθενούς')}
+                </button>
+              </div>
+            )}
+            {/* A name fitting several: those, to pick from; otherwise what moved last. */}
+            {choosing ? (
+              <section
+                className="trace-recent-list"
+                aria-label={tr('Βρέθηκαν {0} — διαλέξτε ένα:', nameMatches.length)}
+              >
+                <h3 className="trace-section-title">{tr('Βρέθηκαν {0} — διαλέξτε ένα:', nameMatches.length)}</h3>
+                <ul>
+                  {nameMatches.slice(0, 30).map(x => (
+                    <li key={x.id}>
+                      <button type="button" onClick={() => commit(x.barcode)}>
+                        <b className="mono trace-code">{x.barcode}</b>
+                        <span>{x.name}</span>
+                        <span>
+                          {trData(x.department) || tr('Απόθεμα')} · {statusLabel(x.state)}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {nameMatches.length > 30 && (
+                  <small className="trace-hint">
+                    {tr('Εμφανίζονται τα πρώτα 30· γράψτε περισσότερα ή το barcode.')}
+                  </small>
+                )}
+              </section>
+            ) : (
+              recentlyMoved.length > 0 && (
+                <section className="trace-recent-list" aria-label={tr('Κινήθηκαν πρόσφατα')}>
+                  <h3 className="trace-section-title">{tr('Κινήθηκαν πρόσφατα')}</h3>
+                  <ul>
+                    {recentlyMoved.map(({item, at, status}) => (
+                      <li key={item.id}>
+                        <button
+                          type="button"
+                          className={asset?.id === item.id ? 'selected' : undefined}
+                          aria-current={asset?.id === item.id ? 'true' : undefined}
+                          onClick={() => commit(item.barcode)}
+                        >
+                          <b className="mono trace-code">
+                            {'expected' in item ? (
+                              <Layers3 size={15} aria-label={tr('Σετ')} />
+                            ) : (
+                              <Wrench size={15} aria-label={tr('Εργαλείο')} />
+                            )}
+                            {item.barcode}
+                          </b>
+                          <span>{item.name}</span>
+                          <span title={movementText(status)}>{withoutLoadId(movementText(status))}</span>
+                          <span>{at}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )
+            )}
+          </aside>
+          <section className="trace-split-card" aria-label={tr('Ιχνηλάτηση')}>
+            {asset ? (
               <ItemTrace
                 asset={asset}
                 carrierSet={carrierSet}
@@ -275,44 +336,20 @@ export default function TraceabilityPage() {
                   )
                 }
               />
-            </>
-          ) : needle ? (
-            !choosing &&
-            !typedPatient && (
+            ) : needle && !choosing && !typedPatient ? (
               <div className="empty">
                 <strong>{tr('Δεν βρέθηκε Σετ ή εργαλείο με «{0}»', q.trim())}</strong>
                 <span>{tr('Δοκιμάστε άλλο barcode ή όνομα.')}</span>
               </div>
-            )
-          ) : (
-            <>
-              {recentlyMoved.length > 0 && (
-                <section className="trace-recent-list" aria-label={tr('Κινήθηκαν πρόσφατα')}>
-                  <h3 className="trace-section-title">{tr('Κινήθηκαν πρόσφατα')}</h3>
-                  <ul>
-                    {recentlyMoved.map(({item, at, status}) => (
-                      <li key={item.id}>
-                        <button type="button" onClick={() => commit(item.barcode)}>
-                          <b className="mono trace-code">
-                            {'expected' in item ? (
-                              <Layers3 size={15} aria-label={tr('Σετ')} />
-                            ) : (
-                              <Wrench size={15} aria-label={tr('Εργαλείο')} />
-                            )}
-                            {item.barcode}
-                          </b>
-                          <span>{item.name}</span>
-                          <span>{movementText(status)}</span>
-                          <span>{at}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-            </>
-          )}
-        </>
+            ) : (
+              <SplitEmpty
+                icon={ScanSearch}
+                title={tr('Ιχνηλάτηση Σετ ή εργαλείου')}
+                text={tr('Διαλέξτε ένα Σετ ή εργαλείο από τη λίστα, ή γράψτε το barcode του.')}
+              />
+            )}
+          </section>
+        </div>
       )}
       {report && <PrintPreviewModal title={tr('Ιχνηλάτηση')} html={report} onClose={() => setReport(null)} />}
     </div>
