@@ -157,7 +157,7 @@ html body .issues-list .issue-row-when {
   text-align: right;
 }
 html body .issues-list .issue-row-when.old {
-  color: #b3261e;
+  color: #9c2219;
   font-weight: 600;
 }
 html body .issues-list small {
@@ -189,15 +189,15 @@ html body .issue-dot::before {
 }
 html body .issue-dot.bad,
 html body .trace-info .trace-tone.issue-tone-bad {
-  color: #b3261e;
+  color: #9c2219;
 }
 html body .issue-dot.warn,
 html body .trace-info .trace-tone.issue-tone-warn {
-  color: #a36a12;
+  color: #7d4f00;
 }
 html body .issue-dot.missing,
 html body .trace-info .trace-tone.issue-tone-missing {
-  color: #6a42b8;
+  color: #5a32a3;
 }
 html body .issue-dot.neutral,
 html body .trace-info .trace-tone.issue-tone-neutral {
@@ -207,7 +207,7 @@ html body .issue-dot.done {
   color: var(--c-green-40);
 }
 html body .issue-card-old {
-  color: #b3261e;
+  color: #9c2219;
   font-weight: 600;
 }
 html body .issue-card-note {
@@ -219,7 +219,7 @@ html body .issue-card-note {
 html body .issue-card-note span {
   display: block;
   margin-bottom: 3px;
-  color: var(--c-gray-45);
+  color: #50606a;
   font-size: 11.5px;
 }
 html body .issue-card-note p {
@@ -231,7 +231,7 @@ html body .issue-card-note p {
 html body .issue-card-note small {
   display: block;
   margin-top: 4px;
-  color: var(--c-gray-45);
+  color: #50606a;
   font-size: 12px;
 }
 html body .issue-card-photos {
@@ -350,7 +350,7 @@ html body .order-card-qty {
   text-align: center;
 }
 html body .issue-dot.open {
-  color: #1f7a93;
+  color: #16627a;
 }
 /* Each part of a line keeps to its own column: a long name or Set is cut with «…», never under its neighbour. */
 html body .trace-split-list .issues-list button > * {
@@ -365,4 +365,12 @@ html body .trace-split-list .issues-list button > small {
 html body .trace-split-list .issues-list .issue-dot,
 html body .trace-split-list .issues-list .issue-row-when {
   justify-self: end;
+}
+
+/* A narrow window: the list, then the card, one under the other; the workspace scrolls so the card is reached. */
+@media (max-width: 1000px) {
+  html body .issues-main:has(.issues-split),
+  html body .tools-list-workspace:has(> .issues-layout .issues-split) {
+    overflow-y: auto;
+  }
 }
