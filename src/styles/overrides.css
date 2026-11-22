@@ -2789,9 +2789,32 @@ html body .release-actions .release-print {
 html body .sidebar-bin {
   flex: 0 0 auto;
   margin-top: auto;
+  overflow: visible;
 }
-html body .sidebar-bin .nav-badge.muted {
-  background: rgba(255, 255, 255, 0.18);
+html body .sidebar .sidebar-bin .sidebar-bin-icon {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  margin-right: 4px;
+  overflow: visible;
+}
+html body .sidebar-bin-count {
+  position: absolute;
+  top: -8px;
+  right: -9px;
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border: 2px solid var(--c-blue-15-2);
+  border-radius: 999px;
+  background: #d64541;
+  color: #fff;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
 }
 /* Phone: title and Filters on the first line, the search field on its own full-width line. */
 /* Composition & preparation: one compact line for who/when/how many, checks as tidy cards, the accepted

@@ -11,11 +11,19 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import {beforeEach, describe, expect, it} from 'vitest';
+import {useEffect} from 'react';
 import BackLink from '../../components/ui/BackLink';
+import {rememberPath} from '../../core/backTarget';
 
 const Where = () => {
   const {pathname, search} = useLocation();
   return <output data-testid="where">{pathname + search}</output>;
+};
+// As the app's shell does: each step's address, for «Πίσω» to name.
+const Remember = () => {
+  const {pathname, search} = useLocation();
+  useEffect(() => rememberPath(pathname + search), [pathname, search]);
+  return null;
 };
 const Queue = () => {
   const [params] = useSearchParams();
@@ -33,6 +41,7 @@ const App = () => (
       <Go />
     </nav>
     <Where />
+    <Remember />
     <Routes>
       <Route path="/" element={<p>home</p>} />
       <Route path="/sets" element={<p>sets page</p>} />
@@ -41,7 +50,7 @@ const App = () => (
         element={
           <>
             <p>tool page</p>
-            <BackLink fallback="/tools">back</BackLink>
+            <BackLink fallback="/tools" />
           </>
         }
       />
@@ -92,7 +101,8 @@ describe('routing (HashRouter)', () => {
     fireEvent.click(screen.getByRole('link', {name: 'sets-link'}));
     fireEvent.click(screen.getByRole('link', {name: 'tool-link'}));
     expect(screen.getByText('tool page')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('link', {name: 'back'}));
+    // It says where it returns to.
+    fireEvent.click(screen.getByRole('link', {name: 'Πίσω στα Σετ'}));
     await waitFor(() => expect(screen.getByText('sets page')).toBeInTheDocument());
   });
 });

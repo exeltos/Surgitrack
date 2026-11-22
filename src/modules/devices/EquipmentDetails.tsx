@@ -1,18 +1,7 @@
 import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {useHasModule} from '../../data/cloud/modulesContext';
-import {
-  ArrowLeft,
-  Cable,
-  FlaskConical,
-  KeyRound,
-  Pencil,
-  Plus,
-  Trash2,
-  TriangleAlert,
-  Upload,
-  Wrench,
-} from 'lucide-react';
+import {Cable, FlaskConical, KeyRound, Pencil, Plus, Trash2, TriangleAlert, Upload, Wrench} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import AppButton from '../../components/ui/AppButton';
 import BackLink from '../../components/ui/BackLink';
@@ -171,9 +160,7 @@ export default function EquipmentDetails({
     <section className="asset-detail-workspace equipment-detail-workspace" aria-label={row.name}>
       <div className="asset-workbench-actions">
         <div className="asset-action-group">
-          <BackLink fallback="/sterilizers" className="asset-action-link">
-            <ArrowLeft size={18} /> {L('Πίσω στη λίστα', 'Back to the list')}
-          </BackLink>
+          <BackLink fallback="/sterilizers" className="asset-action-link" />
         </div>
         <div className="asset-action-group">
           {row.libraryId && canConfigure && (

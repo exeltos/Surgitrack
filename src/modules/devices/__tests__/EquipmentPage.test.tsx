@@ -266,7 +266,7 @@ describe('Sterilizers & Devices, one screen', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     // The list is not shown beside it.
     expect(screen.queryByText('ΚΛΙΒΑΝΟΣ 2')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
+    fireEvent.click(screen.getByRole('link', {name: /^Πίσω/}));
     expect(await screen.findByText('ΚΛΙΒΑΝΟΣ 2')).toBeInTheDocument();
     expect(screen.queryByRole('region', {name: 'ΚΛΙΒΑΝΟΣ 1'})).not.toBeInTheDocument();
   });
@@ -289,7 +289,7 @@ describe('Sterilizers & Devices, one screen', () => {
         ],
       }),
     );
-    fireEvent.click(screen.getByRole('link', {name: /Πίσω στη λίστα/}));
+    fireEvent.click(screen.getByRole('link', {name: /^Πίσω/}));
     // The row says which test failed: Bowie-Dick, marked failed.
     const failed = within(await rowOf('ΚΛΙΒΑΝΟΣ 2'))
       .getByText('Bowie-Dick')
