@@ -18,8 +18,8 @@ table{width:100%;border-collapse:collapse}thead{display:table-header-group}
 th{font-size:6.8pt;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#4b5d68;text-align:left;padding:1.8mm 1.6mm;background:#eef4f6;border-bottom:.35mm solid #9fb3bd}
 td{padding:1.6mm;border-bottom:.2mm solid #dde4e8;vertical-align:top}tbody tr:nth-child(even) td{background:#f8fafb}tr{break-inside:avoid}
 .mono{font-family:Consolas,monospace;font-weight:700}.name{font-weight:700}.small{display:block;color:#6a7a84;font-size:7pt;font-weight:400}
-.chip{display:inline-block;padding:.2mm 1.4mm;border-radius:.8mm;font-size:6.8pt;font-weight:800}
-.r-SERVICE{background:#e7f0fb;color:#1f4f8a}.r-DAMAGED{background:#fff3df;color:#8a4b00}.r-LOST{background:#fde8e6;color:#b3261e}.r-RETIRED{background:#eef2f4;color:#4b5d68}
+.reason{font-weight:800}.r-SERVICE{color:#1f4f8a}.r-DAMAGED{color:#8a4b00}.r-LOST{color:#b3261e}.r-RETIRED{color:#4b5d68}
+.clip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60mm}
 .yes{color:#1d7a4d;font-weight:800}.no{color:#b3261e;font-weight:800}
 .num{text-align:right}.qty{text-align:center;font-weight:800;font-size:10pt}
 .meta{display:grid;grid-template-columns:repeat(4,1fr);border:.25mm solid #d7e0e5;border-radius:2mm;margin-bottom:5mm}.meta div{padding:2mm 3mm;border-right:.25mm solid #e3e9ec}.meta div:last-child{border-right:0}.meta b{display:block;font-size:6.5pt;letter-spacing:.06em;color:#6a7a84;text-transform:uppercase;margin-bottom:.6mm}.meta span{font-weight:700;font-size:9pt}
@@ -50,12 +50,15 @@ export function replacementListHtml(items: readonly ReplacementItem[], subtitle:
     .map(
       (item, index) => `<tr>
 <td class="num">${index + 1}</td>
-<td class="mono">${esc(item.tool.barcode)}</td>
-<td class="name">${esc(item.tool.name)}<span class="small">${esc(item.tool.code || '—')}${item.tool.serialNumber ? ` · S/N ${esc(item.tool.serialNumber)}` : ''}</span></td>
-<td>${esc(item.tool.manufacturer || '—')}</td>
-<td>${item.set ? `<span class="mono">${esc(item.set.barcode)}</span><span class="small">${esc(item.set.name)}</span>` : '—'}</td>
-<td>${esc(trData(item.department || '—'))}</td>
-<td><span class="chip r-${item.reason}">${esc(tr(REASON_LABEL[item.reason]))}</span>${item.issueTypes.length ? `<span class="small">${esc(item.issueTypes.map(trData).join(' · '))}</span>` : ''}${item.issueNote ? `<span class="small">${esc(item.issueNote)}</span>` : ''}</td>
+<td class="name">${esc(item.tool.name)}<span class="small"><span class="mono">${esc(item.tool.barcode)}</span>${[
+        item.tool.code,
+        item.tool.manufacturer,
+      ]
+        .filter(Boolean)
+        .map(v => ` · ${esc(v)}`)
+        .join('')}${item.tool.serialNumber ? ` · S/N ${esc(item.tool.serialNumber)}` : ''}</span></td>
+<td>${item.set ? `${esc(item.set.name)}<span class="small"><span class="mono">${esc(item.set.barcode)}</span> · ${esc(trData(item.department || '—'))}</span>` : esc(trData(item.department || '—'))}</td>
+<td><span class="reason r-${item.reason}">${esc(tr(REASON_LABEL[item.reason]))}</span>${item.issueTypes.length ? `<span class="small">${esc(item.issueTypes.map(trData).join(' · '))}</span>` : ''}${item.issueNote ? `<span class="small clip">${esc(item.issueNote)}</span>` : ''}</td>
 <td>${esc(item.since || '—')}</td>
 <td>${item.stock.length ? `<span class="yes">${esc(tr('Ναι · {0}', item.stock.length))}</span>` : `<span class="no">${esc(tr('Όχι'))}</span>`}</td>
 <td>${esc(status(item))}</td>
@@ -73,8 +76,8 @@ export function replacementListHtml(items: readonly ReplacementItem[], subtitle:
 <div><b>${esc(tr('Εκτός χρήσης'))}</b><span>${count('RETIRED')}</span></div>
 <div><b>${esc(tr('Υπάρχει στο απόθεμα'))}</b><span>${items.filter(i => i.stock.length).length}</span></div>
 </div>
-<table><thead><tr><th class="num">#</th><th>Barcode</th><th>${esc(tr('Εργαλείο / κωδικός'))}</th><th>${esc(tr('Κατασκευαστής'))}</th><th>${esc(tr('Σετ'))}</th><th>${esc(tr('Τμήμα'))}</th><th>${esc(tr('Αιτία'))}</th><th>${esc(tr('Από'))}</th><th>${esc(tr('Στο απόθεμα'))}</th><th>${esc(tr('Κατάσταση'))}</th></tr></thead>
-<tbody>${rows || `<tr><td colspan="10">${esc(tr('Δεν υπάρχουν εγγραφές για τα επιλεγμένα φίλτρα.'))}</td></tr>`}</tbody></table>
+<table><thead><tr><th class="num">#</th><th style="width:30%">${esc(tr('Εργαλείο'))}</th><th style="width:22%">${esc(tr('Σετ / τμήμα'))}</th><th style="width:18%">${esc(tr('Αιτία'))}</th><th>${esc(tr('Από'))}</th><th>${esc(tr('Στο απόθεμα'))}</th><th>${esc(tr('Κατάσταση'))}</th></tr></thead>
+<tbody>${rows || `<tr><td colspan="7">${esc(tr('Δεν υπάρχουν εγγραφές για τα επιλεγμένα φίλτρα.'))}</td></tr>`}</tbody></table>
 <div class="footer"><span>SurgiTrack</span><span>${esc(tr('{0} εγγραφές', items.length))}</span></div>`,
   );
 }

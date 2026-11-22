@@ -1664,7 +1664,6 @@ export const en: Record<string, string> = {
   Επιστροφή: 'Return',
   'Εργαλεία σε Service, με βλάβη ή χαμένα: αντικατάσταση από το Απόθεμα ή παραγγελία.':
     'Instruments in Service, damaged or lost: replace from Stock or order.',
-  'Εργαλείο / κωδικός': 'Instrument / code',
   'Ημερομηνία & υπογραφή': 'Date & signature',
   'Καθαρισμός επιλογής': 'Clear selection',
   'Κανένα εργαλείο δεν ταιριάζει στα φίλτρα.': 'No instrument matches the filters.',
