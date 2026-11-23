@@ -2564,6 +2564,8 @@ export const en: Record<string, string> = {
   'Πρώτα τελειώνει ο κύκλος που είναι στον κλίβανο.': 'The cycle in the sterilizer ends first.',
   '{0} λεπτά ακόμα': '{0} min to go',
   'Ο χρόνος του προγράμματος πέρασε': 'The program time has passed',
+  'Ο κλίβανος «{0}» έχει ήδη τον κύκλο {1}: το φορτίο επιστρέφει όταν τελειώσει αυτός.':
+    'Sterilizer «{0}» is running cycle {1}: the load goes back once it has ended.',
   'Αποστείρωση (λεπτά)': 'Sterilization (min)',
   'Όλος ο κύκλος (λεπτά)': 'Whole cycle (min)',
   'Όνομα προγράμματος': 'Program name',

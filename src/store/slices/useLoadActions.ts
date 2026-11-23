@@ -432,6 +432,22 @@ export function useLoadActions(
   const reopenProcessLoad = (loadId: string, reason: string) => {
     const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
     if (!load || load.status !== 'AWAITING_RELEASE' || !reason.trim()) return false;
+    // One cycle at a time: it goes back only while no other load is in that sterilizer.
+    const inside = openCycleOn(
+      processLoads.filter(item => item.id !== loadId),
+      load.equipment,
+    );
+    if (inside) {
+      notify(
+        tr(
+          'Ο κλίβανος «{0}» έχει ήδη τον κύκλο {1}: το φορτίο επιστρέφει όταν τελειώσει αυτός.',
+          inside.equipment,
+          inside.cycleNumber,
+        ),
+        true,
+      );
+      return false;
+    }
     if (sterilizationReleases.some(r => r.loadId === loadId)) {
       notify(
         tr('Από το φορτίο {0} έχουν ήδη αποδεσμευτεί αντικείμενα: δεν επιστρέφει στον κλίβανο.', named(loadId)),
