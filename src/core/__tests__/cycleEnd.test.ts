@@ -40,10 +40,13 @@ describe('a program with the whole cycle length', () => {
 describe('the end of a cycle', () => {
   const start = new Date(2026, 10, 23, 9, 0).getTime();
 
-  it('is known from the program, and passed once its time has come', () => {
-    expect(autoEndAt(load())).toBe(start + 45 * 60_000);
-    expect(autoEnded(load(), start + 44 * 60_000)).toBe(false);
-    expect(autoEnded(load(), start + 45 * 60_000)).toBe(true);
+  it('is known from the program, counted from the exact start, and passed once its time has come', () => {
+    const exact = load({startedAtMs: start + 59_000});
+    expect(autoEndAt(exact)).toBe(start + 59_000 + 45 * 60_000);
+    expect(autoEnded(exact, start + 45 * 60_000)).toBe(false);
+    expect(autoEnded(exact, start + 59_000 + 45 * 60_000)).toBe(true);
+    // Only the minute known: from the end of that minute, never short.
+    expect(autoEndAt(load())).toBe(start + 46 * 60_000);
   });
 
   it('is by hand for a program with no total, a simulated cycle or a load no longer in the sterilizer', () => {

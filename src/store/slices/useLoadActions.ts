@@ -256,7 +256,7 @@ export function useLoadActions(
       createdByUserId: currentUser.id,
       createdByName: currentUser.name,
       createdAt: now,
-      ...(running ? {} : {completedAt: now}),
+      ...(running ? {startedAtMs: Date.now()} : {completedAt: now}),
     };
     setProcessLoads(list => [record, ...list]);
     if (running) {

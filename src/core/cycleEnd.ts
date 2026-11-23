@@ -19,8 +19,11 @@ export function autoEndAt(load: ProcessLoadRecord): number | undefined {
   if (load.kind !== 'STERILIZATION' || load.status !== 'OPEN' || load.simulation) return undefined;
   if (load.reopenedAt || load.note?.includes(AUTO_END_NOTE)) return undefined;
   const minutes = programTotalMinutes(load.program);
+  if (!minutes) return undefined;
+  if (load.startedAtMs) return load.startedAtMs + minutes * 60_000;
+  // A load with only its minute: counted from the end of that minute, so the cycle is never cut short.
   const started = parseDisplayDate(load.createdAt);
-  return minutes && started ? started.getTime() + minutes * 60_000 : undefined;
+  return started ? started.getTime() + 60_000 + minutes * 60_000 : undefined;
 }
 
 /** Whether a load in the sterilizer has reached the end its program sets. */

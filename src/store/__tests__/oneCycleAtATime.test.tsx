@@ -81,7 +81,7 @@ describe('a sterilizer runs one cycle at a time', () => {
   });
 
   it("ends a cycle by itself once its program's whole length has passed, at that time", () => {
-    vi.useFakeTimers({toFake: ['Date'], now: new Date(2026, 10, 23, 9, 0)});
+    vi.useFakeTimers({toFake: ['Date'], now: new Date(2026, 10, 23, 9, 0, 30)});
     const f = setup();
     f.load(0, 'S-1', '134°C · 5 min · σύνολο 45 min');
     vi.setSystemTime(new Date(2026, 10, 23, 9, 30));
@@ -91,7 +91,9 @@ describe('a sterilizer runs one cycle at a time', () => {
     expect(f.load(1, 'S-2', '134°C · 5 min')?.status).toBe('OPEN');
     const ended = f.s().processLoads.find(l => l.cycleNumber === 'S-1')!;
     expect(ended.status).toBe('AWAITING_RELEASE');
+    // Ended 45 minutes after its exact start (09:00:30), not at the start of its minute.
     expect(ended.completedAt).toBe('23/11/2026 09:45');
+    expect(ended.startedAtMs).toBe(new Date(2026, 10, 23, 9, 0, 30).getTime());
     expect(ended.note).toContain('Αυτόματο τέλος κύκλου');
     // One record per load and item, so that two apps recording the same end keep one.
     const cycles = f.s().sterilizationCycles.filter(c => c.loadId === ended.id);
