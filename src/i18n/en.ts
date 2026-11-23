@@ -2564,6 +2564,9 @@ export const en: Record<string, string> = {
   'Πρώτα τελειώνει ο κύκλος που είναι στον κλίβανο.': 'The cycle in the sterilizer ends first.',
   '{0} λεπτά ακόμα': '{0} min to go',
   'Ο χρόνος του προγράμματος πέρασε': 'The program time has passed',
+  'Διαγραφή προγράμματος;': 'Delete program?',
+  'Το πρόγραμμα «{0}» θα αφαιρεθεί από τον κλίβανο μόλις πατήσετε «Αποθήκευση». Τα φορτία που έγιναν με αυτό μένουν ως έχουν.':
+    'Program «{0}» will be removed from the sterilizer when you press «Save». Loads already run with it stay as they are.',
   'Ο κλίβανος «{0}» έχει ήδη τον κύκλο {1}: το φορτίο επιστρέφει όταν τελειώσει αυτός.':
     'Sterilizer «{0}» is running cycle {1}: the load goes back once it has ended.',
   'Αποστείρωση (λεπτά)': 'Sterilization (min)',

@@ -9,6 +9,7 @@ import {
 } from '../../core/sterilizerPrograms';
 import type {LibraryItem} from '../../core/libraries';
 import AppButton from '../../components/ui/AppButton';
+import {useConfirm} from '../../components/ui/useConfirm';
 import {translateToEnglish} from '../../core/glossary';
 import {tr} from '../../i18n';
 
@@ -42,8 +43,11 @@ export default function LibraryEditor({
     );
   // One name only: the English comes from the built-in glossary (or stays as written).
   const english = translateToEnglish(el);
+  // Removing a program is asked first, as every deletion is.
+  const [confirm, ask] = useConfirm();
   return (
     <div className="studio-drawer-backdrop" onMouseDown={e => e.currentTarget === e.target && onClose()}>
+      {confirm}
       <aside className="studio-drawer">
         <header>
           <div>
@@ -118,7 +122,18 @@ export default function LibraryEditor({
                     type="button"
                     aria-label={tr('Αφαίρεση προγράμματος')}
                     disabled={programs.length === 1}
-                    onClick={() => setOwnPrograms(programs.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      ask({
+                        title: tr('Διαγραφή προγράμματος;'),
+                        message: tr(
+                          'Το πρόγραμμα «{0}» θα αφαιρεθεί από τον κλίβανο μόλις πατήσετε «Αποθήκευση». Τα φορτία που έγιναν με αυτό μένουν ως έχουν.',
+                          programFromFields(program) || tr('Πρόγραμμα'),
+                        ),
+                        confirmLabel: tr('Διαγραφή'),
+                        danger: true,
+                        onConfirm: () => setOwnPrograms(programs.filter((_, i) => i !== index)),
+                      })
+                    }
                   >
                     <X size={16} />
                   </button>
