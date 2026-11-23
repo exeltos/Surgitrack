@@ -212,7 +212,8 @@ const sameName = (a?: string, b?: string) => !!a && !!b && plain(a.trim()) === p
  */
 const peopleOf = (m: Movement, stage?: string) => {
   const [recorder, ...byRest] = (m.by || '').split(' · ');
-  const segments = movementText(m.status).split(' · ');
+  // The stored text, untranslated: the roles are read from its Greek words, and only what is shown is translated.
+  const segments = m.status.split(' · ');
   const name = (prefix: RegExp) =>
     [...segments, ...byRest].map(seg => seg.match(prefix)?.[1]).find((found): found is string => !!found);
   const handedBy = name(/^παρέδωσε\s+(.+)$/i);
@@ -239,7 +240,11 @@ const peopleOf = (m: Movement, stage?: string) => {
               ...(receivedBy ? ([[tr('Παρέλαβε'), receivedBy]] as Array<[string, string]>) : []),
             ]
           : [['', recorder]];
-  return {action: segments[0], rest: rest.join(' · '), roles: roles.filter(([, who]) => !!who)};
+  return {
+    action: movementText(segments[0]),
+    rest: rest.map(movementText).join(' · '),
+    roles: roles.filter(([, who]) => !!who),
+  };
 };
 
 function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean; onPatient?: (code: string) => void}) {

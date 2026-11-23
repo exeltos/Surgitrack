@@ -204,4 +204,29 @@ describe('TraceFlow', () => {
     expect(steps[1]).toHaveTextContent('Παρέλαβε ΤΣΙΝΤΖΙΡΟΥΛΗ ΜΑΡΙΑ');
     expect(steps[1]).toHaveTextContent('χωρίς εμφανή απόκλιση');
   });
+
+  it('reads the roles from the stored text in English too', async () => {
+    const {setI18nLang} = await import('../../../i18n');
+    setI18nLang('en');
+    try {
+      const r: Round = {
+        key: 'r4',
+        moves: [
+          move('d', 'Παράδοση / παραλαβή ολοκληρώθηκε · παρέδωσε ΝΙΚΟΣ · παρέλαβε ΜΑΡΙΑ', '24/11/2026 09:00', {
+            from: 'Κεντρική Αποστείρωση',
+            to: 'ΜΕΘ',
+            by: 'ΕΛΕΝΗ',
+          }),
+        ],
+      };
+      render(<TraceFlow rounds={[r]} undone={new Set()} />);
+      const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
+      expect(steps[6]).toHaveTextContent('ΝΙΚΟΣ');
+      expect(steps[6]).toHaveTextContent('ΜΑΡΙΑ');
+      expect(steps[6]).not.toHaveTextContent('ΕΛΕΝΗ');
+      expect(steps[6]).not.toHaveTextContent('handed over by');
+    } finally {
+      setI18nLang('el');
+    }
+  });
 });
