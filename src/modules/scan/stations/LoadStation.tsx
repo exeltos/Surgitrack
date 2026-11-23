@@ -10,7 +10,8 @@ import {ScanWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../S
 import {useScanAnswers} from '../useScanAnswers';
 import {CheckCircle2, TriangleAlert} from 'lucide-react';
 import {askConfirm} from '../../../components/ui/confirmService';
-import {autoEnded, openCycleOn} from '../../../core/cycleEnd';
+import {autoEndAt, autoEnded, openCycleOn} from '../../../core/cycleEnd';
+import {useNow} from '../../sterilization/parts/simulationClock';
 import {shortCycleNumber} from '../../../core/cycleNumber';
 
 /**
@@ -41,7 +42,9 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
   const items = s.loadCandidates.filter(item => s.loadSelected.has(`${item.kind}:${item.id}`));
   // One cycle at a time: the sterilizer's cycle still running ends first (see cycleEnd).
   const inside = openCycleOn(s.processLoads, s.loadEquipment);
-  const blocked = !!inside && !autoEnded(inside);
+  // A timed cycle frees the sterilizer at its end: the clock redraws, so «Έναρξη κύκλου» unlocks then.
+  const now = useNow(!!inside && autoEndAt(inside) !== undefined);
+  const blocked = !!inside && !autoEnded(inside, now);
   const ready =
     !blocked && !!items.length && !!s.loadEquipment.trim() && !!s.loadCycleNumber.trim() && !!s.loadProgram.trim();
 

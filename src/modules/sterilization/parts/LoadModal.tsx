@@ -11,7 +11,8 @@ import DeviceCyclePicker from '../../devices/DeviceCyclePicker';
 import {useHasModule} from '../../../data/cloud/modulesContext';
 import {deviceNote} from '../sterilizationTypes';
 import type {SterilizationPageState} from '../useSterilizationPage';
-import {autoEnded, openCycleOn} from '../../../core/cycleEnd';
+import {autoEndAt, autoEnded, openCycleOn} from '../../../core/cycleEnd';
+import {useNow} from './simulationClock';
 import {shortCycleNumber} from '../../../core/cycleNumber';
 import {formatDate} from '../../../core/displayDate';
 import {useConfirm} from '../../../components/ui/useConfirm';
@@ -58,7 +59,9 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
   // One cycle at a time: the sterilizer's cycle still running ends first (one past the end its program sets has
   // ended by itself, and is ended when this load starts).
   const inside = loadModal === 'STERILIZATION' ? openCycleOn(s.processLoads, loadEquipment) : undefined;
-  const blocked = !!inside && !autoEnded(inside);
+  // A timed cycle frees the sterilizer at its end: the clock redraws, so «Έναρξη κύκλου» unlocks then.
+  const now = useNow(!!inside && autoEndAt(inside) !== undefined);
+  const blocked = !!inside && !autoEnded(inside, now);
   return (
     <>
       {confirm}
