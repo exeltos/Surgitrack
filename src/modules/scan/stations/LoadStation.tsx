@@ -8,6 +8,11 @@ import CycleNumberSelect from '../../sterilization/parts/CycleNumberSelect';
 import {programsOf} from '../../../core/sterilizerPrograms';
 import {ScanWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
+import {CheckCircle2, TriangleAlert} from 'lucide-react';
+import {askConfirm} from '../../../components/ui/confirmService';
+import {autoEndAt, autoEnded, openCycleOn} from '../../../core/cycleEnd';
+import {useNow} from '../../sterilization/parts/simulationClock';
+import {shortCycleNumber} from '../../../core/cycleNumber';
 
 /**
  * Sterilizer loading: scan what goes into the cycle, then the sterilizer, cycle number, program and the
@@ -35,7 +40,13 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
     }
   }, [s.loadModal]);
   const items = s.loadCandidates.filter(item => s.loadSelected.has(`${item.kind}:${item.id}`));
-  const ready = !!items.length && !!s.loadEquipment.trim() && !!s.loadCycleNumber.trim() && !!s.loadProgram.trim();
+  // One cycle at a time: the sterilizer's cycle still running ends first (see cycleEnd).
+  const inside = openCycleOn(s.processLoads, s.loadEquipment);
+  // A timed cycle frees the sterilizer at its end: the clock redraws, so «Έναρξη κύκλου» unlocks then.
+  const now = useNow(!!inside && autoEndAt(inside) !== undefined);
+  const blocked = !!inside && !autoEnded(inside, now);
+  const ready =
+    !blocked && !!items.length && !!s.loadEquipment.trim() && !!s.loadCycleNumber.trim() && !!s.loadProgram.trim();
 
   if (step === 'DONE')
     return (
@@ -100,6 +111,49 @@ export default function LoadStation({onStations}: {onStations: () => void}) {
             <input value={s.loadEquipment} onChange={e => s.setLoadEquipment(e.target.value)} />
           )}
         </label>
+        {inside && blocked && (
+          <div className="scan-cycle-open" role="alert">
+            <b>{tr('Ο κλίβανος έχει ακόμα τον κύκλο {0}', shortCycleNumber(inside.cycleNumber))}</b>
+            <small>{tr('Πρώτα τελειώνει αυτός, μετά ξεκινά ο επόμενος.')}</small>
+            <div className="scan-load-actions">
+              <button
+                type="button"
+                className="scan-danger"
+                onClick={() =>
+                  void askConfirm({
+                    title: tr('Αποτυχία κύκλου;'),
+                    message: tr(
+                      'Όλο το φορτίο ({0} αντικείμενα) θα επιστρέψει σε επανεπεξεργασία. Η ενέργεια καταγράφεται στο ιστορικό.',
+                      inside.items.length,
+                    ),
+                    confirmLabel: tr('Αποτυχία κύκλου'),
+                    danger: true,
+                  }).then(sure => sure !== false && s.finishProcessLoad(inside.id, 'FAILED'))
+                }
+              >
+                <TriangleAlert size={16} /> {tr('Αποτυχία κύκλου')}
+              </button>
+              <button
+                type="button"
+                className="scan-primary"
+                onClick={() =>
+                  void askConfirm({
+                    title: tr('Τέλος κύκλου;'),
+                    message: tr(
+                      'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.',
+                      inside.cycleNumber,
+                      trData(inside.equipment),
+                      inside.items.length,
+                    ),
+                    confirmLabel: tr('Τέλος κύκλου'),
+                  }).then(sure => sure !== false && s.finishProcessLoad(inside.id, 'PASSED'))
+                }
+              >
+                <CheckCircle2 size={16} /> {tr('Τέλος κύκλου {0}', shortCycleNumber(inside.cycleNumber))}
+              </button>
+            </div>
+          </div>
+        )}
         <CycleNumberSelect
           className="scan-field"
           sterilizer={sterilizers.find(item => item.el === s.loadEquipment)}

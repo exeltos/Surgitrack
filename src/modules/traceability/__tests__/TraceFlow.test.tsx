@@ -54,7 +54,7 @@ describe('TraceFlow', () => {
       'Παράδοση',
       'Ασθενής',
     ]);
-    expect(steps[1]).toHaveTextContent('← Χειρουργείο');
+    expect(steps[1]).toHaveTextContent('Από Χειρουργείο');
     expect(steps[2]).toHaveClass('is-empty');
     expect(steps[4]).toHaveTextContent('Κλίβανος Ατμού 02');
     // The cycle's result here; its release is said once, in «Αποδέσμευση».
@@ -63,7 +63,7 @@ describe('TraceFlow', () => {
     expect(steps[0]).toHaveClass('is-empty');
     expect(steps[4]).toHaveTextContent('Νίκος');
     expect(steps[5]).toHaveTextContent('12/11/2026 08:30');
-    expect(steps[6]).toHaveTextContent('→ Χειρουργείο');
+    expect(steps[6]).toHaveTextContent('Προς Χειρουργείο');
     fireEvent.click(within(steps[7]).getByRole('button', {name: 'PT-2026-0177'}));
     expect(onPatient).toHaveBeenCalledWith('PT-2026-0177');
     fireEvent.click(within(steps[4]).getByRole('button', {name: 'Φορτίο'}));
@@ -100,7 +100,7 @@ describe('TraceFlow', () => {
     };
     render(<TraceFlow rounds={[r]} undone={new Set()} onPatient={vi.fn()} onLoad={vi.fn()} />);
     const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
-    expect(steps[0]).toHaveTextContent('← ΜΕΘ');
+    expect(steps[0]).toHaveTextContent('Από ΜΕΘ');
     expect(steps[0]).toHaveTextContent('ΣΑΡΡΟΣ');
     expect(steps[7]).toHaveClass('is-empty');
     expect(screen.queryByText(/Στον κλίβανο/)).toBeNull();
@@ -174,5 +174,78 @@ describe('TraceFlow', () => {
     const r: Round = {key: 'r9', moves: [move('k', 'Φυσική παραλαβή · χωρίς εμφανή απόκλιση', '21/11/2026 12:48')]};
     render(<TraceFlow rounds={[r]} undone={new Set()} />);
     expect(screen.getByText('χωρίς εμφανή απόκλιση')).not.toHaveClass('failed');
+  });
+
+  it('says who sent, who handed over and who took it, each name once', () => {
+    const r: Round = {
+      key: 'r3',
+      moves: [
+        move(
+          's',
+          'Ηλεκτρονική αποστολή · ΑΒΡΑΜΠΟΥ ΚΩΝΣΤΑΝΤΙΝΑ (u-12) · αναμονή φυσικής παραλαβής',
+          '23/11/2026 08:29',
+          {
+            from: 'ΚΑΡΔΙΟΧΕΙΡΟΥΡΓΙΚΗ',
+            by: 'ΑΒΡΑΜΠΟΥ ΚΩΝΣΤΑΝΤΙΝΑ',
+          },
+        ),
+        move('r', 'Φυσική παραλαβή · χωρίς εμφανή απόκλιση', '23/11/2026 08:35', {
+          from: 'ΚΑΡΔΙΟΧΕΙΡΟΥΡΓΙΚΗ',
+          by: 'ΤΣΙΝΤΖΙΡΟΥΛΗ ΜΑΡΙΑ · παρέδωσε ΑΒΡΑΜΠΟΥ ΚΩΝΣΤΑΝΤΙΝΑ',
+        }),
+      ],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} />);
+    const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
+    expect(steps[0]).toHaveTextContent('Από ΚΑΡΔΙΟΧΕΙΡΟΥΡΓΙΚΗ');
+    expect(steps[0]).toHaveTextContent('Έστειλε ΑΒΡΑΜΠΟΥ ΚΩΝΣΤΑΝΤΙΝΑ');
+    expect(steps[0].textContent!.match(/ΑΒΡΑΜΠΟΥ/g)).toHaveLength(1);
+    expect(steps[1]).toHaveTextContent('Παρέδωσε ΑΒΡΑΜΠΟΥ ΚΩΝΣΤΑΝΤΙΝΑ');
+    expect(steps[1]).toHaveTextContent('Παρέλαβε ΤΣΙΝΤΖΙΡΟΥΛΗ ΜΑΡΙΑ');
+    expect(steps[1]).toHaveTextContent('χωρίς εμφανή απόκλιση');
+  });
+
+  it('reads the roles from the stored text in English too', async () => {
+    const {setI18nLang} = await import('../../../i18n');
+    setI18nLang('en');
+    try {
+      const r: Round = {
+        key: 'r4',
+        moves: [
+          move('d', 'Παράδοση / παραλαβή ολοκληρώθηκε · παρέδωσε ΝΙΚΟΣ · παρέλαβε ΜΑΡΙΑ', '24/11/2026 09:00', {
+            from: 'Κεντρική Αποστείρωση',
+            to: 'ΜΕΘ',
+            by: 'ΕΛΕΝΗ',
+          }),
+        ],
+      };
+      render(<TraceFlow rounds={[r]} undone={new Set()} />);
+      const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
+      expect(steps[6]).toHaveTextContent('ΝΙΚΟΣ');
+      expect(steps[6]).toHaveTextContent('ΜΑΡΙΑ');
+      expect(steps[6]).not.toHaveTextContent('ΕΛΕΝΗ');
+      expect(steps[6]).not.toHaveTextContent('handed over by');
+    } finally {
+      setI18nLang('el');
+    }
+  });
+
+  it('says who undid a delivery, without giving them a handover role', () => {
+    const r: Round = {
+      key: 'r5',
+      moves: [
+        move('u', 'Αναίρεση: Παράδοση / παραλαβή ολοκληρώθηκε · παρέδωσε ΝΙΚΟΣ · παρέλαβε ΜΑΡΙΑ', '24/11/2026 10:00', {
+          from: 'Κεντρική Αποστείρωση',
+          to: 'ΜΕΘ',
+          by: 'ΕΛΕΝΗ',
+          undoes: 'd1',
+        }),
+      ],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} />);
+    const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
+    const step = steps.find(s => s.textContent?.includes('ΕΛΕΝΗ'))!;
+    expect(step).toHaveTextContent('Αναίρεσε ΕΛΕΝΗ');
+    expect(step).not.toHaveTextContent('Παρέλαβε ΕΛΕΝΗ');
   });
 });

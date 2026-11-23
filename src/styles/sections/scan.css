@@ -863,7 +863,7 @@ html body .scan-refused li.scan-report-row {
   gap: 10px;
   border-color: #f5c56b;
   border-left-color: #d97f06;
-  background: #fff8ea;
+  background: var(--c-amber-95);
   color: #7a4b00;
   font-size: 14px;
 }
@@ -1566,4 +1566,18 @@ html body .scan-pass-scan {
 html body .scan-pass-scan-label {
   font-size: 15px;
   font-weight: 650;
+}
+
+/* A sterilizer still running a cycle (Φόρτωση κλιβάνου): it ends first. */
+html body .scan-cycle-open {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--c-amber-85);
+  border-radius: 12px;
+  background: var(--c-amber-95);
+  color: var(--c-amber-35);
+}
+html body .scan-cycle-open small {
+  color: var(--c-amber-40);
 }

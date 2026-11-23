@@ -1674,6 +1674,15 @@
   padding: 0;
   border: 0;
 }
+.studio-program-head span {
+  color: var(--c-gray-45);
+  font-size: 11px;
+}
+.studio-programs-note {
+  color: var(--c-gray-45);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
 .studio-programs legend {
   margin-bottom: 6px;
   padding: 0;
@@ -1683,7 +1692,7 @@
 }
 .studio-program-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 40px;
+  grid-template-columns: 92px 92px 92px minmax(0, 1fr) 40px;
   gap: 6px;
   width: 100%;
 }

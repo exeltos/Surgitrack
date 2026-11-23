@@ -471,6 +471,33 @@ html body .ster-asset-cell.with-pick .ster-row-pick {
   font-size: 13px;
   font-weight: 600;
 }
+/* A sterilizer still running a cycle: it ends first, here, before the next load starts. */
+.load-cycle-open {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--c-amber-85);
+  border-radius: 10px;
+  background: var(--c-amber-95);
+  color: var(--c-amber-35);
+  font-size: 13px;
+}
+.load-cycle-open > span {
+  display: grid;
+  flex: 1 1 260px;
+  gap: 2px;
+}
+.load-cycle-open small {
+  color: var(--c-amber-40);
+  font-size: 12px;
+}
+.load-cycle-open-actions {
+  display: flex;
+  gap: 8px;
+}
 /* Sterilizer load and load release: roomy dialogs, the instrument list gets the free height. */
 html body .load-modal {
   width: min(1180px, calc(100vw - 32px));

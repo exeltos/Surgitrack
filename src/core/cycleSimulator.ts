@@ -6,6 +6,8 @@
  * values are made up and always marked «Προσομοίωση»; they never pass for a device's data.
  */
 
+import {programBase} from './sterilizerPrograms';
+
 export type SimScenario = 'PASS' | 'LOW_PRESSURE' | 'ABORTED';
 
 /** What a run keeps: when it started (epoch ms), the scenario and the speed (simulated seconds per second). */
@@ -32,8 +34,10 @@ const round = (value: number, digits = 1) => Math.round(value * 10 ** digits) / 
 
 /** The plan of a program written like «134°C · 5 min» (anything else runs the common 134°C for 5 minutes). */
 export function planFor(program: string): CyclePlan {
+  // «· σύνολο 45 min» is the whole cycle, not the exposure.
+  program = programBase(program);
   const temperature = /(\d{2,3})\s*°?\s*C/i.exec(program);
-  const minutes = /(\d{1,2})\s*(?:min|λεπτ|')/i.exec(program);
+  const minutes = /(\d{1,2})\s*(?:min|λεπτ|['′’])/i.exec(program);
   const setpoint = temperature ? Math.min(Math.max(Number(temperature[1]), 110), 140) : 134;
   const holdMinutes = minutes ? Math.min(Math.max(Number(minutes[1]), 1), 30) : 5;
   return {setpoint, holdMinutes, heatMinutes: 6, dryMinutes: 9};

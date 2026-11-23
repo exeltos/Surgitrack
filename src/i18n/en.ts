@@ -958,6 +958,8 @@ export const en: Record<string, string> = {
   Παρακολούθηση: 'Monitoring',
   'Πίσω στα Σετ & Εργαλεία': 'Back to Sets & Instruments',
   'Πίσω στη λίστα': 'Back to list',
+  Έστειλε: 'Sent by',
+  Αναίρεσε: 'Undone by',
   'Αναζήτηση: όνομα, barcode, ποιος το διέγραψε…': 'Search: name, barcode, who deleted it…',
   'Άδειασμα κάδου;': 'Empty the recycle bin?',
   'Διαγράφονται για πάντα {0} εγγραφές και δεν θα μπορούν να επανέλθουν.':
@@ -2492,7 +2494,6 @@ export const en: Record<string, string> = {
   Αναμένεται: 'Pending',
   'Φορτίο κλιβάνου': 'Sterilizer load',
   Προγράμματα: 'Programs',
-  'Πρόγραμμα {0}': 'Program {0}',
   'Αφαίρεση προγράμματος': 'Remove program',
   'Προσθήκη προγράμματος': 'Add program',
   'λέξεις με ορθογραφικό λάθος': 'words misspelled',
@@ -2556,4 +2557,28 @@ export const en: Record<string, string> = {
   'Όλοι οι γύροι': 'All rounds',
   Ημερομηνίες: 'Dates',
   'Καμία κίνηση σε αυτές τις ημερομηνίες': 'No movement on these dates',
+  'Ο κλίβανος έχει ακόμα τον κύκλο {0}': 'The sterilizer is still running cycle {0}',
+  'Πρώτα τελειώνει αυτός, μετά ξεκινά ο επόμενος.': 'It ends first, then the next one starts.',
+  'Τέλος κύκλου {0}': 'End of cycle {0}',
+  'τελειώνει αυτόματα {0}': 'ends by itself at {0}',
+  'Πρώτα τελειώνει ο κύκλος που είναι στον κλίβανο.': 'The cycle in the sterilizer ends first.',
+  '{0} λεπτά ακόμα': '{0} min to go',
+  'Ο χρόνος του προγράμματος πέρασε': 'The program time has passed',
+  'Διαγραφή προγράμματος;': 'Delete program?',
+  'Το πρόγραμμα «{0}» θα αφαιρεθεί από τον κλίβανο μόλις πατήσετε «Αποθήκευση». Τα φορτία που έγιναν με αυτό μένουν ως έχουν.':
+    'Program «{0}» will be removed from the sterilizer when you press «Save». Loads already run with it stay as they are.',
+  'Ο κλίβανος «{0}» έχει ήδη τον κύκλο {1}: το φορτίο επιστρέφει όταν τελειώσει αυτός.':
+    'Sterilizer «{0}» is running cycle {1}: the load goes back once it has ended.',
+  'Αποστείρωση (λεπτά)': 'Sterilization (min)',
+  'Όλος ο κύκλος (λεπτά)': 'Whole cycle (min)',
+  'Όνομα προγράμματος': 'Program name',
+  'π.χ. Prion': 'e.g. Prion',
+  'Θερμοκρασία προγράμματος {0} (°C)': 'Program {0} temperature (°C)',
+  'Έκθεση προγράμματος {0} (λεπτά)': 'Program {0} exposure (min)',
+  'Ονομασία προγράμματος {0}': 'Program {0} name',
+  'Συνολική διάρκεια προγράμματος {0} (λεπτά)': 'Whole length of program {0} (minutes)',
+  'Ο κλίβανος «{0}» έχει ακόμα τον κύκλο {1}: πρώτα «Τέλος κύκλου» ή «Αποτυχία κύκλου».':
+    'Sterilizer «{0}» is still running cycle {1}: first «End of cycle» or «Cycle failed».',
+  'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Αν το συμπληρώσετε, ο κύκλος τελειώνει αυτόματα. Αλλιώς τελειώνει με «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.':
+    'Sterilization: the minutes held at temperature (e.g. 5). Whole cycle: from the start until the sterilizer opens, with heating and drying (e.g. 45). When filled in, the cycle ends by itself; otherwise with «End of cycle». A sterilizer takes a new load only once its cycle has ended.',
 };

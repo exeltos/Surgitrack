@@ -1,6 +1,6 @@
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import BarcodeCapture from '../../../components/barcode/BarcodeCapture';
-import {CheckCircle2, Flame, TriangleAlert, PackageOpen} from 'lucide-react';
+import {CheckCircle2, Flame, Hourglass, TriangleAlert, PackageOpen} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
 import ProgramSelect from './ProgramSelect';
 import CycleNumberSelect from './CycleNumberSelect';
@@ -11,6 +11,18 @@ import DeviceCyclePicker from '../../devices/DeviceCyclePicker';
 import {useHasModule} from '../../../data/cloud/modulesContext';
 import {deviceNote} from '../sterilizationTypes';
 import type {SterilizationPageState} from '../useSterilizationPage';
+import {autoEndAt, autoEnded, openCycleOn} from '../../../core/cycleEnd';
+import {useNow} from './simulationClock';
+import {shortCycleNumber} from '../../../core/cycleNumber';
+import {formatDate} from '../../../core/displayDate';
+import {useConfirm} from '../../../components/ui/useConfirm';
+import AppButton from '../../../components/ui/AppButton';
+
+/** When a cycle started: the time alone today, the date and time otherwise. */
+const sinceText = (at: string) => {
+  const today = formatDate(new Date());
+  return at.startsWith(today) ? at.slice(today.length).trim() : at;
+};
 
 export default function LoadModal({s}: {s: SterilizationPageState}) {
   const {sterilizers, washers} = useLibraries();
@@ -43,8 +55,16 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
   // The equipment comes from the hospital's list (Studio › Libraries), typed only when the list is empty.
   const equipmentList = loadModal === 'WASHING' ? washers : sterilizers;
   const tested = loadModal === 'WASHING' ? 'WASHER' : 'STERILIZER';
+  const [confirm, ask] = useConfirm();
+  // One cycle at a time: the sterilizer's cycle still running ends first (one past the end its program sets has
+  // ended by itself, and is ended when this load starts).
+  const inside = loadModal === 'STERILIZATION' ? openCycleOn(s.processLoads, loadEquipment) : undefined;
+  // A timed cycle frees the sterilizer at its end: the clock redraws, so «Έναρξη κύκλου» unlocks then.
+  const now = useNow(!!inside && autoEndAt(inside) !== undefined);
+  const blocked = !!inside && !autoEnded(inside, now);
   return (
     <>
+      {confirm}
       {loadModal && (
         <div className="modal-backdrop" onMouseDown={closeLoad}>
           <div
@@ -179,6 +199,59 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
                   </>
                 )}
               </div>
+              {inside && blocked && (
+                <div className="load-cycle-open" role="alert">
+                  <Hourglass size={16} aria-hidden="true" />
+                  <span>
+                    <b>{tr('Ο κλίβανος έχει ακόμα τον κύκλο {0}', shortCycleNumber(inside.cycleNumber))}</b>
+                    <small>
+                      {inside.program} · {tr('από')} {sinceText(inside.createdAt)} · {trData(inside.createdByName)}.{' '}
+                      {tr('Πρώτα τελειώνει αυτός, μετά ξεκινά ο επόμενος.')}
+                    </small>
+                  </span>
+                  <div className="load-cycle-open-actions">
+                    <AppButton
+                      variant="danger"
+                      size="sm"
+                      icon={<TriangleAlert size={15} />}
+                      onClick={() =>
+                        ask({
+                          title: tr('Αποτυχία κύκλου;'),
+                          message: tr(
+                            'Όλο το φορτίο ({0} αντικείμενα) θα επιστρέψει σε επανεπεξεργασία. Η ενέργεια καταγράφεται στο ιστορικό.',
+                            inside.items.length,
+                          ),
+                          confirmLabel: tr('Αποτυχία κύκλου'),
+                          danger: true,
+                          onConfirm: () => s.finishProcessLoad(inside.id, 'FAILED'),
+                        })
+                      }
+                    >
+                      {tr('Αποτυχία κύκλου')}
+                    </AppButton>
+                    <AppButton
+                      variant="primary"
+                      size="sm"
+                      icon={<CheckCircle2 size={15} />}
+                      onClick={() =>
+                        ask({
+                          title: tr('Τέλος κύκλου;'),
+                          message: tr(
+                            'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.',
+                            inside.cycleNumber,
+                            trData(inside.equipment),
+                            inside.items.length,
+                          ),
+                          confirmLabel: tr('Τέλος κύκλου'),
+                          onConfirm: () => s.finishProcessLoad(inside.id, 'PASSED'),
+                        })
+                      }
+                    >
+                      {tr('Τέλος κύκλου {0}', shortCycleNumber(inside.cycleNumber))}
+                    </AppButton>
+                  </div>
+                </div>
+              )}
               {loadModal === 'STERILIZATION' && loadChemical === 'FAIL' && (
                 <div className="load-device-fail" role="alert">
                   <TriangleAlert size={16} />
@@ -303,7 +376,14 @@ export default function LoadModal({s}: {s: SterilizationPageState}) {
               <button onClick={closeLoad}>{tr('Ακύρωση')}</button>
               <button
                 className={loadChemical === 'FAIL' ? 'danger-action primary' : 'primary'}
-                disabled={!loadSelected.size || !loadEquipment.trim() || !loadCycleNumber.trim() || !loadProgram.trim()}
+                disabled={
+                  blocked ||
+                  !loadSelected.size ||
+                  !loadEquipment.trim() ||
+                  !loadCycleNumber.trim() ||
+                  !loadProgram.trim()
+                }
+                title={blocked ? tr('Πρώτα τελειώνει ο κύκλος που είναι στον κλίβανο.') : undefined}
                 onClick={completeLoad}
               >
                 {loadChemical === 'FAIL' ? <TriangleAlert size={16} /> : <CheckCircle2 size={16} />}{' '}

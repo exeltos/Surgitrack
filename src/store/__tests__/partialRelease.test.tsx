@@ -3,6 +3,7 @@ import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it} from 'vitest';
 import {LibraryStoreProvider, useLibraries} from '../../core/LibraryStore';
 import {SurgiProvider, useSurgi} from '../SurgiStore';
+import {openCycleOn} from '../../core/cycleEnd';
 
 const wrapper = ({children}: {children: ReactNode}) => (
   <LibraryStoreProvider>
@@ -61,7 +62,7 @@ describe('releasing a load with one item failed', () => {
       s().createProcessLoad({
         kind: 'STERILIZATION',
         assetRefs: refs,
-        equipment: s().libs.sterilizers[0].el,
+        equipment: s().libs.sterilizers.find(x => !openCycleOn(s().processLoads, x.el))!.el,
         cycleNumber: 'S-9',
         program: '134°C · 5 min',
         chemicalIndicatorResult: 'PASS',

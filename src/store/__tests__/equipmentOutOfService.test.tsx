@@ -3,6 +3,7 @@ import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it} from 'vitest';
 import {LibraryStoreProvider, useLibraries} from '../../core/LibraryStore';
 import {SurgiProvider, useSurgi} from '../SurgiStore';
+import {openCycleOn} from '../../core/cycleEnd';
 
 const wrapper = ({children}: {children: ReactNode}) => (
   <LibraryStoreProvider>
@@ -54,7 +55,8 @@ describe('a sterilizer taken out of service', () => {
 
   it('is not loaded, and is loaded again once it is put back', () => {
     const f = setup();
-    const sterilizer = f.s().libs.sterilizers[0];
+    // One with no cycle running (a sterilizer takes one load at a time).
+    const sterilizer = f.s().libs.sterilizers.find(x => !openCycleOn(f.s().processLoads, x.el))!;
     f.run(() =>
       f.s().libs.updateItem('sterilizers', sterilizer.id, {
         outOfService: {reason: 'BREAKDOWN', since: '10/11/2026 08:00', by: 'Τ'},
@@ -77,7 +79,8 @@ describe('a sterilizer taken out of service', () => {
 
   it('is not loaded while its latest test failed, and is loaded again after a passing one', () => {
     const f = setup();
-    const sterilizer = f.s().libs.sterilizers[0];
+    // One with no cycle running (a sterilizer takes one load at a time).
+    const sterilizer = f.s().libs.sterilizers.find(x => !openCycleOn(f.s().processLoads, x.el))!;
     const test = (result: 'PASS' | 'FAIL', id: string) => ({
       id,
       kind: 'BOWIE_DICK' as const,
@@ -102,7 +105,8 @@ describe('a sterilizer taken out of service', () => {
 
   it('is not released while its latest test failed, and is released after a passing one', () => {
     const f = setup();
-    const sterilizer = f.s().libs.sterilizers[0];
+    // One with no cycle running (a sterilizer takes one load at a time).
+    const sterilizer = f.s().libs.sterilizers.find(x => !openCycleOn(f.s().processLoads, x.el))!;
     const test = (result: 'PASS' | 'FAIL', id: string) => ({
       id,
       kind: 'BOWIE_DICK' as const,
