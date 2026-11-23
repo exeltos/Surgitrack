@@ -1,0 +1,29 @@
+import {parseDisplayDate} from './displayDate';
+import {programTotalMinutes} from './sterilizerPrograms';
+import type {ProcessLoadRecord} from '../types/domain';
+
+/**
+ * A sterilizer runs one cycle at a time: the next load goes in only once the one in it has ended. A cycle whose
+ * program says how long it all lasts («· σύνολο 45 min») ends by itself at that time; any other is ended by hand
+ * («Τέλος κύκλου» or «Αποτυχία κύκλου»). A simulated cycle keeps its own clock (cycleSimulator).
+ */
+
+/** When a load in the sterilizer ends by itself (epoch ms), or undefined when it is ended by hand. */
+export function autoEndAt(load: ProcessLoadRecord): number | undefined {
+  if (load.kind !== 'STERILIZATION' || load.status !== 'OPEN' || load.simulation) return undefined;
+  const minutes = programTotalMinutes(load.program);
+  const started = parseDisplayDate(load.createdAt);
+  return minutes && started ? started.getTime() + minutes * 60_000 : undefined;
+}
+
+/** Whether a load in the sterilizer has reached the end its program sets. */
+export const autoEnded = (load: ProcessLoadRecord, now = Date.now()) => {
+  const end = autoEndAt(load);
+  return end !== undefined && now >= end;
+};
+
+/** The cycle still running in a sterilizer (the one that must end before the next load goes in). */
+export const openCycleOn = (loads: readonly ProcessLoadRecord[], equipment: string) =>
+  loads.find(
+    load => load.kind === 'STERILIZATION' && load.status === 'OPEN' && load.equipment.trim() === equipment.trim(),
+  );

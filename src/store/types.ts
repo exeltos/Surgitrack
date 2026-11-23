@@ -330,7 +330,13 @@ export type SurgiStoreValue = {
   createProcessLoad: (payload: CreateProcessLoadPayload) => ProcessLoadRecord | undefined;
   releaseProcessLoad: (loadId: string, payload: ReleaseProcessLoadPayload) => ProcessLoadRecord | undefined;
   /** End of cycle for a load in the sterilizer: on to release, or the whole load back to reprocessing. */
-  finishProcessLoad: (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => ProcessLoadRecord | undefined;
+  finishProcessLoad: (
+    loadId: string,
+    result: 'PASSED' | 'FAILED',
+    note?: string,
+    /** When the cycle ended (epoch ms), for one that ended by itself; now otherwise. */
+    at?: number,
+  ) => ProcessLoadRecord | undefined;
   /** A load awaiting release, nothing of it released yet, goes back into the sterilizer (with the reason). */
   reopenProcessLoad: (loadId: string, reason: string) => boolean;
   /** Starts a simulated cycle in a load that is in the sterilizer (Demo only). */

@@ -381,6 +381,15 @@ async function main() {
       // The cycle number is the sterilizer's letter with today's next number, already picked (A1).
       sterilizerCycle = await page.getByLabel('Αριθμός κύκλου').inputValue();
       if (!/^[A-Z]+\d+$/.test(sterilizerCycle)) throw new Error(`cycle number ${sterilizerCycle}`);
+      // One cycle at a time: a cycle still in the sterilizer ends first, from the same dialog.
+      const open = page.locator('.load-cycle-open');
+      if (await open.isVisible()) {
+        if (!(await page.getByRole('button', {name: 'Έναρξη κύκλου · 1'}).isDisabled()))
+          throw new Error('a load started while the sterilizer still ran a cycle');
+        await open.getByRole('button', {name: /^Τέλος κύκλου /}).click();
+        await page.getByRole('button', {name: 'Τέλος κύκλου', exact: true}).click();
+        await open.waitFor({state: 'detached'});
+      }
       await page.getByRole('button', {name: 'Έναρξη κύκλου · 1'}).click();
       await saved(sterilization);
       const load = db.process_loads.find(l => l.cycle_number === sterilizerCycle);

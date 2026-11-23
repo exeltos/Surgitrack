@@ -31,11 +31,17 @@ import {useLibraries} from '../../core/LibraryStore';
 import {itemTestsState} from '../../core/equipmentTests';
 import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
 import {takeSnapshot} from '../../core/movementUndo';
+import {autoEndAt, openCycleOn} from '../../core/cycleEnd';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
 import type {useSurgiHelpers} from './useSurgiHelpers';
 import type {useReceiptAndCycleActions} from './useReceiptAndCycleActions';
+
+/** The note of a cycle that ended by itself, at the end its program sets (kept in Greek, as records are). */
+const AUTO_END_NOTE = 'Αυτόματο τέλος κύκλου (διάρκεια προγράμματος)';
+/** How long another person's app waits before it ends a cycle that the loader's app has not ended. */
+const OTHERS_WAIT_MS = 2 * 60_000;
 
 export function useLoadActions(
   p: ReturnType<typeof useSurgiSession> &
@@ -99,6 +105,24 @@ export function useLoadActions(
         true,
       );
       return;
+    }
+    // One cycle at a time: the load in the sterilizer ends first. One whose program sets the cycle's length has ended
+    // by itself once that time has passed; any other is ended by hand («Τέλος κύκλου» or «Αποτυχία κύκλου»).
+    const inside = washing ? undefined : openCycleOn(processLoads, payload.equipment);
+    if (inside) {
+      const end = autoEndAt(inside);
+      if (end !== undefined && Date.now() >= end) finishProcessLoad(inside.id, 'PASSED', AUTO_END_NOTE, end);
+      else {
+        notify(
+          tr(
+            'Ο κλίβανος «{0}» έχει ακόμα τον κύκλο {1}: πρώτα «Τέλος κύκλου» ή «Αποτυχία κύκλου».',
+            inside.equipment,
+            inside.cycleNumber,
+          ),
+          true,
+        );
+        return;
+      }
     }
     const refs = payload.assetRefs
       .map(ref => ({ref, asset: assetName(ref.kind, ref.id)}))
@@ -326,7 +350,7 @@ export function useLoadActions(
     notify(tr('Ξεκίνησε η προσομοίωση του κύκλου {0}.', named(loadId)));
   };
   /** "End of cycle" for a load in the sterilizer: it goes to release, or back to reprocessing if it failed. */
-  const finishProcessLoad = (loadId: string, result: 'PASSED' | 'FAILED', note?: string) => {
+  const finishProcessLoad = (loadId: string, result: 'PASSED' | 'FAILED', note?: string, at?: number) => {
     const load = processLoads.find(item => item.id === loadId && item.kind === 'STERILIZATION');
     if (!load || load.status !== 'OPEN') return;
     // A simulated cycle that is still running cannot be ended as passed (stopping it is a failure).
@@ -339,7 +363,8 @@ export function useLoadActions(
     const refs = load.items
       .map(item => ({ref: {kind: item.assetKind, id: item.assetId}, asset: assetName(item.assetKind, item.assetId)}))
       .filter((entry): entry is LoadRef => !!entry.asset && entry.asset.state === 'IN_STERILIZATION');
-    const now = formatStoreDateTime();
+    // A cycle that ended by itself ended at its own time, not when the app noticed.
+    const now = at !== undefined ? formatDateTime(at) : formatStoreDateTime();
     const finished: ProcessLoadRecord = {
       ...load,
       status: result === 'PASSED' ? 'AWAITING_RELEASE' : 'FAILED',
@@ -545,6 +570,27 @@ export function useLoadActions(
   });
   const handled = useRef(new Set<string>());
   const simulating = processLoads.some(l => l.kind === 'STERILIZATION' && l.status === 'OPEN' && !!l.simulation);
+  // A cycle whose program sets its length ends by itself too, as passed: the load goes on to release, where the
+  // indicators and the readings are checked as always. The app of whoever loaded it ends it on time; any other a
+  // little later, so that two devices do not both record it, and it is ended all the same if that app is closed.
+  const timed = processLoads.some(l => autoEndAt(l) !== undefined);
+  const userId = currentUser.id;
+  useEffect(() => {
+    if (!timed) return;
+    const check = () => {
+      for (const load of loadsRef.current) {
+        const end = autoEndAt(load);
+        if (end === undefined || handled.current.has(load.id)) continue;
+        const wait = load.createdByUserId === userId ? 0 : OTHERS_WAIT_MS;
+        if (Date.now() < end + wait) continue;
+        handled.current.add(load.id);
+        finishRef.current(load.id, 'PASSED', AUTO_END_NOTE, end);
+      }
+    };
+    check();
+    const timer = window.setInterval(check, 15_000);
+    return () => window.clearInterval(timer);
+  }, [timed, userId]);
   useEffect(() => {
     if (!simulating) return;
     const timer = window.setInterval(() => {

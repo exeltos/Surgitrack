@@ -2494,7 +2494,6 @@ export const en: Record<string, string> = {
   Αναμένεται: 'Pending',
   'Φορτίο κλιβάνου': 'Sterilizer load',
   Προγράμματα: 'Programs',
-  'Πρόγραμμα {0}': 'Program {0}',
   'Αφαίρεση προγράμματος': 'Remove program',
   'Προσθήκη προγράμματος': 'Add program',
   'λέξεις με ορθογραφικό λάθος': 'words misspelled',
@@ -2558,4 +2557,20 @@ export const en: Record<string, string> = {
   'Όλοι οι γύροι': 'All rounds',
   Ημερομηνίες: 'Dates',
   'Καμία κίνηση σε αυτές τις ημερομηνίες': 'No movement on these dates',
+  'Ο κλίβανος έχει ακόμα τον κύκλο {0}': 'The sterilizer is still running cycle {0}',
+  'Πρώτα τελειώνει αυτός, μετά ξεκινά ο επόμενος.': 'It ends first, then the next one starts.',
+  'Τέλος κύκλου {0}': 'End of cycle {0}',
+  'τελειώνει αυτόματα {0}': 'ends by itself at {0}',
+  'Πρώτα τελειώνει ο κύκλος που είναι στον κλίβανο.': 'The cycle in the sterilizer ends first.',
+  '{0} λεπτά ακόμα': '{0} min to go',
+  'Σύνολο (λεπτά)': 'Total (min)',
+  'Έκθεση (λεπτά)': 'Exposure (min)',
+  'Θερμοκρασία προγράμματος {0} (°C)': 'Program {0} temperature (°C)',
+  'Έκθεση προγράμματος {0} (λεπτά)': 'Program {0} exposure (min)',
+  'Ονομασία προγράμματος {0}': 'Program {0} name',
+  'Συνολική διάρκεια προγράμματος {0} (λεπτά)': 'Whole length of program {0} (minutes)',
+  'Με συνολική διάρκεια ο κύκλος τελειώνει αυτόματα. Χωρίς, τελειώνει με «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.':
+    'With a total length the cycle ends by itself; without one, with «End of cycle». A sterilizer takes a new load only once its cycle has ended.',
+  'Ο κλίβανος «{0}» έχει ακόμα τον κύκλο {1}: πρώτα «Τέλος κύκλου» ή «Αποτυχία κύκλου».':
+    'Sterilizer «{0}» is still running cycle {1}: first «End of cycle» or «Cycle failed».',
 };

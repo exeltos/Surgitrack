@@ -12,7 +12,9 @@ import type {ProcessLoadRecord} from '../../../types/domain';
 import LoadDetailsDialog from './LoadDetailsDialog';
 import {phaseText} from './cycleLabels';
 import {liveOf, simulationRunning, useNow} from './simulationClock';
-import {formatDate} from '../../../core/displayDate';
+import {formatDate, formatTime} from '../../../core/displayDate';
+import {autoEndAt} from '../../../core/cycleEnd';
+import {programTotalMinutes} from '../../../core/sterilizerPrograms';
 
 /** What the load holds, by kind: «2 Σετ · 3 εργαλεία». */
 const contentText = (load: ProcessLoadRecord) => {
@@ -45,7 +47,8 @@ export default function SterilizerLoads({
   const canSimulate = getRuntimeDataMode() === 'DEMO' && can('sterilization.cycle');
   const [openId, setOpenId] = useState('');
   // A simulated cycle still running: the clock re-renders the rows (and the buttons when it ends).
-  const now = useNow(loads.some(load => !!load.simulation));
+  // A cycle whose program sets its length counts down to its end, when it ends by itself.
+  const now = useNow(loads.some(load => !!load.simulation || autoEndAt(load) !== undefined));
   const order = useTableSort(loads, {
     equipment: load => load.equipment,
     program: load => load.program,
@@ -83,6 +86,11 @@ export default function SterilizerLoads({
           {order.rows.map(load => {
             const live = liveOf(load, now);
             const running = simulationRunning(load, now);
+            const end = autoEndAt(load);
+            const total = programTotalMinutes(load.program) || 0;
+            const left = end !== undefined ? Math.max(0, Math.ceil((end - now) / 60_000)) : 0;
+            const done =
+              end !== undefined && total ? Math.round(Math.min(1, 1 - (end - now) / (total * 60_000)) * 100) : 0;
             return (
               <tr
                 key={load.id}
@@ -134,6 +142,25 @@ export default function SterilizerLoads({
                         {load.simulation ? ` · ${tr('Προσομοίωση')}` : ''}
                       </small>
                     </>
+                  ) : end !== undefined ? (
+                    // Its program sets the cycle's length: it ends by itself then, with no «Τέλος κύκλου».
+                    <>
+                      <span className="row-cycle-line">
+                        <span className="row-phase">{tr('Σε εξέλιξη')}</span>
+                        <span className="num">{tr('τελειώνει αυτόματα {0}', formatTime(end))}</span>
+                      </span>
+                      <div
+                        className="tile-progress"
+                        role="progressbar"
+                        aria-valuenow={done}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={tr('Πρόοδος κύκλου')}
+                      >
+                        <i style={{width: `${done}%`}} />
+                      </div>
+                      <small>{tr('{0} λεπτά ακόμα', left)}</small>
+                    </>
                   ) : canSimulate && !load.simulation ? (
                     // Demo: the cycle can be simulated, in the load's card (where the scenario is chosen); its data then
                     // shows here.
@@ -176,27 +203,29 @@ export default function SterilizerLoads({
                         >
                           <TriangleAlert size={15} /> {tr('Αποτυχία κύκλου')}
                         </button>
-                        <button
-                          className="primary"
-                          data-tour="cycle-end"
-                          disabled={!canFinish || running}
-                          title={running ? tr('Ο κύκλος τρέχει ακόμα') : undefined}
-                          onClick={() =>
-                            ask({
-                              title: tr('Τέλος κύκλου;'),
-                              message: tr(
-                                'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.',
-                                load.cycleNumber,
-                                trData(load.equipment),
-                                load.items.length,
-                              ),
-                              confirmLabel: tr('Τέλος κύκλου'),
-                              onConfirm: () => onFinish(load.id, 'PASSED'),
-                            })
-                          }
-                        >
-                          <CheckCircle2 size={15} /> {tr('Τέλος κύκλου')}
-                        </button>
+                        {end === undefined && (
+                          <button
+                            className="primary"
+                            data-tour="cycle-end"
+                            disabled={!canFinish || running}
+                            title={running ? tr('Ο κύκλος τρέχει ακόμα') : undefined}
+                            onClick={() =>
+                              ask({
+                                title: tr('Τέλος κύκλου;'),
+                                message: tr(
+                                  'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.',
+                                  load.cycleNumber,
+                                  trData(load.equipment),
+                                  load.items.length,
+                                ),
+                                confirmLabel: tr('Τέλος κύκλου'),
+                                onConfirm: () => onFinish(load.id, 'PASSED'),
+                              })
+                            }
+                          >
+                            <CheckCircle2 size={15} /> {tr('Τέλος κύκλου')}
+                          </button>
+                        )}
                       </>
                     )}
                   </div>

@@ -3,6 +3,8 @@ import {CheckCircle2, ChevronRight, Flame, ShieldCheck, TriangleAlert} from 'luc
 import type {BarcodeFeedback} from '../../../components/barcode/BarcodeCapture';
 import {askConfirm} from '../../../components/ui/confirmService';
 import {loadLabel} from '../../../core/loadLabel';
+import {autoEndAt} from '../../../core/cycleEnd';
+import {formatTime} from '../../../core/displayDate';
 import {tr, trData} from '../../../i18n';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
@@ -200,6 +202,7 @@ export default function ReleaseStation({onStations}: {onStations: () => void}) {
                   <b>{loadLabel(l)}</b>
                   <small>
                     {l.program} · {tr('{0} αντικείμενα', l.items.length)}
+                    {autoEndAt(l) !== undefined && ` · ${tr('τελειώνει αυτόματα {0}', formatTime(autoEndAt(l)!))}`}
                   </small>
                 </span>
                 <ChevronRight size={18} />
@@ -245,24 +248,26 @@ export default function ReleaseStation({onStations}: {onStations: () => void}) {
                   >
                     <TriangleAlert size={16} /> {tr('Αποτυχία κύκλου')}
                   </button>
-                  <button
-                    type="button"
-                    className="scan-primary"
-                    onClick={() =>
-                      void askConfirm({
-                        title: tr('Τέλος κύκλου;'),
-                        message: tr(
-                          'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.',
-                          l.cycleNumber,
-                          trData(l.equipment),
-                          l.items.length,
-                        ),
-                        confirmLabel: tr('Τέλος κύκλου'),
-                      }).then(sure => sure !== false && s.finishProcessLoad(l.id, 'PASSED'))
-                    }
-                  >
-                    <CheckCircle2 size={16} /> {tr('Τέλος κύκλου · {0}', l.items.length)}
-                  </button>
+                  {autoEndAt(l) === undefined && (
+                    <button
+                      type="button"
+                      className="scan-primary"
+                      onClick={() =>
+                        void askConfirm({
+                          title: tr('Τέλος κύκλου;'),
+                          message: tr(
+                            'Τελείωσε ο κύκλος {0} στο {1}; Το φορτίο ({2} αντικείμενα) πηγαίνει στην αποδέσμευση.',
+                            l.cycleNumber,
+                            trData(l.equipment),
+                            l.items.length,
+                          ),
+                          confirmLabel: tr('Τέλος κύκλου'),
+                        }).then(sure => sure !== false && s.finishProcessLoad(l.id, 'PASSED'))
+                      }
+                    >
+                      <CheckCircle2 size={16} /> {tr('Τέλος κύκλου · {0}', l.items.length)}
+                    </button>
+                  )}
                 </div>
               )}
             </li>
