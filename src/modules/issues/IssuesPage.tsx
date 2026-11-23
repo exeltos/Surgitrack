@@ -11,7 +11,8 @@ import {
   Truck,
 } from 'lucide-react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
-import {lazy, Suspense, useMemo, useState} from 'react';
+import {Suspense, useMemo, useState} from 'react';
+import {lazyPage} from '../../core/resilience';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
@@ -53,7 +54,7 @@ const issueAge = (created: string) => {
   return days <= 0 ? tr('Από σήμερα') : days === 1 ? tr('1 ημέρα') : tr('{0} ημέρες', days);
 };
 
-const ReplacementsPage = lazy(() => import('../replacements/ReplacementsPage'));
+const ReplacementsPage = lazyPage(() => import('../replacements/ReplacementsPage'));
 import {askDeleteIssue, askEditIssueNote} from '../../components/assets/issueDialogs';
 import ActionMenu from '../../components/ui/ActionMenu';
 import ResolveIssueDialog from '../../components/assets/ResolveIssueDialog';

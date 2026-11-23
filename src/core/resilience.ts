@@ -1,6 +1,10 @@
 import {lazy, type ComponentType} from 'react';
 
 const RELOAD_KEY = 'surgitrack-chunk-reload';
+let reloading = false;
+
+/** Whether the page is reloading to a new version (what happens meanwhile is not an error to report). */
+export const reloadingForNewVersion = () => reloading;
 
 /** A page file that failed to download, usually because a new version was published meanwhile. */
 export const isChunkLoadError = (error: unknown) =>
@@ -17,6 +21,7 @@ function reloadForNewVersion() {
     const last = Number(sessionStorage.getItem(RELOAD_KEY) || 0);
     if (Date.now() - last < 30_000) return false;
     sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+    reloading = true;
   } catch {
     // Without a stored guard a reload could repeat forever: show the error instead.
     return false;
@@ -32,13 +37,21 @@ export function installChunkRecovery() {
   });
 }
 
-/** React.lazy that reloads once when the page file is gone after a new version was published. */
-export function lazyPage<P extends object>(load: () => Promise<{default: ComponentType<P>}>) {
+/**
+ * React.lazy that reloads once when the page file is gone after a new version was published. When Vite's
+ * `vite:preloadError` was handled (installChunkRecovery: the page is already reloading), the import resolves
+ * to nothing: the page then waits for the reload instead of failing on the missing module.
+ */
+export function lazyPage<P extends object>(load: () => Promise<{default: ComponentType<P>} | undefined>) {
+  const waitForReload = () => new Promise<{default: ComponentType<P>}>(() => {});
   return lazy(() =>
-    load().catch(error => {
-      if (isChunkLoadError(error) && reloadForNewVersion()) return new Promise<{default: ComponentType<P>}>(() => {});
-      throw error;
-    }),
+    load().then(
+      module => module ?? waitForReload(),
+      error => {
+        if (isChunkLoadError(error) && reloadForNewVersion()) return waitForReload();
+        throw error;
+      },
+    ),
   );
 }
 

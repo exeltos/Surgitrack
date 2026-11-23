@@ -52,3 +52,16 @@ describe('chunk load errors', () => {
     expect(isChunkLoadError(new Error('Cannot read properties of undefined'))).toBe(false);
   });
 });
+
+describe('a page file whose download was handled by the reload to a new version', () => {
+  it('waits for the reload instead of failing on the missing module', async () => {
+    const {render, screen} = await import('@testing-library/react');
+    const {Suspense, createElement} = await import('react');
+    const {lazyPage} = await import('../resilience');
+    // vite:preloadError was prevented: the import resolves to nothing.
+    const Page = lazyPage(() => Promise.resolve(undefined));
+    render(createElement(Suspense, {fallback: createElement('p', null, 'φόρτωση')}, createElement(Page)));
+    await new Promise(r => setTimeout(r, 20));
+    expect(screen.getByText('φόρτωση')).toBeInTheDocument();
+  });
+});
