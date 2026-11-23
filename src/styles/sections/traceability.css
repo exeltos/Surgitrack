@@ -903,3 +903,12 @@ html body .trace-split-list .asset-filter-bar > .asset-filter-search {
   flex: 1 1 150px;
   min-width: 0;
 }
+/* A role in a move: «Από», «Έστειλε», «Παρέδωσε», «Παρέλαβε», then the place or the name. */
+html body .trace-flow-role {
+  color: var(--c-blue-15-2);
+  font-size: 12px;
+}
+html body .trace-flow-role i {
+  color: var(--c-gray-45);
+  font-style: normal;
+}

@@ -958,6 +958,7 @@ export const en: Record<string, string> = {
   Παρακολούθηση: 'Monitoring',
   'Πίσω στα Σετ & Εργαλεία': 'Back to Sets & Instruments',
   'Πίσω στη λίστα': 'Back to list',
+  Έστειλε: 'Sent by',
   'Αναζήτηση: όνομα, barcode, ποιος το διέγραψε…': 'Search: name, barcode, who deleted it…',
   'Άδειασμα κάδου;': 'Empty the recycle bin?',
   'Διαγράφονται για πάντα {0} εγγραφές και δεν θα μπορούν να επανέλθουν.':

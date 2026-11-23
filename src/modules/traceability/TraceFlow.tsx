@@ -60,13 +60,6 @@ const PROBLEM = /αποτυχ|αποκλισ|ελλειψ|βλαβ|fail|deviat|m
 const DENIED = /χωρις [^·]*(αποκλισ|ελλειψ|βλαβ)|no [^·]*(deviat|damage)/;
 const FAILED = {test: (status: string) => PROBLEM.test(plain(status)) && !DENIED.test(plain(status))};
 
-/** What a move's text says after its name («Φυσική παραλαβή · εμφανής απόκλιση» → «εμφανής απόκλιση»). */
-const detailOf = (status: string) => {
-  const text = movementText(status);
-  const at = text.indexOf(' · ');
-  return at < 0 ? '' : text.slice(at + 3);
-};
-
 const day = (at: string) => at.split(' ')[0];
 
 /**
@@ -209,26 +202,66 @@ function CycleStep({
   );
 }
 
+/** Two names the same, ignoring case and accents. */
+const sameName = (a?: string, b?: string) => !!a && !!b && plain(a.trim()) === plain(b.trim());
+
+/**
+ * Who did what in a move, said with words: who sent it, who handed it over, who took it. The names come from the
+ * move's text («… · παρέδωσε Χ · παρέλαβε Υ») and from who recorded it («Υ · παρέδωσε Χ» on a receipt); what is
+ * left of the text (a deviation, «αναμονή φυσικής παραλαβής») is said once, without the names again.
+ */
+const peopleOf = (m: Movement, stage?: string) => {
+  const [recorder, ...byRest] = (m.by || '').split(' · ');
+  const segments = movementText(m.status).split(' · ');
+  const name = (prefix: RegExp) =>
+    [...segments, ...byRest].map(seg => seg.match(prefix)?.[1]).find((found): found is string => !!found);
+  const handedBy = name(/^παρέδωσε\s+(.+)$/i);
+  const receivedBy = name(/^παρέλαβε\s+(.+)$/i);
+  // A sender written in the text with their account («Αβράμπου Κ. (u-12)») is the recorder again.
+  const strip = (seg: string) => seg.replace(/\s*\([^)]*\)\s*$/, '');
+  const rest = segments
+    .slice(1)
+    .filter(
+      seg =>
+        !/^παρ(έδωσε|έλαβε)\s/i.test(seg) &&
+        !sameName(strip(seg), recorder) &&
+        !sameName(strip(seg), handedBy) &&
+        !sameName(strip(seg), receivedBy),
+    );
+  const roles: Array<[string, string]> =
+    stage === 'send'
+      ? [[tr('Έστειλε'), recorder]]
+      : stage === 'receive'
+        ? [...(handedBy ? ([[tr('Παρέδωσε'), handedBy]] as Array<[string, string]>) : []), [tr('Παρέλαβε'), recorder]]
+        : stage === 'delivery'
+          ? [
+              [tr('Παρέδωσε'), handedBy || recorder],
+              ...(receivedBy ? ([[tr('Παρέλαβε'), receivedBy]] as Array<[string, string]>) : []),
+            ]
+          : [['', recorder]];
+  return {action: segments[0], rest: rest.join(' · '), roles: roles.filter(([, who]) => !!who)};
+};
+
 function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean; onPatient?: (code: string) => void}) {
   const stage = stageOf(m);
-  const back = stage === 'send' || stage === 'receive' || stage === 'patient';
-  // Only a department is a place worth saying (where it came from, where it was delivered): the steps inside
-  // Sterilization (→ Σύνθεση, → Φόρτωση) are the stages themselves.
-  const sayPlace = back || stage === 'delivery' || !stage;
-  const place = sayPlace ? (back ? m.from : m.to) : undefined;
+  const {action, rest, roles} = peopleOf(m, stage);
+  // Only a department is a place worth saying (where it came from, where it went): the steps inside Sterilization
+  // (→ Σύνθεση, → Φόρτωση) are the stages themselves.
+  const from = stage === 'send' || stage === 'receive' ? m.from : undefined;
+  const to = stage === 'delivery' ? m.to : undefined;
+  const elsewhere = !stage && (m.from || m.to);
+  const routine = !m.undoes && isRoutine(stage, m.status);
+  const failed = FAILED.test(m.status);
   return (
     <div className={`trace-flow-event${undone ? ' undone' : ''}`} title={movementText(m.status)}>
       <span className="trace-when">{m.at}</span>
-      {/* Any other move in full; an undo also says what it undid, and why. */}
-      {(m.undoes || !isRoutine(stage, m.status)) && (
-        <small className={`trace-flow-action${FAILED.test(m.status) || m.undoes ? ' failed' : ''}`}>
-          {movementText(m.status)}
+      {/* What was done: a routine move only what it adds to its stage's name; any other in full, once. */}
+      {!routine && (
+        <small className={`trace-flow-action${failed || m.undoes ? ' failed' : ''}`}>
+          {[action, rest].filter(Boolean).join(' · ')}
         </small>
       )}
-      {/* A routine move: what it adds after its name («υπογραφή παραλαμβάνοντα», «χωρίς χρήση: …»). */}
-      {!m.undoes && isRoutine(stage, m.status) && detailOf(m.status) && (
-        <small className={`trace-flow-action${FAILED.test(m.status) ? ' failed' : ''}`}>{detailOf(m.status)}</small>
-      )}
+      {routine && rest && <small className={`trace-flow-action${failed ? ' failed' : ''}`}>{rest}</small>}
       {m.undoes && m.note && (
         <small>
           {tr('Αιτιολογία')}: {m.note}
@@ -242,15 +275,33 @@ function MoveStep({move: m, undone, onPatient}: {move: Movement; undone: boolean
         ) : (
           <b>{m.patientCode}</b>
         ))}
-      {place &&
-        (stage === 'patient' ? (
-          <small>{trData(place)}</small>
-        ) : (
+      {stage === 'patient' && m.from && <small>{trData(m.from)}</small>}
+      {from && (
+        <span className="trace-flow-role">
+          <i>{tr('Από')}</i> <b>{trData(from)}</b>
+        </span>
+      )}
+      {to && (
+        <span className="trace-flow-role">
+          <i>{tr('Προς')}</i> <b>{trData(to)}</b>
+        </span>
+      )}
+      {elsewhere && (
+        <span className="trace-flow-role">
           <b>
-            {back ? '←' : '→'} {trData(place)}
+            {trData(m.from) || '—'} → {trData(m.to) || '—'}
           </b>
-        ))}
-      <small>{trData(m.by)}</small>
+        </span>
+      )}
+      {roles.map(([role, who]) =>
+        role ? (
+          <span key={role} className="trace-flow-role">
+            <i>{role}</i> {trData(who)}
+          </span>
+        ) : (
+          <small key="by">{trData(who)}</small>
+        ),
+      )}
       {undone && <span className="undone-badge">{tr('Αναιρέθηκε')}</span>}
     </div>
   );
