@@ -1,7 +1,7 @@
 import {supabase} from '../../lib/supabase';
 import {APP_VERSION} from '../../config/appMeta';
 import {getRuntimeDataMode} from '../../config/dataMode';
-import {isChunkLoadError} from '../../core/resilience';
+import {isChunkLoadError, reloadingForNewVersion} from '../../core/resilience';
 import {onSyncNotice} from './useAppRecordSync';
 
 /**
@@ -39,6 +39,8 @@ export const ignoredError = (message: string, error?: unknown, source?: string) 
 
 export function reportError(kind: ErrorKind, error: unknown, detail?: string) {
   if (getRuntimeDataMode() !== 'PRODUCTION') return;
+  // Reloading to a new version: what fails meanwhile is the old version's page files, not an error.
+  if (reloadingForNewVersion()) return;
   const message = text(error, 500);
   if (ignoredError(message, error)) return;
   const route = window.location.hash.replace(/^#/, '').split('?')[0].slice(0, 200) || '/';

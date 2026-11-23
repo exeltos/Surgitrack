@@ -52,3 +52,37 @@ describe('chunk load errors', () => {
     expect(isChunkLoadError(new Error('Cannot read properties of undefined'))).toBe(false);
   });
 });
+
+describe('a page file whose download was handled by the reload to a new version', () => {
+  it('does not silence error reports when no reload is under way', async () => {
+    const {reloadingForNewVersion} = await import('../resilience');
+    expect(reloadingForNewVersion()).toBe(false);
+  });
+
+  it('asks for the page file again when the reload was cancelled', async () => {
+    vi.useFakeTimers();
+    const {render, screen, act} = await import('@testing-library/react');
+    const {Suspense, createElement} = await import('react');
+    const {lazyPage} = await import('../resilience');
+    let calls = 0;
+    const Loaded = () => createElement('p', null, 'η σελίδα');
+    const Page = lazyPage(() => Promise.resolve(calls++ ? {default: Loaded} : undefined));
+    render(createElement(Suspense, {fallback: createElement('p', null, 'φόρτωση')}, createElement(Page)));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    vi.useRealTimers();
+    expect(screen.getByText('η σελίδα')).toBeInTheDocument();
+  });
+
+  it('waits for the reload instead of failing on the missing module', async () => {
+    const {render, screen} = await import('@testing-library/react');
+    const {Suspense, createElement} = await import('react');
+    const {lazyPage} = await import('../resilience');
+    // vite:preloadError was prevented: the import resolves to nothing.
+    const Page = lazyPage(() => Promise.resolve(undefined));
+    render(createElement(Suspense, {fallback: createElement('p', null, 'φόρτωση')}, createElement(Page)));
+    await new Promise(r => setTimeout(r, 20));
+    expect(screen.getByText('φόρτωση')).toBeInTheDocument();
+  });
+});

@@ -164,11 +164,11 @@ export default function IndicatorsPage() {
       );
     const up = now > then;
     const tone = !worse ? '' : (up ? worse === 'up' : worse === 'down') ? 'bad' : 'good';
-    // A share of a few says little («↑ 4000%» from 6): below 5 the difference itself.
+    // A share says something only of a base large enough and a change not too large («↑ 4033%» from 6 says
+    // nothing): otherwise the difference itself («+242 από 6»).
+    const share = then > 0 ? Math.round((Math.abs(now - then) / then) * 100) : Infinity;
     const change =
-      then >= 5
-        ? `${up ? '↑' : '↓'} ${Math.round((Math.abs(now - then) / then) * 100)}%`
-        : `${up ? '+' : '−'}${Math.abs(now - then)}`;
+      then >= 20 && share <= 300 ? `${up ? '↑' : '↓'} ${share}%` : `${up ? '+' : '−'}${Math.abs(now - then)}`;
     return (
       <>
         <em className={`ind-chip ${tone}`}>{change}</em> {L(`από ${then}`, `from ${then}`)}

@@ -188,7 +188,7 @@ a.ind-fact:hover .ind-fact-go {
   padding: 1px 7px;
   border-radius: 999px;
   background: var(--c-gray-95);
-  color: var(--c-gray-45);
+  color: var(--st-muted);
   font-size: 11.5px;
   font-style: normal;
   font-weight: 600;
