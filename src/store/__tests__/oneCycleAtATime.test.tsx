@@ -96,5 +96,13 @@ describe('a sterilizer runs one cycle at a time', () => {
     // One record per load and item, so that two apps recording the same end keep one.
     const cycles = f.s().sterilizationCycles.filter(c => c.loadId === ended.id);
     expect(cycles.map(c => c.id)).toEqual([`sc-auto-${ended.id}-${cycles[0].assetKind}-${cycles[0].assetId}`]);
+    // Back into the sterilizer: it is ended by hand from then on, and its new result is a record of its own.
+    expect(f.run(() => f.s().reopenProcessLoad(ended.id, 'Ο κύκλος δεν είχε τελειώσει'))).toBe(true);
+    vi.setSystemTime(new Date(2026, 10, 23, 11, 0));
+    expect(f.s().processLoads.find(l => l.id === ended.id)?.status).toBe('OPEN');
+    f.run(() => f.s().finishProcessLoad(ended.id, 'FAILED'));
+    const after = f.s().sterilizationCycles.filter(c => c.loadId === ended.id);
+    expect(after).toHaveLength(2);
+    expect(after.find(c => c.result === 'FAILED')?.id).not.toMatch(/^sc-auto-/);
   });
 });

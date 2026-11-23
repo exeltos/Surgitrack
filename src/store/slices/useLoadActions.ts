@@ -31,15 +31,12 @@ import {useLibraries} from '../../core/LibraryStore';
 import {itemTestsState} from '../../core/equipmentTests';
 import {sendSimulatedCycle, simulatedDeviceName} from '../../data/cloud/simulatedDevice';
 import {takeSnapshot} from '../../core/movementUndo';
-import {autoEndAt, openCycleOn} from '../../core/cycleEnd';
+import {AUTO_END_NOTE, autoEndAt, openCycleOn} from '../../core/cycleEnd';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
 import type {useSurgiHelpers} from './useSurgiHelpers';
 import type {useReceiptAndCycleActions} from './useReceiptAndCycleActions';
-
-/** The note of a cycle that ended by itself, at the end its program sets (kept in Greek, as records are). */
-const AUTO_END_NOTE = 'Αυτόματο τέλος κύκλου (διάρκεια προγράμματος)';
 
 export function useLoadActions(
   p: ReturnType<typeof useSurgiSession> &
@@ -291,9 +288,14 @@ export function useLoadActions(
   };
   type LoadRef = {ref: {kind: AssetKind; id: string}; asset: NonNullable<ReturnType<typeof assetName>>};
   /** The end of a sterilizer cycle: one cycle record per item; a passed cycle goes on to release. */
-  const recordCycleResult = (load: ProcessLoadRecord, refs: LoadRef[], result: 'PASSED' | 'FAILED', now: string) => {
-    // A cycle that ended by itself has one id per load and item, so two apps that both record it keep one record.
-    const auto = load.note?.includes(AUTO_END_NOTE);
+  const recordCycleResult = (
+    load: ProcessLoadRecord,
+    refs: LoadRef[],
+    result: 'PASSED' | 'FAILED',
+    now: string,
+    // The end of a cycle by itself has one id per load and item, so two apps that both record it keep one record.
+    auto = false,
+  ) => {
     refs.forEach(({ref, asset}, index) => {
       const toolIds = ref.kind === 'SET' ? tools.filter(t => t.setId === ref.id).map(t => t.id) : [ref.id];
       const cycle: SterilizationCycleRecord = {
@@ -383,7 +385,7 @@ export function useLoadActions(
           }
         : {}),
     };
-    recordCycleResult(finished, refs, result, now);
+    recordCycleResult(finished, refs, result, now, at !== undefined);
     setProcessLoads(list => list.map(item => (item.id === loadId ? finished : item)));
     const organizationId = p.cloud?.organizationId;
     if (run && finished.cycleData && organizationId && withDevices) {

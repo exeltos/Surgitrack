@@ -4,6 +4,7 @@ import type {BarcodeFeedback} from '../../../components/barcode/BarcodeCapture';
 import {askConfirm} from '../../../components/ui/confirmService';
 import {loadLabel} from '../../../core/loadLabel';
 import {autoEndAt} from '../../../core/cycleEnd';
+import {useNow} from '../../sterilization/parts/simulationClock';
 import {formatTime} from '../../../core/displayDate';
 import {tr, trData} from '../../../i18n';
 import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
@@ -21,6 +22,9 @@ export default function ReleaseStation({onStations}: {onStations: () => void}) {
   useScanAnswers(feedback);
   const load = s.selectedReleaseLoad;
   const canCycle = s.can('sterilization.cycle');
+  // A cycle that ends by its program's time: the clock redraws the list, so «Τέλος κύκλου» comes back once it has
+  // passed (the loader's app ends it; another one may still be needed to).
+  const now = useNow(s.runningLoads.some(l => autoEndAt(l) !== undefined));
   // What to say once the decision is recorded (the release closes); when it stays open the store said why.
   const decided = useRef<BarcodeFeedback | null>(null);
   useEffect(() => {
@@ -248,7 +252,7 @@ export default function ReleaseStation({onStations}: {onStations: () => void}) {
                   >
                     <TriangleAlert size={16} /> {tr('Αποτυχία κύκλου')}
                   </button>
-                  {(autoEndAt(l) === undefined || Date.now() >= autoEndAt(l)!) && (
+                  {(autoEndAt(l) === undefined || now >= autoEndAt(l)!) && (
                     <button
                       type="button"
                       className="scan-primary"

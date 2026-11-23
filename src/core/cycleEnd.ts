@@ -8,9 +8,16 @@ import type {ProcessLoadRecord} from '../types/domain';
  * («Τέλος κύκλου» or «Αποτυχία κύκλου»). A simulated cycle keeps its own clock (cycleSimulator).
  */
 
-/** When a load in the sterilizer ends by itself (epoch ms), or undefined when it is ended by hand. */
+/** The note of a cycle that ended by itself, at the end its program sets (kept in Greek, as records are). */
+export const AUTO_END_NOTE = 'Αυτόματο τέλος κύκλου (διάρκεια προγράμματος)';
+
+/**
+ * When a load in the sterilizer ends by itself (epoch ms), or undefined when it is ended by hand. A load that already
+ * ended by itself once and went back into the sterilizer («Επιστροφή στον κλίβανο») is ended by hand from then on.
+ */
 export function autoEndAt(load: ProcessLoadRecord): number | undefined {
   if (load.kind !== 'STERILIZATION' || load.status !== 'OPEN' || load.simulation) return undefined;
+  if (load.note?.includes(AUTO_END_NOTE)) return undefined;
   const minutes = programTotalMinutes(load.program);
   const started = parseDisplayDate(load.createdAt);
   return minutes && started ? started.getTime() + minutes * 60_000 : undefined;
