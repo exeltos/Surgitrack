@@ -1,10 +1,13 @@
 import {lazy, type ComponentType} from 'react';
 
 const RELOAD_KEY = 'surgitrack-chunk-reload';
-let reloading = false;
+let reloadingSince = 0;
+/** A reload can be cancelled (unsaved changes ask «Leave the page?»): it counts only for a few seconds. */
+const RELOAD_WINDOW_MS = 10_000;
 
 /** Whether the page is reloading to a new version (what happens meanwhile is not an error to report). */
-export const reloadingForNewVersion = () => reloading;
+export const reloadingForNewVersion = (now = Date.now()) =>
+  reloadingSince > 0 && now - reloadingSince < RELOAD_WINDOW_MS;
 
 /** A page file that failed to download, usually because a new version was published meanwhile. */
 export const isChunkLoadError = (error: unknown) =>
@@ -21,7 +24,7 @@ function reloadForNewVersion() {
     const last = Number(sessionStorage.getItem(RELOAD_KEY) || 0);
     if (Date.now() - last < 30_000) return false;
     sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
-    reloading = true;
+    reloadingSince = Date.now();
   } catch {
     // Without a stored guard a reload could repeat forever: show the error instead.
     return false;
@@ -43,7 +46,18 @@ export function installChunkRecovery() {
  * to nothing: the page then waits for the reload instead of failing on the missing module.
  */
 export function lazyPage<P extends object>(load: () => Promise<{default: ComponentType<P>} | undefined>) {
-  const waitForReload = () => new Promise<{default: ComponentType<P>}>(() => {});
+  // The reload normally replaces the page first; if it was cancelled, the page file is asked for again.
+  const waitForReload = () =>
+    new Promise<{default: ComponentType<P>}>((resolve, reject) =>
+      window.setTimeout(
+        () =>
+          load().then(
+            module => (module ? resolve(module) : reject(new Error('The page could not be loaded.'))),
+            reject,
+          ),
+        RELOAD_WINDOW_MS,
+      ),
+    );
   return lazy(() =>
     load().then(
       module => module ?? waitForReload(),
