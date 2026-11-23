@@ -3,17 +3,20 @@ import type {ExportTable} from '../../../core/exportTable';
 import {markPrintHtml} from '../../../core/sampleDataMark';
 import {printHospital} from '../../../core/printStamp';
 
-export type UsernameRow = {department: string; name: string; userCode: string};
+export type UsernameRow = {department: string; name: string; userCode: string; email?: string};
 
 const byDepartmentThenName = (a: UsernameRow, b: UsernameRow) =>
   a.department.localeCompare(b.department, 'el') || a.name.localeCompare(b.name, 'el');
 
-/** Department, full name and username, in department order, for Excel and CSV (never a password or a number). */
+/**
+ * Department, full name, username and email, in department order, for Excel and CSV (never a password). The printed
+ * sheets for the departments carry no email.
+ */
 export const usernameTable = (rows: UsernameRow[], el: boolean, subtitle?: string): ExportTable => ({
   title: el ? 'Ονόματα χρήστη ανά τμήμα' : 'Usernames by department',
   subtitle,
-  headers: el ? ['Τμήμα', 'Ονοματεπώνυμο', 'Όνομα χρήστη'] : ['Department', 'Full name', 'Username'],
-  rows: [...rows].sort(byDepartmentThenName).map(r => [r.department, r.name, r.userCode]),
+  headers: el ? ['Τμήμα', 'Ονοματεπώνυμο', 'Όνομα χρήστη', 'Email'] : ['Department', 'Full name', 'Username', 'Email'],
+  rows: [...rows].sort(byDepartmentThenName).map(r => [r.department, r.name, r.userCode, r.email || '']),
 });
 
 /**

@@ -2,19 +2,19 @@ import {describe, expect, it} from 'vitest';
 import {usernameSheetsHtml, usernameTable} from '../usernameLists';
 
 const rows = [
-  {department: 'ΜΕΘ', name: 'ΝΙΚΟΣ ΠΑΠΑΔΟΠΟΥΛΟΣ', userCode: 'NP1000'},
+  {department: 'ΜΕΘ', name: 'ΝΙΚΟΣ ΠΑΠΑΔΟΠΟΥΛΟΣ', userCode: 'NP1000', email: 'np@example.com'},
   {department: 'ΑΠΟΣΤΕΙΡΩΣΗ', name: 'ΜΑΡΙΑ ΙΩΑΝΝΟΥ', userCode: 'MI2000'},
   {department: 'ΜΕΘ', name: 'ΑΝΝΑ ΛΑΜΠΡΟΥ', userCode: 'AL3000'},
 ];
 
 describe('the usernames by department', () => {
-  it('lists department, full name and username, by department and then name, and nothing else', () => {
+  it('lists department, full name, username and email, by department and then name', () => {
     const table = usernameTable(rows, true);
-    expect(table.headers).toEqual(['Τμήμα', 'Ονοματεπώνυμο', 'Όνομα χρήστη']);
+    expect(table.headers).toEqual(['Τμήμα', 'Ονοματεπώνυμο', 'Όνομα χρήστη', 'Email']);
     expect(table.rows).toEqual([
-      ['ΑΠΟΣΤΕΙΡΩΣΗ', 'ΜΑΡΙΑ ΙΩΑΝΝΟΥ', 'MI2000'],
-      ['ΜΕΘ', 'ΑΝΝΑ ΛΑΜΠΡΟΥ', 'AL3000'],
-      ['ΜΕΘ', 'ΝΙΚΟΣ ΠΑΠΑΔΟΠΟΥΛΟΣ', 'NP1000'],
+      ['ΑΠΟΣΤΕΙΡΩΣΗ', 'ΜΑΡΙΑ ΙΩΑΝΝΟΥ', 'MI2000', ''],
+      ['ΜΕΘ', 'ΑΝΝΑ ΛΑΜΠΡΟΥ', 'AL3000', ''],
+      ['ΜΕΘ', 'ΝΙΚΟΣ ΠΑΠΑΔΟΠΟΥΛΟΣ', 'NP1000', 'np@example.com'],
     ]);
   });
 
@@ -26,6 +26,8 @@ describe('the usernames by department', () => {
     expect(html).toContain('ΙΑΣΩ Θεσσαλίας');
     expect(html).toContain('ως αρχικό κωδικό τον αριθμό του κινητού σας');
     expect(html).not.toMatch(/69\d{8}/);
+    // The sheets handed to the departments carry no email.
+    expect(html).not.toContain('np@example.com');
   });
 
   it('escapes what it prints', () => {

@@ -89,6 +89,7 @@ export default function UsersSection({s}: {s: PeopleState}) {
         department: wholeHospital(m.role) ? L('Όλο το νοσοκομείο', 'Whole hospital') : departmentName(m.department_id),
         name: m.name,
         userCode: m.user_code!,
+        email: m.email,
       }));
   // Whether the person has set their own password yet (accounts made by a staff import start on the mobile number).
   const passwordBadge = (m: (typeof shown)[number]) => {
