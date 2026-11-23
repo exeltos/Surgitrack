@@ -229,4 +229,23 @@ describe('TraceFlow', () => {
       setI18nLang('el');
     }
   });
+
+  it('says who undid a delivery, without giving them a handover role', () => {
+    const r: Round = {
+      key: 'r5',
+      moves: [
+        move('u', 'Αναίρεση: Παράδοση / παραλαβή ολοκληρώθηκε · παρέδωσε ΝΙΚΟΣ · παρέλαβε ΜΑΡΙΑ', '24/11/2026 10:00', {
+          from: 'Κεντρική Αποστείρωση',
+          to: 'ΜΕΘ',
+          by: 'ΕΛΕΝΗ',
+          undoes: 'd1',
+        }),
+      ],
+    };
+    render(<TraceFlow rounds={[r]} undone={new Set()} />);
+    const steps = screen.getAllByRole('listitem').filter(li => li.classList.contains('trace-flow-step'));
+    const step = steps.find(s => s.textContent?.includes('ΕΛΕΝΗ'))!;
+    expect(step).toHaveTextContent('Αναίρεσε ΕΛΕΝΗ');
+    expect(step).not.toHaveTextContent('Παρέλαβε ΕΛΕΝΗ');
+  });
 });

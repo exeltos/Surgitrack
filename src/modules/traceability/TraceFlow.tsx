@@ -212,6 +212,13 @@ const sameName = (a?: string, b?: string) => !!a && !!b && plain(a.trim()) === p
  */
 const peopleOf = (m: Movement, stage?: string) => {
   const [recorder, ...byRest] = (m.by || '').split(' · ');
+  // An undo is no handover: its text in full (what it undid), and who undid it.
+  if (m.undoes)
+    return {action: movementText(m.status), rest: '', roles: recorder ? [[tr('Αναίρεσε'), recorder]] : []} as {
+      action: string;
+      rest: string;
+      roles: Array<[string, string]>;
+    };
   // The stored text, untranslated: the roles are read from its Greek words, and only what is shown is translated.
   const segments = m.status.split(' · ');
   const name = (prefix: RegExp) =>
