@@ -79,6 +79,10 @@ describe('a program in its parts', () => {
       total: '',
     });
     expect(programFields('60°C')).toEqual({name: '', temperature: '60', exposure: '', total: ''});
+    // Minutes written with a prime, as the sample sterilizers have them.
+    expect(programFields('134°C · 5′')).toEqual({name: '', temperature: '134', exposure: '5', total: ''});
+    expect(programFromFields({...programFields('134°C · 5′'), exposure: '7'})).toBe('134°C · 7 min');
+    expect(planFor('121°C · 18′').holdMinutes).toBe(18);
     for (const text of ['134°C · 5 min', '121°C · 18 min', '60°C', 'Prion · 134°C · 18 min · σύνολο 60 min'])
       expect(programFromFields(programFields(text))).toBe(text);
     expect(programFromFields({name: '', temperature: '', exposure: '', total: '40'})).toBe('σύνολο 40 min');

@@ -14,7 +14,7 @@ export const programsOf = (sterilizer?: {el: string; programs?: string[]}) => {
 
 // A program may say how long the whole cycle lasts, as «134°C · 5 min · σύνολο 45 min»: then its end is known and
 // the cycle ends by itself. «5 min» alone is only the exposure (the heating and the drying come on top).
-const TOTAL = /\s*·?\s*(?:σύνολο|συνολικά|total)\s*(\d{1,3})\s*(?:min|λεπτά|λ\.?|')?\s*$/i;
+const TOTAL = /\s*·?\s*(?:σύνολο|συνολικά|total)\s*(\d{1,3})\s*(?:min|λεπτά|λ\.?|['′’])?\s*$/i;
 
 /** The whole cycle's minutes the program says (undefined when it does not). */
 export const programTotalMinutes = (program: string | undefined) => {
@@ -46,7 +46,8 @@ export function programFields(program: string): ProgramFields {
     return m[1];
   };
   const temperature = take(/(\d{2,3})\s*°?\s*C\b/i);
-  const exposure = take(/(\d{1,3})\s*(?:min|λεπτά|λεπτ|')/i);
+  // Minutes as «5 min», «5 λεπτά» or with a prime («5′», «5'»).
+  const exposure = take(/(\d{1,3})\s*(?:min|λεπτά|λεπτ|['′’])/i);
   const name = rest
     .split('·')
     .map(part => part.trim())

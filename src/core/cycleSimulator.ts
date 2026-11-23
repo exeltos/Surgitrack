@@ -37,7 +37,7 @@ export function planFor(program: string): CyclePlan {
   // «· σύνολο 45 min» is the whole cycle, not the exposure.
   program = programBase(program);
   const temperature = /(\d{2,3})\s*°?\s*C/i.exec(program);
-  const minutes = /(\d{1,2})\s*(?:min|λεπτ|')/i.exec(program);
+  const minutes = /(\d{1,2})\s*(?:min|λεπτ|['′’])/i.exec(program);
   const setpoint = temperature ? Math.min(Math.max(Number(temperature[1]), 110), 140) : 134;
   const holdMinutes = minutes ? Math.min(Math.max(Number(minutes[1]), 1), 30) : 5;
   return {setpoint, holdMinutes, heatMinutes: 6, dryMinutes: 9};
