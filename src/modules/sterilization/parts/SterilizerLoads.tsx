@@ -159,7 +159,7 @@ export default function SterilizerLoads({
                       >
                         <i style={{width: `${done}%`}} />
                       </div>
-                      <small>{tr('{0} λεπτά ακόμα', left)}</small>
+                      <small>{left ? tr('{0} λεπτά ακόμα', left) : tr('Ο χρόνος του προγράμματος πέρασε')}</small>
                     </>
                   ) : canSimulate && !load.simulation ? (
                     // Demo: the cycle can be simulated, in the load's card (where the scenario is chosen); its data then
@@ -203,7 +203,7 @@ export default function SterilizerLoads({
                         >
                           <TriangleAlert size={15} /> {tr('Αποτυχία κύκλου')}
                         </button>
-                        {end === undefined && (
+                        {(end === undefined || now >= end) && (
                           <button
                             className="primary"
                             data-tour="cycle-end"

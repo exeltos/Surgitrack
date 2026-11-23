@@ -80,9 +80,9 @@ export default function LibraryEditor({
               <legend>{tr('Προγράμματα')}</legend>
               <div className="studio-program-row studio-program-head" aria-hidden="true">
                 <span>°C</span>
-                <span>{tr('Έκθεση (λεπτά)')}</span>
-                <span>{tr('Σύνολο (λεπτά)')}</span>
-                <span>{tr('Ονομασία')}</span>
+                <span>{tr('Αποστείρωση (λεπτά)')}</span>
+                <span>{tr('Όλος ο κύκλος (λεπτά)')}</span>
+                <span>{tr('Όνομα προγράμματος')}</span>
               </div>
               {programs.map((program, index) => (
                 <div key={index} className="studio-program-row">
@@ -110,7 +110,7 @@ export default function LibraryEditor({
                   />
                   <input
                     value={program.name}
-                    placeholder={tr('Προαιρετικό')}
+                    placeholder={tr('π.χ. Prion')}
                     aria-label={tr('Ονομασία προγράμματος {0}', index + 1)}
                     onChange={e => setField(index, 'name', e.target.value)}
                   />
@@ -126,7 +126,7 @@ export default function LibraryEditor({
               ))}
               <small className="studio-programs-note">
                 {tr(
-                  'Με συνολική διάρκεια ο κύκλος τελειώνει αυτόματα. Χωρίς, τελειώνει με «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.',
+                  'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Αν το συμπληρώσετε, ο κύκλος τελειώνει αυτόματα. Αλλιώς τελειώνει με «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.',
                 )}
               </small>
               <AppButton

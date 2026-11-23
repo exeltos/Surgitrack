@@ -93,5 +93,8 @@ describe('a sterilizer runs one cycle at a time', () => {
     expect(ended.status).toBe('AWAITING_RELEASE');
     expect(ended.completedAt).toBe('23/11/2026 09:45');
     expect(ended.note).toContain('Αυτόματο τέλος κύκλου');
+    // One record per load and item, so that two apps recording the same end keep one.
+    const cycles = f.s().sterilizationCycles.filter(c => c.loadId === ended.id);
+    expect(cycles.map(c => c.id)).toEqual([`sc-auto-${ended.id}-${cycles[0].assetKind}-${cycles[0].assetId}`]);
   });
 });

@@ -40,8 +40,6 @@ import type {useReceiptAndCycleActions} from './useReceiptAndCycleActions';
 
 /** The note of a cycle that ended by itself, at the end its program sets (kept in Greek, as records are). */
 const AUTO_END_NOTE = 'Αυτόματο τέλος κύκλου (διάρκεια προγράμματος)';
-/** How long another person's app waits before it ends a cycle that the loader's app has not ended. */
-const OTHERS_WAIT_MS = 2 * 60_000;
 
 export function useLoadActions(
   p: ReturnType<typeof useSurgiSession> &
@@ -111,7 +109,8 @@ export function useLoadActions(
     const inside = washing ? undefined : openCycleOn(processLoads, payload.equipment);
     if (inside) {
       const end = autoEndAt(inside);
-      if (end !== undefined && Date.now() >= end) finishProcessLoad(inside.id, 'PASSED', AUTO_END_NOTE, end);
+      if (end !== undefined && Date.now() >= end && p.can('sterilization.cycle'))
+        finishProcessLoad(inside.id, 'PASSED', AUTO_END_NOTE, end);
       else {
         notify(
           tr(
@@ -293,10 +292,12 @@ export function useLoadActions(
   type LoadRef = {ref: {kind: AssetKind; id: string}; asset: NonNullable<ReturnType<typeof assetName>>};
   /** The end of a sterilizer cycle: one cycle record per item; a passed cycle goes on to release. */
   const recordCycleResult = (load: ProcessLoadRecord, refs: LoadRef[], result: 'PASSED' | 'FAILED', now: string) => {
+    // A cycle that ended by itself has one id per load and item, so two apps that both record it keep one record.
+    const auto = load.note?.includes(AUTO_END_NOTE);
     refs.forEach(({ref, asset}, index) => {
       const toolIds = ref.kind === 'SET' ? tools.filter(t => t.setId === ref.id).map(t => t.id) : [ref.id];
       const cycle: SterilizationCycleRecord = {
-        id: `sc${uniqueStamp()}-${index}`,
+        id: auto ? `sc-auto-${load.id}-${ref.kind}-${ref.id}` : `sc${uniqueStamp()}-${index}`,
         workflowVersion: sterilizationWorkflow.version,
         loadId: load.id,
         assetId: ref.id,
@@ -571,18 +572,19 @@ export function useLoadActions(
   const handled = useRef(new Set<string>());
   const simulating = processLoads.some(l => l.kind === 'STERILIZATION' && l.status === 'OPEN' && !!l.simulation);
   // A cycle whose program sets its length ends by itself too, as passed: the load goes on to release, where the
-  // indicators and the readings are checked as always. The app of whoever loaded it ends it on time; any other a
-  // little later, so that two devices do not both record it, and it is ended all the same if that app is closed.
-  const timed = processLoads.some(l => autoEndAt(l) !== undefined);
+  // indicators and the readings are checked as always. Only the app of whoever loaded it ends it, and only while
+  // they may run cycles: one app records it, not every open one. If that app is closed, the cycle shows as ended
+  // («Τέλος κύκλου» comes back for the others), and it is ended when the sterilizer is loaded again.
   const userId = currentUser.id;
+  const mayCycle = p.can('sterilization.cycle');
+  const timed = mayCycle && processLoads.some(l => l.createdByUserId === userId && autoEndAt(l) !== undefined);
   useEffect(() => {
     if (!timed) return;
     const check = () => {
       for (const load of loadsRef.current) {
         const end = autoEndAt(load);
-        if (end === undefined || handled.current.has(load.id)) continue;
-        const wait = load.createdByUserId === userId ? 0 : OTHERS_WAIT_MS;
-        if (Date.now() < end + wait) continue;
+        if (end === undefined || load.createdByUserId !== userId || handled.current.has(load.id)) continue;
+        if (Date.now() < end) continue;
         handled.current.add(load.id);
         finishRef.current(load.id, 'PASSED', AUTO_END_NOTE, end);
       }

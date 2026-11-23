@@ -248,7 +248,7 @@ export default function ReleaseStation({onStations}: {onStations: () => void}) {
                   >
                     <TriangleAlert size={16} /> {tr('Αποτυχία κύκλου')}
                   </button>
-                  {autoEndAt(l) === undefined && (
+                  {(autoEndAt(l) === undefined || Date.now() >= autoEndAt(l)!) && (
                     <button
                       type="button"
                       className="scan-primary"
