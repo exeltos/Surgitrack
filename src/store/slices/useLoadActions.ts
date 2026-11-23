@@ -456,7 +456,9 @@ export function useLoadActions(
     });
     setProcessLoads(list =>
       list.map(item =>
-        item.id === loadId ? {...item, status: 'OPEN', completedAt: undefined, cycleData: undefined} : item,
+        item.id === loadId
+          ? {...item, status: 'OPEN', completedAt: undefined, cycleData: undefined, reopenedAt: formatStoreDateTime()}
+          : item,
       ),
     );
     notify(tr('Το φορτίο {0} επέστρεψε στον κλίβανο.', named(loadId)));

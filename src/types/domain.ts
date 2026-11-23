@@ -276,6 +276,8 @@ export interface ProcessLoadRecord {
   createdByName: string;
   createdAt: string;
   completedAt?: string;
+  /** When it went back into the sterilizer («Επιστροφή στον κλίβανο»): from then on it is ended by hand only. */
+  reopenedAt?: string;
   releasedAt?: string;
   recalledAt?: string;
   recallReason?: string;

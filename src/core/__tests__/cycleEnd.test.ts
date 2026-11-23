@@ -50,6 +50,8 @@ describe('the end of a cycle', () => {
     expect(autoEndAt(load({program: '134°C · 5 min'}))).toBeUndefined();
     expect(autoEndAt(load({simulation: {scenario: 'PASS', startedAt: start, speed: 20}}))).toBeUndefined();
     expect(autoEndAt(load({status: 'AWAITING_RELEASE'}))).toBeUndefined();
+    // Sent back into the sterilizer after being ended by hand: by hand from then on.
+    expect(autoEndAt(load({reopenedAt: '23/11/2026 10:00'}))).toBeUndefined();
   });
 
   it('finds the cycle still running in a sterilizer', () => {
