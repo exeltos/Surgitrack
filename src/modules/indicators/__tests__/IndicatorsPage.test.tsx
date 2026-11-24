@@ -25,4 +25,14 @@ describe('Indicators', () => {
     expect(cycles.querySelector('.ind-chip')).not.toBeNull();
     expect(cycles).toHaveTextContent(/από \d+|όπως πριν/);
   });
+
+  it('shows today alone, without an average per day', () => {
+    renderPage(<IndicatorsPage />, {path: '/indicators'});
+    expect(screen.getByText('Μέσος όρος ανά ημέρα')).toBeInTheDocument();
+    const today = screen.getByRole('button', {name: 'Σήμερα'});
+    fireEvent.click(today);
+    expect(today).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByText('Μέσος όρος ανά ημέρα')).toBeNull();
+    expect(screen.getByText('Κινήσεις')).toBeInTheDocument();
+  });
 });
