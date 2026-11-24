@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 Disallow: /scan.html
 
-Sitemap: https://surgitrack.gr/sitemap.xml
+Sitemap: https://www.surgitrack.eu/sitemap.xml
