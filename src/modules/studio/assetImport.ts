@@ -86,16 +86,16 @@ export const IMPORT_FIELDS: ReadonlyArray<{
     key: 'department',
     el: 'Τμήμα',
     en: 'Department',
-    hintEl: 'Όπως στο Studio· κενό = Απόθεμα',
-    hintEn: 'As in Studio; empty = Stock',
+    hintEl: 'Στήλη του αρχείου ή ίδιο σε όλες· κενό = Απόθεμα',
+    hintEn: 'A column of the file or the same for all; empty = Stock',
     aliases: ['τμημα', 'department', 'κλινικη', 'dept'],
   },
   {
     key: 'specialty',
     el: 'Ειδικότητα',
     en: 'Specialty',
-    hintEl: '',
-    hintEn: '',
+    hintEl: 'Στήλη του αρχείου ή ίδια σε όλες',
+    hintEn: 'A column of the file or the same for all',
     aliases: ['ειδικοτητα', 'specialty', 'speciality'],
   },
   {
@@ -199,8 +199,16 @@ export function autoMapping(headers: string[]): ImportMapping {
   return mapping;
 }
 
+/** Fields that can take one value for every row, for a file without that column. */
+export type FixedField = 'department' | 'specialty';
+export const FIXED_FIELDS: readonly FixedField[] = ['department', 'specialty'];
+/** One value for every row (a row's own cell, when its column is chosen and filled, comes first). */
+export type ImportFixed = Partial<Record<FixedField, string>>;
+
 export type ImportContext = {
   lang: 'el' | 'en';
+  /** Values given for every row in the wizard (department, specialty). */
+  fixed?: ImportFixed;
   /** The hospital's active departments. */
   departments: Array<{name: string; code?: string}>;
   /** Every barcode already in the hospital (current and old ones), upper case. */
@@ -240,7 +248,9 @@ export function buildImportPlan(
 ): ImportPlan {
   const L = (el: string, en: string) => (context.lang === 'el' ? el : en);
   const errors: ImportIssue[] = [];
-  const value = (row: string[], field: ImportField) => (mapping[field] >= 0 ? (row[mapping[field]] || '').trim() : '');
+  const value = (row: string[], field: ImportField) =>
+    (mapping[field] >= 0 ? (row[mapping[field]] || '').trim() : '') ||
+    (context.fixed?.[field as FixedField] || '').trim();
   const departmentByKey = new Map<string, string>();
   for (const d of context.departments) {
     departmentByKey.set(normalize(d.name), d.name);

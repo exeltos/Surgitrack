@@ -8,7 +8,14 @@ import {
   undoAssetImport,
   type AssetImport,
 } from '../../../data/cloud/assetImports';
-import {autoMapping, buildImportPlan, findHeaderRow, type ImportMapping, type ImportPlan} from '../assetImport';
+import {
+  autoMapping,
+  buildImportPlan,
+  findHeaderRow,
+  type ImportFixed,
+  type ImportMapping,
+  type ImportPlan,
+} from '../assetImport';
 import {cleanName} from '../../../core/nameCheck';
 import type {SetAsset, Tool} from '../../../types/domain';
 import {formatDateTime} from '../../../core/displayDate';
@@ -46,6 +53,8 @@ export function useAssetImport({lang, organizations, departments, byName, choose
   const [rows, setRows] = useState<SheetRows>([]);
   const [headerRow, setHeaderRow] = useState(0);
   const [mapping, setMapping] = useState<ImportMapping>(() => autoMapping([]));
+  // A department or specialty for every row, when the file does not say it.
+  const [fixed, setFixed] = useState<ImportFixed>({});
   const [plan, setPlan] = useState<ImportPlan>();
   const [busy, setBusy] = useState('');
   const [progress, setProgress] = useState<{done: number; total: number}>();
@@ -60,6 +69,7 @@ export function useAssetImport({lang, organizations, departments, byName, choose
   const [useExisting, setUseExisting] = useState(true);
 
   const organization = organizations.find(o => o.id === organizationId);
+  const organizationDepartments = departments.filter(d => d.organizationId === organizationId && d.active);
   const headers = rows[headerRow] || [];
   const dataRows = useMemo(() => rows.slice(headerRow + 1), [rows, headerRow]);
 
@@ -83,6 +93,7 @@ export function useAssetImport({lang, organizations, departments, byName, choose
     setPlan(undefined);
     setProgress(undefined);
     setError('');
+    setFixed({});
   };
   // The open workspace holds that hospital's records in memory; it reloads to see the change.
   const touchesOpenWorkspace = (id: string) => getCloudOrganizationId() === id;
@@ -123,9 +134,8 @@ export function useAssetImport({lang, organizations, departments, byName, choose
       setPlan(
         buildImportPlan(dataRows, headerRow + 2, mapping, {
           lang,
-          departments: departments
-            .filter(d => d.organizationId === organizationId && d.active)
-            .map(d => ({name: d.name, code: d.code})),
+          fixed,
+          departments: organizationDepartments.map(d => ({name: d.name, code: d.code})),
           existingBarcodes,
           batch: `imp${Date.now().toString(36)}`,
         }),
@@ -252,6 +262,9 @@ export function useAssetImport({lang, organizations, departments, byName, choose
     fileName,
     filledRows,
     final,
+    fixed,
+    setFixed,
+    organizationDepartments,
     finalName,
     formatDate,
     headerRow,

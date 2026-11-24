@@ -173,3 +173,36 @@ describe('uses already made and new instruments in the import', () => {
     expect(autoMapping(['Όνομα εργαλείου', 'Χρήσεις']).maxUses).toBe(-1);
   });
 });
+
+describe('a department and specialty for every row', () => {
+  it('fills them in when the file has no such column, and a row that says its own keeps it', () => {
+    const headers = ['ΕΡΓΑΛΕΙΟ', 'ΤΕΜΑΧΙΑ', 'ΚΩΔΙΚΟΣ'];
+    const rows = [
+      ['ΔΙΠΟΛΙΚΗ ΜΠΙΛΙΑ', '2', 'PP01'],
+      ['ΨΑΛΙΔΙ', '1', 'VZ'],
+    ];
+    const mapping = autoMapping(headers);
+    expect(mapping.department).toBe(-1);
+    const result = buildImportPlan(rows, 2, mapping, {
+      ...context(),
+      fixed: {department: 'Χειρουργείο', specialty: 'Ουρολογία'},
+    });
+    expect(result.errors).toEqual([]);
+    expect(result.tools.map(t => [t.department, t.specialty])).toEqual([
+      ['Χειρουργείο', 'Ουρολογία'],
+      ['Χειρουργείο', 'Ουρολογία'],
+      ['Χειρουργείο', 'Ουρολογία'],
+    ]);
+    // A file with its own column: a filled cell is kept, an empty one takes the value for every row.
+    const withColumn = buildImportPlan(
+      [
+        ['ΨΑΛΙΔΙ', '1', 'VZ', 'Ορθοπαιδική'],
+        ['ΛΑΒΙΔΑ', '1', 'VY', ''],
+      ],
+      2,
+      autoMapping([...headers, 'ΤΜΗΜΑ']),
+      {...context(), fixed: {department: 'Χειρουργείο'}},
+    );
+    expect(withColumn.tools.map(t => t.department)).toEqual(['Ορθοπαιδική', 'Χειρουργείο']);
+  });
+});
