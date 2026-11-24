@@ -8,7 +8,7 @@ describe('the hospital editor’s modules', () => {
     const onSave = vi.fn();
     render(<OrganizationEditor onClose={() => undefined} onSave={onSave} />);
     const boxes = screen.getAllByRole('checkbox');
-    expect(boxes).toHaveLength(6);
+    expect(boxes).toHaveLength(7);
     expect(boxes.every(box => !(box as HTMLInputElement).checked)).toBe(true);
     fireEvent.change(screen.getAllByRole('textbox')[0], {target: {value: 'Νέο Νοσοκομείο'}});
     fireEvent.change(screen.getByRole('textbox', {name: 'Ονοματεπώνυμο'}), {target: {value: 'Άννα Διαχειρίστρια'}});
@@ -30,9 +30,9 @@ describe('the hospital editor’s modules', () => {
       modules: ['REPLACEMENTS'],
     };
     render(<OrganizationEditor organization={hospital} onClose={() => undefined} onSave={onSave} />);
-    expect((screen.getByRole('checkbox', {name: /Αντικαταστάσεις/}) as HTMLInputElement).checked).toBe(true);
+    expect((screen.getByRole('checkbox', {name: /αντικαταστάσεις/i}) as HTMLInputElement).checked).toBe(true);
     expect((screen.getByRole('checkbox', {name: /Ελάχιστα αποθέματα/}) as HTMLInputElement).checked).toBe(false);
-    fireEvent.click(screen.getByRole('checkbox', {name: /Αντικαταστάσεις/}));
+    fireEvent.click(screen.getByRole('checkbox', {name: /αντικαταστάσεις/i}));
     fireEvent.click(screen.getByRole('button', {name: 'Αποθήκευση'}));
     expect(onSave.mock.calls[0][0]).toMatchObject({modules: []});
   });

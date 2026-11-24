@@ -84,14 +84,18 @@ export default function IssuesPage() {
   // Sterilization and admins also see the instruments to replace, as a second tab (in a hospital the platform
   // owner gave the Replacements & Orders module).
   const hasReplacements = useHasModule('REPLACEMENTS');
+  const hasOrders = useHasModule('ORDERS');
   const withReplacements = can('stock.manage') && hasReplacements;
+  const withOrders = can('stock.manage') && hasOrders;
   const [params, setParams] = useSearchParams();
-  // Three tabs: the reports, the instruments to replace and the purchase orders (`view=orders` is the old link).
-  const tab = !withReplacements
-    ? 'REPORTS'
-    : params.get('tab') === 'orders' || (params.get('tab') === 'replacements' && params.get('view') === 'orders')
+  // Up to three tabs: the reports, the instruments to replace and the purchase orders, each of the last two with
+  // its own module (`view=orders` is the old link).
+  const askedOrders =
+    params.get('tab') === 'orders' || (params.get('tab') === 'replacements' && params.get('view') === 'orders');
+  const tab =
+    askedOrders && withOrders
       ? 'ORDERS'
-      : params.get('tab') === 'replacements'
+      : params.get('tab') === 'replacements' && withReplacements
         ? 'REPLACEMENTS'
         : 'REPORTS';
   const neededReplacements = useMemo(
@@ -161,34 +165,39 @@ export default function IssuesPage() {
     },
     active: status === nextStatus && age === nextAge,
   });
-  const tabs = withReplacements ? (
-    <div className="name-check-tabs issues-tabs" role="tablist">
-      <button
-        role="tab"
-        aria-selected={tab === 'REPORTS'}
-        className={tab === 'REPORTS' ? 'active' : ''}
-        onClick={() => setParams({})}
-      >
-        <ClipboardList size={16} /> {tr('Προβλήματα')} <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
-      </button>
-      <button
-        role="tab"
-        aria-selected={tab === 'REPLACEMENTS'}
-        className={tab === 'REPLACEMENTS' ? 'active' : ''}
-        onClick={() => setParams({tab: 'replacements'})}
-      >
-        <PackageX size={16} /> {tr('Αποσύρσεις & αντικαταστάσεις')} <b>{neededReplacements}</b>
-      </button>
-      <button
-        role="tab"
-        aria-selected={tab === 'ORDERS'}
-        className={tab === 'ORDERS' ? 'active' : ''}
-        onClick={() => setParams({tab: 'orders'})}
-      >
-        <Truck size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
-      </button>
-    </div>
-  ) : null;
+  const tabs =
+    withReplacements || withOrders ? (
+      <div className="name-check-tabs issues-tabs" role="tablist">
+        <button
+          role="tab"
+          aria-selected={tab === 'REPORTS'}
+          className={tab === 'REPORTS' ? 'active' : ''}
+          onClick={() => setParams({})}
+        >
+          <ClipboardList size={16} /> {tr('Προβλήματα')} <b>{scopedIssues.filter(i => i.status === 'OPEN').length}</b>
+        </button>
+        {withReplacements && (
+          <button
+            role="tab"
+            aria-selected={tab === 'REPLACEMENTS'}
+            className={tab === 'REPLACEMENTS' ? 'active' : ''}
+            onClick={() => setParams({tab: 'replacements'})}
+          >
+            <PackageX size={16} /> {tr('Αποσύρσεις & αντικαταστάσεις')} <b>{neededReplacements}</b>
+          </button>
+        )}
+        {withOrders && (
+          <button
+            role="tab"
+            aria-selected={tab === 'ORDERS'}
+            className={tab === 'ORDERS' ? 'active' : ''}
+            onClick={() => setParams({tab: 'orders'})}
+          >
+            <Truck size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
+          </button>
+        )}
+      </div>
+    ) : null;
   const goToOrders = () => setParams({tab: 'orders'});
   return (
     <div className="tools-list-workspace">
@@ -397,7 +406,7 @@ export default function IssuesPage() {
                                             },
                                           ]
                                         : []),
-                                      ...(withReplacements && subject(i).tool
+                                      ...(withOrders && subject(i).tool
                                         ? [
                                             {
                                               key: 'order',

@@ -25,6 +25,7 @@ import {
 import type {PurchaseOrder, PurchaseOrderLine} from '../../types/domain';
 import OrderDialog from './OrderDialog';
 import OrdersPanel from './OrdersPanel';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import ReceiveDialog from './ReceiveDialog';
 import {isReceivable} from '../../core/purchaseReceipt';
 import {useConfirm} from '../../components/ui/useConfirm';
@@ -63,6 +64,8 @@ export default function ReplacementsPage({
   const store = useSurgi();
   const {tools, retiredTools, sets, issues, movements, purchaseOrders, can, organizationName} = store;
   const editable = can('stock.manage');
+  // Ordering from the supplier is a module of its own («Παραγγελίες»): without it, no order actions here.
+  const canOrder = useHasModule('ORDERS');
   const items = useMemo(
     () => replacementItems({tools, retiredTools, sets, issues, movements, purchaseOrders}),
     [tools, retiredTools, sets, issues, movements, purchaseOrders],
@@ -138,7 +141,7 @@ export default function ReplacementsPage({
   const canReturnItem = (item: ReplacementItem) => item.reason === 'SERVICE' && item.status !== 'REPLACED';
   const slots = {
     replace: shown.some(canReplaceItem),
-    order: shown.some(item => item.status === 'NEEDED'),
+    order: canOrder && shown.some(item => item.status === 'NEEDED'),
     back: shown.some(canReturnItem),
   };
 
@@ -283,14 +286,16 @@ export default function ReplacementsPage({
           >
             <RefreshCcw size={16} /> {tr('Εργαλεία')} <b>{shown.length}</b>
           </button>
-          <button
-            role="tab"
-            aria-selected={tab === 'ORDERS'}
-            className={tab === 'ORDERS' ? 'active' : ''}
-            onClick={() => setTab('ORDERS')}
-          >
-            <ClipboardList size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
-          </button>
+          {canOrder && (
+            <button
+              role="tab"
+              aria-selected={tab === 'ORDERS'}
+              className={tab === 'ORDERS' ? 'active' : ''}
+              onClick={() => setTab('ORDERS')}
+            >
+              <ClipboardList size={16} /> {tr('Παραγγελίες')} <b>{purchaseOrders.filter(isReceivable).length}</b>
+            </button>
+          )}
         </div>
       )}
 
@@ -322,13 +327,17 @@ export default function ReplacementsPage({
                 active: status === 'NEEDED' && stock === 'NO',
                 onClick: () => (setStatus('NEEDED'), setStock('NO')),
               },
-              {
-                key: 'ordered',
-                label: tr('Σε παραγγελία'),
-                count: items.filter(i => i.status === 'IN_ORDER').length,
-                active: status === 'IN_ORDER',
-                onClick: () => (setStatus('IN_ORDER'), setStock('')),
-              },
+              ...(canOrder
+                ? [
+                    {
+                      key: 'ordered',
+                      label: tr('Σε παραγγελία'),
+                      count: items.filter(i => i.status === 'IN_ORDER').length,
+                      active: status === 'IN_ORDER',
+                      onClick: () => (setStatus('IN_ORDER'), setStock('')),
+                    },
+                  ]
+                : []),
             ]}
           />
           {/* The search, Filters and the download on the bar every list has, above the list. */}
@@ -374,12 +383,14 @@ export default function ReplacementsPage({
                 >
                   {tr('Αντικατάσταση από Απόθεμα ({0})', fromStock.length)}
                 </AppButton>
-                <AppButton
-                  icon={<ShoppingCart size={15} />}
-                  onClick={() => setOrdering(orderLines(picked.filter(item => item.status !== 'REPLACED')))}
-                >
-                  {tr('Παραγγελία αγοράς')}
-                </AppButton>
+                {canOrder && (
+                  <AppButton
+                    icon={<ShoppingCart size={15} />}
+                    onClick={() => setOrdering(orderLines(picked.filter(item => item.status !== 'REPLACED')))}
+                  >
+                    {tr('Παραγγελία αγοράς')}
+                  </AppButton>
+                )}
                 <button type="button" className="replacements-clear" onClick={() => setSelected(new Set())}>
                   <X size={14} /> {tr('Καθαρισμός επιλογής')}
                 </button>
@@ -524,7 +535,7 @@ export default function ReplacementsPage({
                               ) : (
                                 slots.replace && <span className="slot-replace" aria-hidden="true" />
                               )}
-                              {item.status === 'NEEDED' ? (
+                              {canOrder && item.status === 'NEEDED' ? (
                                 <button
                                   type="button"
                                   className="slot-order"

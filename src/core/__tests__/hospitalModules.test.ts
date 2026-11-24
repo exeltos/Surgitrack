@@ -5,6 +5,7 @@ describe('the modules of a hospital', () => {
   it('are the ones the platform owner switches on', () => {
     expect(ALL_MODULES).toEqual([
       'REPLACEMENTS',
+      'ORDERS',
       'STOCK_MINIMUMS',
       'DEVICES',
       'SURGICAL_COUNT',
@@ -12,6 +13,11 @@ describe('the modules of a hospital', () => {
       'MANUAL_USES',
     ]);
     expect(HOSPITAL_MODULES.every(m => m.el && m.en && m.descriptionEl && m.descriptionEn)).toBe(true);
+  });
+
+  it('has withdrawals & replacements and orders as two modules', () => {
+    expect(modulesOf(['ORDERS'])).toEqual(['ORDERS']);
+    expect(HOSPITAL_MODULES.find(m => m.id === 'ORDERS')?.el).toBe('Παραγγελίες');
   });
 
   it('are read from the hospital row: the known ones, in order; undefined when the row says nothing', () => {
