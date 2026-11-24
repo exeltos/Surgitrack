@@ -153,6 +153,11 @@ export interface Issue {
   /** The admin who last corrected its text, and when. */
   editedBy?: string;
   editedAt?: string;
+  /** Who closed it (the final assessment) and when (older reports have none). */
+  resolvedBy?: string;
+  resolvedAt?: string;
+  /** How it was closed, when that is more than «resolved»: the instrument was withdrawn from use. */
+  outcome?: 'RETIRED';
 }
 export type ReceiptCheckResult = 'OK' | 'MISSING' | 'DAMAGE' | 'OTHER';
 export type ReceiptItemCheckStatus = 'OK' | 'PROBLEM';

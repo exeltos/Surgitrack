@@ -2,6 +2,7 @@ import type {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
 import {isNew} from '../../core/usageStatus';
+import {issueWithdrawn} from '../../core/issueOutcome';
 import {
   LOAD_STATUS,
   indicatorText,
@@ -17,7 +18,7 @@ type Store = ReturnType<typeof useSurgi>;
 export type ReportInput = Pick<
   Store,
   'sets' | 'tools' | 'retiredTools' | 'issues' | 'processLoads' | 'sterilizationReleases' | 'receipts' | 'deliveries'
-> & {warningThreshold: number};
+> & {warningThreshold: number; movements?: Store['movements']};
 /** The chosen filters; 'ALL' is no filter. */
 export type ReportFilters = {
   group: InventoryGroup;
@@ -106,17 +107,27 @@ export function buildReport(
     };
   }
   if (active === 'issues') {
+    // A report closed by withdrawing the instrument is not «resolved»: it says «Αποσύρθηκε» (older reports by the
+    // text of their resolution), with who made that final assessment (older ones: who recorded the withdrawal).
+    const retired = issueWithdrawn;
+    const withdrawnBy = (i: (typeof issues)[number]) => {
+      const barcode = i.asset.split(' ')[0];
+      return input.movements?.find(m => m.asset.startsWith(`${barcode} `) && m.status.startsWith('Απόσυρση'))?.by;
+    };
+    const statusOf = (i: (typeof issues)[number]) =>
+      i.status === 'OPEN' ? 'OPEN' : retired(i) ? 'RETIRED' : 'RESOLVED';
     const rows = issues
       .filter(i => department === 'ALL' || i.department === department)
       .filter(i => issueType === 'ALL' || i.type === issueType)
-      .filter(i => issueStatus === 'ALL' || i.status === issueStatus)
+      .filter(i => issueStatus === 'ALL' || statusOf(i) === issueStatus)
       .map(i => ({
         asset: i.asset,
         type: i.type,
         department: i.department,
-        status: i.status === 'OPEN' ? 'Ανοικτή' : 'Επιλυμένη',
+        status: statusOf(i) === 'OPEN' ? 'Ανοικτή' : statusOf(i) === 'RETIRED' ? 'Αποσύρθηκε' : 'Επιλυμένη',
         created: i.created,
         reportedBy: i.reportedBy || '—',
+        resolvedBy: i.status === 'OPEN' ? '—' : i.resolvedBy || (retired(i) && withdrawnBy(i)) || '—',
         note: i.note,
       }));
     return {
@@ -127,6 +138,7 @@ export function buildReport(
         {key: 'status', label: tr('Κατάσταση')},
         {key: 'created', label: tr('Ημερομηνία')},
         {key: 'reportedBy', label: tr('Δήλωσε')},
+        {key: 'resolvedBy', label: tr('Αξιολόγησε')},
         {key: 'note', label: tr('Παρατήρηση')},
       ],
       rows: rows as Row[],

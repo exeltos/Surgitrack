@@ -570,6 +570,7 @@ export const en: Record<string, string> = {
   'Επιλογή όλων': 'Select all',
   Επιλυμένες: 'Resolved',
   Επιλυμένη: 'Resolved',
+  Αποσύρθηκε: 'Withdrawn',
   'Επιστρέψτε στη λίστα εργαλείων και επιλέξτε ξανά.': 'Go back to the instrument list and select again.',
   'Επιστρέψτε στη λίστα των Σετ και επιλέξτε ξανά.': 'Go back to the set list and select again.',
   'Επιστροφή στο κεντρικό Απόθεμα': 'Return to central stock',
@@ -2564,6 +2565,8 @@ export const en: Record<string, string> = {
   'Πρώτα τελειώνει ο κύκλος που είναι στον κλίβανο.': 'The cycle in the sterilizer ends first.',
   '{0} λεπτά ακόμα': '{0} min to go',
   'Ο χρόνος του προγράμματος πέρασε': 'The program time has passed',
+  Αποσύρθηκαν: 'Withdrawn',
+  Αξιολόγησε: 'Assessed by',
   'Διαγραφή προγράμματος;': 'Delete program?',
   'Το πρόγραμμα «{0}» θα αφαιρεθεί από τον κλίβανο μόλις πατήσετε «Αποθήκευση». Τα φορτία που έγιναν με αυτό μένουν ως έχουν.':
     'Program «{0}» will be removed from the sterilizer when you press «Save». Loads already run with it stay as they are.',

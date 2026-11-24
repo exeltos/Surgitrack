@@ -338,7 +338,13 @@ export function useAssetCatalogActions(
     setIssues(list =>
       list.map(issue =>
         ids.has(issue.id)
-          ? {...issue, status: 'RESOLVED' as const, note: `${issue.note} · Επίλυση: ${resolutionNote}`}
+          ? {
+              ...issue,
+              status: 'RESOLVED' as const,
+              note: `${issue.note} · Επίλυση: ${resolutionNote}`,
+              resolvedBy: currentUser.name,
+              resolvedAt: formatStoreDateTime(),
+            }
           : issue,
       ),
     );
@@ -400,7 +406,14 @@ export function useAssetCatalogActions(
     setIssues(list =>
       list.map(i =>
         i.status === 'OPEN' && i.asset.split(' ')[0] === tool.barcode
-          ? {...i, status: 'RESOLVED' as const, note: `${i.note} · Επίλυση: Αποσύρθηκε (${why})`}
+          ? {
+              ...i,
+              status: 'RESOLVED' as const,
+              note: `${i.note} · Επίλυση: Αποσύρθηκε (${why})`,
+              resolvedBy: currentUser.name,
+              resolvedAt: at,
+              outcome: 'RETIRED' as const,
+            }
           : i,
       ),
     );

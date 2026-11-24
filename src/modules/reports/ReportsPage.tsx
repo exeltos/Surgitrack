@@ -42,7 +42,8 @@ import {reportSummary} from './reportSummary';
 import LoadCell from './loadCells';
 
 export default function ReportsPage() {
-  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries} = useSurgi();
+  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries, movements} =
+    useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
   // The report open is in the address (?report=…): «Πίσω» returns to the one before, and a link opens it.
   const [params, setParams] = useSearchParams();
@@ -119,6 +120,7 @@ export default function ReportsPage() {
           receipts,
           deliveries,
           warningThreshold,
+          movements,
         },
         {
           group,
@@ -158,6 +160,7 @@ export default function ReportsPage() {
       receipts,
       deliveries,
       signature,
+      movements,
     ],
   );
 
@@ -291,6 +294,7 @@ export default function ReportsPage() {
             options: [
               {value: 'OPEN', label: tr('Ανοικτές')},
               {value: 'RESOLVED', label: tr('Επιλυμένες')},
+              {value: 'RETIRED', label: tr('Αποσύρθηκαν')},
             ],
             ...choice(issueStatus, setIssueStatus),
           },

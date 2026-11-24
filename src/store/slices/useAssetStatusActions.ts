@@ -124,7 +124,7 @@ export function useAssetStatusActions(
     setIssues(x =>
       x.map(i =>
         i.status === 'OPEN' && i.asset.startsWith(a.barcode) && (i.type === 'Απώλεια' || i.type === 'Βλάβη / Service')
-          ? {...i, status: 'RESOLVED'}
+          ? {...i, status: 'RESOLVED', resolvedBy: currentUser.name, resolvedAt: formatStoreDateTime()}
           : i,
       ),
     );
