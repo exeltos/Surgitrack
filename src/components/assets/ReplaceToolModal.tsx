@@ -6,6 +6,7 @@ import {useSurgi} from '../../store/SurgiStore';
 import {inActiveProcess, isMovable, kindKey} from '../../core/replacements';
 import {tr, trData} from '../../i18n';
 import {useSetColorQuestion} from './useSetColorQuestion';
+import {useHasModule} from '../../data/cloud/modulesContext';
 import type {Issue, Tool} from '../../types/domain';
 
 type Source = 'STOCK' | 'SET' | 'STANDALONE';
@@ -23,6 +24,8 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
   const store = useSurgi();
   const {tools, sets, issues} = store;
   const colorQuestion = useSetColorQuestion();
+  // A purchase order only in a hospital with the Orders module.
+  const canOrder = useHasModule('ORDERS');
   // The store as it is when the step is confirmed (after the color question), not when it was opened: another
   // workstation may have started a process meanwhile.
   const latest = useRef(store);
@@ -177,7 +180,7 @@ export default function ReplaceToolModal({tool, onClose}: {tool: Tool; onClose: 
           </p>
         )}
         <footer>
-          {!same.length && (
+          {!same.length && canOrder && (
             <Link className="app-button app-button-secondary" to="/issues?tab=replacements" onClick={onClose}>
               <ShoppingCart size={15} aria-hidden="true" /> {tr('Παραγγελία αγοράς')}
             </Link>

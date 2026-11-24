@@ -3,7 +3,7 @@
  * given a module does not see its screens, counts or alerts.
  */
 export type HospitalModule =
-  'REPLACEMENTS' | 'STOCK_MINIMUMS' | 'DEVICES' | 'SURGICAL_COUNT' | 'EQUIPMENT_TESTS' | 'MANUAL_USES';
+  'REPLACEMENTS' | 'ORDERS' | 'STOCK_MINIMUMS' | 'DEVICES' | 'SURGICAL_COUNT' | 'EQUIPMENT_TESTS' | 'MANUAL_USES';
 
 export const HOSPITAL_MODULES: Array<{
   id: HospitalModule;
@@ -14,10 +14,19 @@ export const HOSPITAL_MODULES: Array<{
 }> = [
   {
     id: 'REPLACEMENTS',
-    el: 'Αντικαταστάσεις & Παραγγελίες',
-    en: 'Replacements & Orders',
-    descriptionEl: 'Ποια εργαλεία χρειάζονται αντικατάσταση και οι παραγγελίες προς τον προμηθευτή.',
-    descriptionEn: 'Which instruments need replacing, and the orders sent to the supplier.',
+    el: 'Αποσύρσεις & αντικαταστάσεις',
+    en: 'Withdrawals & replacements',
+    descriptionEl:
+      'Ποια εργαλεία χρειάζονται αντικατάσταση (βλάβη, απώλεια, Service, απόσυρση) και η αντικατάστασή τους από το Απόθεμα.',
+    descriptionEn:
+      'Which instruments need replacing (damage, loss, service, withdrawal), and replacing them from Stock.',
+  },
+  {
+    id: 'ORDERS',
+    el: 'Παραγγελίες',
+    en: 'Orders',
+    descriptionEl: 'Παραγγελίες αγοράς προς τον προμηθευτή και η παραλαβή τους στο Απόθεμα.',
+    descriptionEn: 'Purchase orders to the supplier, and receiving them into Stock.',
   },
   {
     id: 'STOCK_MINIMUMS',

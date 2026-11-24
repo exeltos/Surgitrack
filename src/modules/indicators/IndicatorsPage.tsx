@@ -59,12 +59,12 @@ function Fact({
     <div className={className}>{body}</div>
   );
 }
-const PERIODS = [7, 30, 90] as const;
+const PERIODS = [1, 7, 30, 90] as const;
 
 /**
  * Indicators (the admin, the Sterilization supervisor, the platform owner): how the work spreads over the hours and
  * the days, how long a round takes per department, who uses what and for which operations, and the quality —
- * failed cycles, issues, losses and expiries — over the last 7, 30 or 90 days.
+ * failed cycles, issues, losses and expiries — today or over the last 7, 30 or 90 days.
  */
 export default function IndicatorsPage() {
   const {movements, processLoads, issues, sets, tools, can} = useSurgi();
@@ -233,7 +233,7 @@ export default function IndicatorsPage() {
         <div className="ind-period" role="group" aria-label={L('Περίοδος', 'Period')}>
           {PERIODS.map(p => (
             <button key={p} type="button" aria-pressed={days === p} onClick={() => setDays(p)}>
-              {L(`${p} ημέρες`, `${p} days`)}
+              {p === 1 ? L('Σήμερα', 'Today') : L(`${p} ημέρες`, `${p} days`)}
             </button>
           ))}
         </div>
@@ -243,11 +243,14 @@ export default function IndicatorsPage() {
         <>
           <div className="ind-facts">
             <Fact label={L('Κινήσεις', 'Movements')} value={load.total} sub={trend(load.total, before.movements)} />
-            <Fact
-              label={L('Μέσος όρος ανά ημέρα', 'Average per day')}
-              value={load.perDay.toFixed(1).replace('.', lang === 'el' ? ',' : '.')}
-              sub={L('κινήσεις', 'movements')}
-            />
+            {/* Today alone has no average per day: the movements are the day's. */}
+            {days > 1 && (
+              <Fact
+                label={L('Μέσος όρος ανά ημέρα', 'Average per day')}
+                value={load.perDay.toFixed(1).replace('.', lang === 'el' ? ',' : '.')}
+                sub={L('κινήσεις', 'movements')}
+              />
+            )}
             <Fact
               label={L('Πιο φορτωμένη ώρα', 'Busiest hour')}
               value={load.peakHour === undefined ? '—' : hourSpan(load.peakHour)}

@@ -14,7 +14,7 @@ describe('Issues and the Replacements & Orders module', () => {
       </ModulesContext.Provider>,
       {path: '/issues', signedIn: admin},
     );
-    expect(screen.getByRole('tab', {name: /Αντικαταστάσεις/})).toBeTruthy();
+    expect(screen.getByRole('tab', {name: /αντικαταστάσεις/i})).toBeTruthy();
   });
 
   it('has only the issues in one that was not, even by the address of the replacements', () => {
@@ -25,6 +25,28 @@ describe('Issues and the Replacements & Orders module', () => {
       {path: '/issues?tab=replacements', signedIn: admin},
     );
     expect(screen.queryByRole('tab')).toBeNull();
-    expect(screen.queryByText(/Αντικαταστάσεις/)).toBeNull();
+    expect(screen.queryByText(/αντικαταστάσεις/i)).toBeNull();
+  });
+
+  it('shows the replacements and the orders each with its own module', () => {
+    const {unmount} = renderPage(
+      <ModulesContext.Provider value={['REPLACEMENTS']}>
+        <IssuesPage />
+      </ModulesContext.Provider>,
+      {path: '/issues?tab=orders', signedIn: admin},
+    );
+    expect(screen.getByRole('tab', {name: /αντικαταστάσεις/i})).toBeTruthy();
+    expect(screen.queryByRole('tab', {name: /^Παραγγελίες/})).toBeNull();
+    // The orders' address falls back to the issues without the module.
+    expect(screen.getByRole('tab', {name: /Προβλήματα/}).getAttribute('aria-selected')).toBe('true');
+    unmount();
+    renderPage(
+      <ModulesContext.Provider value={['ORDERS']}>
+        <IssuesPage />
+      </ModulesContext.Provider>,
+      {path: '/issues', signedIn: admin},
+    );
+    expect(screen.getByRole('tab', {name: /Παραγγελίες/})).toBeTruthy();
+    expect(screen.queryByRole('tab', {name: /αντικαταστάσεις/i})).toBeNull();
   });
 });

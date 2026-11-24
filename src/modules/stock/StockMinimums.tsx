@@ -31,7 +31,7 @@ const STATUS: Record<MinimumRow['status'], {label: string; className: string}> =
 export default function StockMinimums() {
   const {tools, retiredTools, purchaseOrders, createPurchaseOrder, can, role, currentUser} = useSurgi();
   // Ordering what is missing needs the Replacements & Orders module (where the orders are kept).
-  const hasOrders = useHasModule('REPLACEMENTS');
+  const hasOrders = useHasModule('ORDERS');
   const canOrder = can('stock.manage') && hasOrders;
   const {systemSettings, updateSystemSettings} = useLibraries();
   const navigate = useNavigate();

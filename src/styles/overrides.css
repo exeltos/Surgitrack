@@ -1727,6 +1727,10 @@ div.asset-import-hospital b {
   color: var(--c-cyan-40-2);
   font-size: 12px;
 }
+/* An empty-list message inside a table stays a cell, so it spans every column (the generic .empty is a grid). */
+td.empty {
+  display: table-cell;
+}
 .replacements-table .empty {
   padding: 26px;
   text-align: center;

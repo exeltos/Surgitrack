@@ -7,7 +7,7 @@ export const REASON_LABEL: Record<ReplacementReason, string> = {
   SERVICE: 'Service',
   DAMAGED: 'Βλάβη / φθορά',
   LOST: 'Απώλεια',
-  RETIRED: 'Εκτός χρήσης',
+  RETIRED: 'Αποσύρθηκε',
 };
 
 /** Issue types that mean the instrument itself is damaged. */

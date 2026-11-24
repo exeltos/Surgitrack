@@ -5,7 +5,7 @@ begin;
 select tests.login('platform');
 select tests.eq(
   (select modules from public.organizations where id = tests.org('A')),
-  array['REPLACEMENTS', 'STOCK_MINIMUMS', 'DEVICES', 'SURGICAL_COUNT', 'EQUIPMENT_TESTS', 'MANUAL_USES']::text[], 'a hospital starts with every module on (nothing disappears)');
+  array['REPLACEMENTS', 'ORDERS', 'STOCK_MINIMUMS', 'DEVICES', 'SURGICAL_COUNT', 'EQUIPMENT_TESTS', 'MANUAL_USES']::text[], 'a hospital starts with every module on (nothing disappears)');
 select tests.eq(tests.rows($q$update public.organizations set modules = '{}' where id = tests.org('A')$q$), 1,
   'the platform owner switches the modules off for a hospital');
 select tests.eq(tests.rows($q$update public.organizations set modules = array['STOCK_MINIMUMS'] where id = tests.org('A')$q$),
@@ -16,6 +16,10 @@ select tests.eq(tests.rows($q$update public.organizations set modules = array['S
   1, 'the count and the equipment tests are modules too');
 select tests.eq(tests.rows($q$update public.organizations set modules = array['MANUAL_USES'] where id = tests.org('A')$q$),
   1, 'and so are the manual use records');
+select tests.eq(tests.rows($q$update public.organizations set modules = array['REPLACEMENTS'] where id = tests.org('A')$q$),
+  1, 'replacements without orders');
+select tests.eq(tests.rows($q$update public.organizations set modules = array['ORDERS'] where id = tests.org('A')$q$),
+  1, '... and orders without replacements');
 select tests.eq(tests.rows($q$update public.organizations set modules = array['STOCK_MINIMUMS'] where id = tests.org('A')$q$),
   1, '... and off again');
 select tests.throws($q$update public.organizations set modules = array['SOMETHING'] where id = tests.org('A')$q$, '23514',
