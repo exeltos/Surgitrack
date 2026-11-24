@@ -1,3 +1,4 @@
+import {AUTO_END_NOTE} from '../../core/cycleEnd';
 import type {useSurgi} from '../../store/SurgiStore';
 import {tr} from '../../i18n';
 import {formatExpiry, sterileExpiryList} from '../../core/sterileExpiry';
@@ -18,7 +19,7 @@ type Store = ReturnType<typeof useSurgi>;
 export type ReportInput = Pick<
   Store,
   'sets' | 'tools' | 'retiredTools' | 'issues' | 'processLoads' | 'sterilizationReleases' | 'receipts' | 'deliveries'
-> & {warningThreshold: number; movements?: Store['movements']};
+> & {warningThreshold: number; movements?: Store['movements']; sterilizationCycles?: Store['sterilizationCycles']};
 /** The chosen filters; 'ALL' is no filter. */
 export type ReportFilters = {
   group: InventoryGroup;
@@ -237,6 +238,10 @@ export function buildReport(
       .filter(load => sterilizerName === 'ALL' || load.equipment === sterilizerName)
       .map(load => {
         const release = sterilizationReleases.find(r => r.loadId === load.id);
+        // Who ended the cycle («Τέλος κύκλου» or «Αποτυχία κύκλου»): the cycle records of its items say it.
+        const endedBy = (input.sterilizationCycles || []).find(c => c.loadId === load.id)?.completedByName;
+        const auto = load.note?.includes(AUTO_END_NOTE);
+        const endedWho = auto ? tr('αυτόματα') : endedBy;
         return {
           loaded: load.createdAt,
           equipment: load.equipment,
@@ -246,8 +251,14 @@ export function buildReport(
           chemical: indicatorText(load.chemicalIndicatorResult),
           biological: indicatorText(load.biologicalIndicatorResult),
           loadStatus: tr(LOAD_STATUS[load.status] || load.status),
+          ended: load.completedAt || '—',
+          endedBy: endedWho || '—',
+          endedInfo: load.completedAt ? [load.completedAt, endedWho].filter(Boolean).join(' · ') : '—',
           released: load.releasedAt || '—',
           releasedBy: release?.releasedByName || '—',
+          // On screen: who, under when.
+          releasedWho: release?.releasedByName || '',
+          endedWho: endedWho || '',
           barcodes: load.items.map(item => item.barcode).join(', '),
           // On screen: the raw values behind the marks and the badge.
           chemicalCode: load.chemicalIndicatorResult || '',
@@ -295,6 +306,8 @@ export function buildReport(
         {key: 'parameters', label: tr('Παράμετροι κύκλου')},
         {key: 'dataSource', label: tr('Πηγή δεδομένων')},
         {key: 'loadStatus', label: tr('Κατάσταση')},
+        {key: 'ended', label: tr('Τέλος κύκλου')},
+        {key: 'endedBy', label: tr('Τέλος κύκλου από')},
         {key: 'released', label: tr('Αποδέσμευση')},
         {key: 'releasedBy', label: tr('Αποδέσμευσε')},
         {key: 'barcodes', label: 'Barcodes'},
