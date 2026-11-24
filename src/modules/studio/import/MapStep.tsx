@@ -24,12 +24,14 @@ export default function MapStep({s}: {s: ImportState}) {
     fixed,
     setFixed,
     organizationDepartments,
+    organizationSpecialties,
   } = s;
   // A department or specialty the file does not say can be given here for every row.
   const {specialties} = useLibraries();
   const choicesFor: Record<FixedField, string[]> = {
     department: organizationDepartments.map(d => d.name),
-    specialty: specialties.map(x => x.el),
+    // The chosen hospital's own list; the open workspace's when it could not be read.
+    specialty: organizationSpecialties.length ? organizationSpecialties : specialties.map(x => x.el),
   };
   const isFixed = (key: string): key is FixedField => (FIXED_FIELDS as readonly string[]).includes(key);
   return (

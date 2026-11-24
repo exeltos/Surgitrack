@@ -4,6 +4,7 @@ import {getCloudOrganizationId} from '../../../data/cloud/appRecords';
 import {
   listAssetImports,
   loadHospitalAssets,
+  loadHospitalSpecialties,
   runAssetImport,
   undoAssetImport,
   type AssetImport,
@@ -84,6 +85,20 @@ export function useAssetImport({lang, organizations, departments, byName, choose
   useEffect(() => {
     void refreshImports(organizationId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organizationId]);
+  // The specialties of the hospital the import is for (not of the workspace open, which the platform owner
+  // may not have): offered as the specialty for every row.
+  const [organizationSpecialties, setOrganizationSpecialties] = useState<string[]>([]);
+  useEffect(() => {
+    let current = true;
+    setOrganizationSpecialties([]);
+    if (organizationId)
+      loadHospitalSpecialties(organizationId)
+        .then(list => current && setOrganizationSpecialties(list))
+        .catch(() => undefined);
+    return () => {
+      current = false;
+    };
   }, [organizationId]);
 
   const reset = () => {
@@ -265,6 +280,7 @@ export function useAssetImport({lang, organizations, departments, byName, choose
     fixed,
     setFixed,
     organizationDepartments,
+    organizationSpecialties,
     finalName,
     formatDate,
     headerRow,
