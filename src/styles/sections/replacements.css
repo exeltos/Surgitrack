@@ -489,3 +489,39 @@ html body .replacements-fixed .replacement-actions > button:not(.primary) {
   color: var(--c-orange-45-2);
   font-size: 13px;
 }
+/* The reasons at a glance above the list: one kind at a time. */
+.replacement-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--c-gray-95);
+}
+.replacement-reasons button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border: 1px solid var(--c-gray-90);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--st-muted);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.replacement-reasons button b {
+  color: var(--c-gray-15);
+}
+.replacement-reasons button.active {
+  border-color: var(--c-gray-15);
+  background: var(--c-gray-15);
+  color: #fff;
+}
+.replacement-reasons button.active b {
+  color: #fff;
+}
+.replacement-reasons button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

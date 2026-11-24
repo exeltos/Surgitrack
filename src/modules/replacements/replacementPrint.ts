@@ -73,7 +73,7 @@ export function replacementListHtml(items: readonly ReplacementItem[], subtitle:
 <div><b>Service</b><span>${count('SERVICE')}</span></div>
 <div><b>${esc(tr('Βλάβη / φθορά'))}</b><span>${count('DAMAGED')}</span></div>
 <div><b>${esc(tr('Απώλεια'))}</b><span>${count('LOST')}</span></div>
-<div><b>${esc(tr('Εκτός χρήσης'))}</b><span>${count('RETIRED')}</span></div>
+<div><b>${esc(tr(REASON_LABEL.RETIRED))}</b><span>${count('RETIRED')}</span></div>
 <div><b>${esc(tr('Υπάρχει στο απόθεμα'))}</b><span>${items.filter(i => i.stock.length).length}</span></div>
 </div>
 <table><thead><tr><th class="num">#</th><th style="width:30%">${esc(tr('Εργαλείο'))}</th><th style="width:22%">${esc(tr('Σετ / τμήμα'))}</th><th style="width:18%">${esc(tr('Αιτία'))}</th><th>${esc(tr('Από'))}</th><th>${esc(tr('Στο απόθεμα'))}</th><th>${esc(tr('Κατάσταση'))}</th></tr></thead>

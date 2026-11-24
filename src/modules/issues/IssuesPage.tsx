@@ -177,7 +177,7 @@ export default function IssuesPage() {
         className={tab === 'REPLACEMENTS' ? 'active' : ''}
         onClick={() => setParams({tab: 'replacements'})}
       >
-        <PackageX size={16} /> {tr('Αντικαταστάσεις')} <b>{neededReplacements}</b>
+        <PackageX size={16} /> {tr('Αποσύρσεις & αντικαταστάσεις')} <b>{neededReplacements}</b>
       </button>
       <button
         role="tab"

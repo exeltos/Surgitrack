@@ -14,7 +14,7 @@ describe('Issues and the Replacements & Orders module', () => {
       </ModulesContext.Provider>,
       {path: '/issues', signedIn: admin},
     );
-    expect(screen.getByRole('tab', {name: /Αντικαταστάσεις/})).toBeTruthy();
+    expect(screen.getByRole('tab', {name: /αντικαταστάσεις/i})).toBeTruthy();
   });
 
   it('has only the issues in one that was not, even by the address of the replacements', () => {
@@ -25,6 +25,6 @@ describe('Issues and the Replacements & Orders module', () => {
       {path: '/issues?tab=replacements', signedIn: admin},
     );
     expect(screen.queryByRole('tab')).toBeNull();
-    expect(screen.queryByText(/Αντικαταστάσεις/)).toBeNull();
+    expect(screen.queryByText(/αντικαταστάσεις/i)).toBeNull();
   });
 });
