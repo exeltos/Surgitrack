@@ -114,6 +114,14 @@ export default function App() {
   useEffect(() => {
     recoveryRef.current = passwordRecovery;
   }, [passwordRecovery]);
+  // The long title (what the site is, for search engines) belongs to the presentation page; in the app, the name.
+  useEffect(() => {
+    const presentation = document.title;
+    if (authenticated) document.title = 'SurgiTrack';
+    return () => {
+      document.title = presentation;
+    };
+  }, [authenticated]);
   useEffect(() => {
     let mounted = true;
     const restoreSession = async () => {

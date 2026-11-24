@@ -1,0 +1,6 @@
+# SurgiTrack: the presentation page is for search engines; the app's own screens are behind sign-in.
+User-agent: *
+Allow: /
+Disallow: /scan.html
+
+Sitemap: https://surgitrack.gr/sitemap.xml
