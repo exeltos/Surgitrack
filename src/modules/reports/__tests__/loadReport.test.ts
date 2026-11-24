@@ -66,4 +66,9 @@ describe('loads report', () => {
     expect(auto.endedBy).toBe('αυτόματα');
     expect(open.endedInfo).toBe('—');
   });
+
+  it('names who ended a cycle that went back into the sterilizer after ending by itself', () => {
+    const [row] = report([load({note: AUTO_END_NOTE, reopenedAt: '24/11/2026 18:00'})]).rows;
+    expect(row.endedBy).toBe('ΠΑΠΑΧΡΗΣΤΟΥ ΕΛΕΝΗ');
+  });
 });

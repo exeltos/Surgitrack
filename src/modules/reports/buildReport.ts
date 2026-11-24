@@ -240,7 +240,8 @@ export function buildReport(
         const release = sterilizationReleases.find(r => r.loadId === load.id);
         // Who ended the cycle («Τέλος κύκλου» or «Αποτυχία κύκλου»): the cycle records of its items say it.
         const endedBy = (input.sterilizationCycles || []).find(c => c.loadId === load.id)?.completedByName;
-        const auto = load.note?.includes(AUTO_END_NOTE);
+        // Ended by itself, unless it went back into the sterilizer: from then on it is ended by hand (see autoEndAt).
+        const auto = !load.reopenedAt && !!load.note?.includes(AUTO_END_NOTE);
         const endedWho = auto ? tr('αυτόματα') : endedBy;
         return {
           loaded: load.createdAt,
