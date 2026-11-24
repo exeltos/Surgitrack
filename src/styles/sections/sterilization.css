@@ -2595,10 +2595,10 @@ html body .sterilization-workspace .sterile-queues.ster-steps button > strong {
   line-height: 18px;
   text-align: center;
 }
-html body .sterilization-workspace .sterile-queues.ster-steps button.empty {
+html body .sterilization-workspace .sterile-queues.ster-steps button.no-items {
   color: var(--st-muted);
 }
-html body .sterilization-workspace .sterile-queues.ster-steps button.empty > strong {
+html body .sterilization-workspace .sterile-queues.ster-steps button.no-items > strong {
   background: transparent;
   color: var(--st-muted);
 }
