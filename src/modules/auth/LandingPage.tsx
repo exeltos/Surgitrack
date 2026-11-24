@@ -45,7 +45,8 @@ const copy = {
       {code: 'S000326', name: 'Σετ καισαρικής τομής', state: 'Λήγει σε 3 ημέρες', tone: 'warn'},
     ],
     featuresTitle: 'Όλη η πορεία του εργαλείου, σε ένα σημείο',
-    featuresLead: 'Φτιαγμένο μαζί με Κεντρική Αποστείρωση και χειρουργεία, για τη δουλειά της ημέρας.',
+    featuresLead:
+      'Λογισμικό αποστείρωσης φτιαγμένο μαζί με την Κεντρική Αποστείρωση (ΚΑΠ) και τα χειρουργεία νοσοκομείων, για τη δουλειά της ημέρας.',
     features: [
       [
         'Πλήρης κύκλος αποστείρωσης',
@@ -83,7 +84,7 @@ const copy = {
     sendEmail: 'Στείλτε email',
     call: 'Καλέστε μας',
     mailSubject: 'SurgiTrack: αίτημα παρουσίασης',
-    footer: 'Ιχνηλασιμότητα χειρουργικών εργαλείων',
+    footer: 'Ιχνηλασιμότητα χειρουργικών εργαλείων και λογισμικό αποστείρωσης',
     by: 'από την',
   },
   en: {
@@ -104,7 +105,8 @@ const copy = {
       {code: 'S000326', name: 'Caesarean section set', state: 'Expires in 3 days', tone: 'warn'},
     ],
     featuresTitle: 'The whole path of an instrument, in one place',
-    featuresLead: 'Built with Central Sterilization and operating theatres, for the work of the day.',
+    featuresLead:
+      'Sterilization software built with hospital Central Sterilization (CSSD) teams and operating theatres, for the work of the day.',
     features: [
       [
         'The whole sterilization cycle',
@@ -141,7 +143,7 @@ const copy = {
     sendEmail: 'Send an email',
     call: 'Call us',
     mailSubject: 'SurgiTrack: demo request',
-    footer: 'Surgical instrument traceability',
+    footer: 'Surgical instrument traceability and sterilization software',
     by: 'by',
   },
 } as const;
