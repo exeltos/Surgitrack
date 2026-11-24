@@ -2042,7 +2042,7 @@ h4.load-details-count small {
 /* Many items: two columns side by side, the list scrolling inside its card. */
 .load-details-items.many {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(440px, 100%), 1fr));
   column-gap: 22px;
   align-content: start;
   max-height: 460px;
