@@ -1,5 +1,5 @@
 import AppButton from '../../../components/ui/AppButton';
-import {FIXED_FIELDS, IMPORT_FIELDS, type FixedField} from '../assetImport';
+import {FIXED_FIELDS, IMPORT_FIELDS, USAGE_TYPES, type FixedField} from '../assetImport';
 import {autoMapping} from '../assetImport';
 import {useLibraries} from '../../../core/LibraryStore';
 import type {ImportState} from './useAssetImport';
@@ -32,6 +32,7 @@ export default function MapStep({s}: {s: ImportState}) {
     department: organizationDepartments.map(d => d.name),
     // The chosen hospital's own list; the open workspace's when it could not be read.
     specialty: organizationSpecialties.length ? organizationSpecialties : specialties.map(x => x.el),
+    usageType: USAGE_TYPES.map(u => L(u.el, u.en)),
   };
   const isFixed = (key: string): key is FixedField => (FIXED_FIELDS as readonly string[]).includes(key);
   return (

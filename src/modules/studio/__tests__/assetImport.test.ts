@@ -206,3 +206,37 @@ describe('a department and specialty for every row', () => {
     expect(withColumn.tools.map(t => t.department)).toEqual(['Ορθοπαιδική', 'Χειρουργείο']);
   });
 });
+
+describe('the usage type of the instruments', () => {
+  const headers = ['ΕΡΓΑΛΕΙΟ', 'ΤΥΠΟΣ ΧΡΗΣΗΣ', 'ΜΕΓΙΣΤΕΣ ΧΡΗΣΕΙΣ', 'ΧΡΗΣΕΙΣ ΠΟΥ ΕΓΙΝΑΝ'];
+  const run = (rows: string[][], fixed?: Record<string, string>) =>
+    buildImportPlan(rows, 2, autoMapping(headers), {...context(), fixed});
+
+  it('reads limited uses, a wear check or no limit, from a column or the same for every row', () => {
+    const result = run([
+      ['ΛΑΒΙΔΑ', 'Πολλαπλών χρήσεων', '20', '3'],
+      ['ΨΑΛΙΔΙ', 'Μέχρι τη φθορά', '', '5'],
+      ['ΑΓΚΙΣΤΡΟ', 'Χωρίς όριο', '', ''],
+    ]);
+    expect(result.errors).toEqual([]);
+    expect(result.tools.map(t => [t.maxUses, t.wearCheck, t.uses])).toEqual([
+      [20, undefined, 3],
+      [undefined, true, 5],
+      [undefined, undefined, 0],
+    ]);
+    const wear = buildImportPlan([['ΨΑΛΙΔΙ']], 2, autoMapping(['ΕΡΓΑΛΕΙΟ']), {
+      ...context(),
+      fixed: {usageType: 'Με έλεγχο φθοράς'},
+    });
+    expect(wear.tools[0].wearCheck).toBe(true);
+  });
+
+  it('says what does not fit the type', () => {
+    const result = run([
+      ['ΛΑΒΙΔΑ', 'Περιορισμένων χρήσεων', '', ''],
+      ['ΨΑΛΙΔΙ', 'Με έλεγχο φθοράς', '10', ''],
+      ['ΑΓΚΙΣΤΡΟ', 'κάτι άλλο', '', ''],
+    ]);
+    expect(result.errors.map(e => e.row)).toEqual([2, 3, 4]);
+  });
+});
