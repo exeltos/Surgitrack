@@ -238,10 +238,14 @@ export function buildReport(
       .filter(load => sterilizerName === 'ALL' || load.equipment === sterilizerName)
       .map(load => {
         const release = sterilizationReleases.find(r => r.loadId === load.id);
-        // Who ended the cycle («Τέλος κύκλου» or «Αποτυχία κύκλου»): the cycle records of its items say it.
-        const endedBy = (input.sterilizationCycles || []).find(c => c.loadId === load.id)?.completedByName;
-        // Ended by itself, unless it went back into the sterilizer: from then on it is ended by hand (see autoEndAt).
-        const auto = !load.reopenedAt && !!load.note?.includes(AUTO_END_NOTE);
+        // Who ended the cycle («Τέλος κύκλου» or «Αποτυχία κύκλου»): the newest cycle record of its items says it. A
+        // cycle that ended by itself has records of its own (sc-auto-…), which no later note or release can change;
+        // a load taken back into the sterilizer and ended by hand has a newer, ordinary record.
+        const ending = (input.sterilizationCycles || []).find(c => c.loadId === load.id);
+        const endedBy = ending?.completedByName;
+        const auto = ending
+          ? ending.id.startsWith('sc-auto-')
+          : !load.reopenedAt && !!load.note?.includes(AUTO_END_NOTE);
         const endedWho = auto ? tr('αυτόματα') : endedBy;
         return {
           loaded: load.createdAt,

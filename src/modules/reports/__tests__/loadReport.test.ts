@@ -32,8 +32,8 @@ const load = (over: Partial<ProcessLoadRecord>): ProcessLoadRecord => ({
   completedAt: '24/11/2026 19:31',
   ...over,
 });
-const cycle = {loadId: 'L2', completedByName: 'ΠΑΠΑΧΡΗΣΤΟΥ ΕΛΕΝΗ'} as SterilizationCycleRecord;
-const report = (loads: ProcessLoadRecord[]) =>
+const cycle = {id: 'sc1', loadId: 'L2', completedByName: 'ΠΑΠΑΧΡΗΣΤΟΥ ΕΛΕΝΗ'} as SterilizationCycleRecord;
+const report = (loads: ProcessLoadRecord[], cycles: SterilizationCycleRecord[] = [cycle]) =>
   buildReport(
     'loads',
     {
@@ -43,7 +43,7 @@ const report = (loads: ProcessLoadRecord[]) =>
       issues: [],
       processLoads: loads,
       sterilizationReleases: [],
-      sterilizationCycles: [cycle],
+      sterilizationCycles: cycles,
       receipts: [],
       deliveries: [],
       warningThreshold: 3,
@@ -58,11 +58,14 @@ describe('loads report', () => {
     expect(row.endedInfo).toBe('24/11/2026 19:31 · ΠΑΠΑΧΡΗΣΤΟΥ ΕΛΕΝΗ');
   });
 
-  it('says a cycle that ended by itself ended automatically, and a running one has not ended', () => {
-    const [auto, open] = report([
-      load({status: 'AWAITING_RELEASE', note: AUTO_END_NOTE}),
-      load({id: 'L3', status: 'OPEN', completedAt: undefined}),
-    ]).rows;
+  it('without cycle records, says a cycle that ended by itself ended automatically, and a running one has not ended', () => {
+    const [auto, open] = report(
+      [
+        load({status: 'AWAITING_RELEASE', note: AUTO_END_NOTE}),
+        load({id: 'L3', status: 'OPEN', completedAt: undefined}),
+      ],
+      [],
+    ).rows;
     expect(auto.endedBy).toBe('αυτόματα');
     expect(open.endedInfo).toBe('—');
   });
@@ -70,5 +73,11 @@ describe('loads report', () => {
   it('names who ended a cycle that went back into the sterilizer after ending by itself', () => {
     const [row] = report([load({note: AUTO_END_NOTE, reopenedAt: '24/11/2026 18:00'})]).rows;
     expect(row.endedBy).toBe('ΠΑΠΑΧΡΗΣΤΟΥ ΕΛΕΝΗ');
+  });
+
+  it('keeps «αυτόματα» from the cycle record, whatever the load note says after release', () => {
+    const autoRecord = {...cycle, id: 'sc-auto-L2-SET-s1', completedByName: 'Όποιος είχε ανοιχτή την εφαρμογή'};
+    const [row] = report([load({status: 'RELEASED', note: 'Σημείωση αποδέσμευσης'})], [autoRecord]).rows;
+    expect(row.endedBy).toBe('αυτόματα');
   });
 });
