@@ -310,7 +310,7 @@ export default function IssuesPage() {
                           sort={order.sort}
                           onSort={order.toggle}
                         />
-                        {(withReplacements || canDelete) && (
+                        {(withReplacements || withOrders || canDelete) && (
                           <th className="col-actions">
                             <span className="visually-hidden">{tr('Ενέργειες')}</span>
                           </th>
@@ -373,7 +373,7 @@ export default function IssuesPage() {
                               </>
                             )}
                           </td>
-                          {(withReplacements || canDelete) && (
+                          {(withReplacements || withOrders || canDelete) && (
                             <td className="issue-actions">
                               <div className="issue-actions-row">
                                 {withReplacements && i.status === 'OPEN' && (
@@ -444,7 +444,7 @@ export default function IssuesPage() {
                       ))}
                       {rows.hasMore && (
                         <MoreRows
-                          colSpan={4 + (withPhotos ? 1 : 0) + (withReplacements || canDelete ? 1 : 0)}
+                          colSpan={4 + (withPhotos ? 1 : 0) + (withReplacements || withOrders || canDelete ? 1 : 0)}
                           onVisible={rows.showMore}
                         />
                       )}
