@@ -248,12 +248,8 @@ export default function EquipmentDetails({
           )}
         </section>
 
-        {/* A load of many items takes the whole width (its list in two columns); a small one shares the row. */}
-        <section
-          className={`asset-section equipment-top${
-            row.trouble?.items.length && (shownLoad?.items.length ?? 0) <= 6 ? '' : ' equipment-wide'
-          }`}
-        >
+        {/* The load, the tests and the failures each take the whole width, one under the other. */}
+        <section className="asset-section equipment-top equipment-wide">
           <div className="asset-section-head">
             <div>
               <h2>
@@ -393,7 +389,7 @@ export default function EquipmentDetails({
         )}
 
         {row.trouble && row.trouble.items.length > 0 && (
-          <section className="asset-section equipment-top">
+          <section className="asset-section equipment-top equipment-wide">
             <div className="asset-section-head">
               <div>
                 <h2>

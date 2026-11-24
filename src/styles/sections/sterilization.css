@@ -2483,7 +2483,8 @@ html body .content:has(> .equipment-page) {
 }
 .equipment-detail-workspace .equipment-trouble li {
   display: grid;
-  grid-template-columns: 90px minmax(0, 1fr) auto auto;
+  /* Cycle, program, result and date in columns across the width, the date at the end. */
+  grid-template-columns: 90px minmax(140px, 240px) auto minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   padding: 6px 0;
@@ -2492,6 +2493,7 @@ html body .content:has(> .equipment-page) {
 }
 .equipment-detail-workspace .equipment-trouble small {
   color: var(--st-muted);
+  text-align: right;
 }
 .out-of-service-dialog .notice-choice {
   grid-template-columns: repeat(2, minmax(0, 1fr));
