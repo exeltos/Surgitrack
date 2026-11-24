@@ -18,6 +18,18 @@ export type AssetImport = {
 
 const PAGE = 1000;
 
+/** The specialties a hospital's library lists (Studio › Libraries), for the import of that hospital. */
+export async function loadHospitalSpecialties(organizationId: string): Promise<string[]> {
+  const {data, error} = await supabase
+    .from('hospital_settings')
+    .select('specialties')
+    .eq('organization_id', organizationId)
+    .maybeSingle();
+  if (error) throw error;
+  const list = (data as {specialties?: Array<{el?: string}> | null} | null)?.specialties || [];
+  return list.map(item => (item?.el || '').trim()).filter(Boolean);
+}
+
 /** Every barcode the hospital uses, current and old, upper case. */
 /**
  * What an import is checked against: every barcode in use in the hospital (old ones too), and the

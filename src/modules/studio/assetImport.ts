@@ -18,6 +18,7 @@ export type ImportField =
   | 'department'
   | 'specialty'
   | 'manufacturer'
+  | 'usageType'
   | 'maxUses'
   | 'usesDone'
   | 'usesLeft'
@@ -86,16 +87,16 @@ export const IMPORT_FIELDS: ReadonlyArray<{
     key: 'department',
     el: 'Τμήμα',
     en: 'Department',
-    hintEl: 'Όπως στο Studio· κενό = Απόθεμα',
-    hintEn: 'As in Studio; empty = Stock',
+    hintEl: 'Στήλη του αρχείου ή ίδιο σε όλες· κενό = Απόθεμα',
+    hintEn: 'A column of the file or the same for all; empty = Stock',
     aliases: ['τμημα', 'department', 'κλινικη', 'dept'],
   },
   {
     key: 'specialty',
     el: 'Ειδικότητα',
     en: 'Specialty',
-    hintEl: '',
-    hintEn: '',
+    hintEl: 'Στήλη του αρχείου ή ίδια σε όλες',
+    hintEn: 'A column of the file or the same for all',
     aliases: ['ειδικοτητα', 'specialty', 'speciality'],
   },
   {
@@ -105,6 +106,14 @@ export const IMPORT_FIELDS: ReadonlyArray<{
     hintEl: '',
     hintEn: '',
     aliases: ['κατασκευαστησ', 'manufacturer', 'εταιρεια', 'brand', 'mfr'],
+  },
+  {
+    key: 'usageType',
+    el: 'Τύπος χρήσης',
+    en: 'Usage type',
+    hintEl: 'Περιορισμένων χρήσεων, με έλεγχο φθοράς ή χωρίς όριο· στήλη ή ίδιο σε όλες',
+    hintEn: 'Limited uses, wear check or no limit; a column or the same for all',
+    aliases: ['τυποσχρησησ', 'κατηγοριαχρησησ', 'χρηση', 'usage', 'usagetype', 'usetype'],
   },
   {
     key: 'maxUses',
@@ -199,8 +208,33 @@ export function autoMapping(headers: string[]): ImportMapping {
   return mapping;
 }
 
+/** Fields that can take one value for every row, for a file without that column. */
+export type FixedField = 'department' | 'specialty' | 'usageType';
+export const FIXED_FIELDS: readonly FixedField[] = ['department', 'specialty', 'usageType'];
+
+/** An instrument's usage type, as the app has it: a use limit, counted uses with a wear check, or no limit. */
+export type UsageType = 'LIMITED' | 'WEAR' | 'UNLIMITED';
+export const USAGE_TYPES: ReadonlyArray<{id: UsageType; el: string; en: string}> = [
+  {id: 'LIMITED', el: 'Περιορισμένων χρήσεων', en: 'Limited uses'},
+  {id: 'WEAR', el: 'Με έλεγχο φθοράς', en: 'Wear check'},
+  {id: 'UNLIMITED', el: 'Χωρίς όριο', en: 'No limit'},
+];
+/** The usage type a cell says, in the words people write («πολλαπλών χρήσεων», «μέχρι φθοράς», «χωρίς»…). */
+export function usageTypeOf(text: string): UsageType | undefined {
+  const t = normalize(text);
+  if (!t) return undefined;
+  if (/φθορ|wear/.test(t)) return 'WEAR';
+  if (/χωρισ|απεριοριστ|unlimited|nolimit|none/.test(t)) return 'UNLIMITED';
+  if (/περιορισμ|πολλαπλ|οριο|limited|multi|^\d+$/.test(t)) return 'LIMITED';
+  return undefined;
+}
+/** One value for every row (a row's own cell, when its column is chosen and filled, comes first). */
+export type ImportFixed = Partial<Record<FixedField, string>>;
+
 export type ImportContext = {
   lang: 'el' | 'en';
+  /** Values given for every row in the wizard (department, specialty). */
+  fixed?: ImportFixed;
   /** The hospital's active departments. */
   departments: Array<{name: string; code?: string}>;
   /** Every barcode already in the hospital (current and old ones), upper case. */
@@ -240,7 +274,9 @@ export function buildImportPlan(
 ): ImportPlan {
   const L = (el: string, en: string) => (context.lang === 'el' ? el : en);
   const errors: ImportIssue[] = [];
-  const value = (row: string[], field: ImportField) => (mapping[field] >= 0 ? (row[mapping[field]] || '').trim() : '');
+  const value = (row: string[], field: ImportField) =>
+    (mapping[field] >= 0 ? (row[mapping[field]] || '').trim() : '') ||
+    (context.fixed?.[field as FixedField] || '').trim();
   const departmentByKey = new Map<string, string>();
   for (const d of context.departments) {
     departmentByKey.set(normalize(d.name), d.name);
@@ -286,6 +322,7 @@ export function buildImportPlan(
     specialty: string;
     manufacturer: string;
     maxUses?: number;
+    wearCheck?: boolean;
     usesDone: number;
     serialNumber: string;
     notes: string;
@@ -329,6 +366,34 @@ export function buildImportPlan(
           `Max uses “${maxUsesText}” is not a positive whole number.`,
         ),
       });
+    // The usage type, when given (a column or the same for every row): it decides what the use figures mean.
+    const usageText = value(row, 'usageType');
+    const usage = usageTypeOf(usageText);
+    if (usageText && !usage)
+      errors.push({
+        row: rowNumber,
+        message: L(
+          `Ο τύπος χρήσης «${usageText}» δεν αναγνωρίζεται: «Περιορισμένων χρήσεων», «Με έλεγχο φθοράς» ή «Χωρίς όριο».`,
+          `Usage type “${usageText}” is not recognized: “Limited uses”, “Wear check” or “No limit”.`,
+        ),
+      });
+    if (usage === 'LIMITED' && maxUses === undefined)
+      errors.push({
+        row: rowNumber,
+        message: L(
+          'Περιορισμένων χρήσεων χωρίς όριο: συμπληρώστε τις «Μέγιστες χρήσεις».',
+          'Limited uses without a limit: fill in “Max uses”.',
+        ),
+      });
+    if ((usage === 'WEAR' || usage === 'UNLIMITED') && maxUses !== undefined)
+      errors.push({
+        row: rowNumber,
+        message: L(
+          `«${usage === 'WEAR' ? 'Με έλεγχο φθοράς' : 'Χωρίς όριο'}» δεν έχει μέγιστες χρήσεις (${maxUsesText}).`,
+          `“${usage === 'WEAR' ? 'Wear check' : 'No limit'}” has no max uses (${maxUsesText}).`,
+        ),
+      });
+    const wearCheck = usage === 'WEAR';
     // The uses already made: given directly, or as the uses left; and whether it is declared new.
     const usesDoneText = value(row, 'usesDone');
     const usesLeftText = value(row, 'usesLeft');
@@ -356,7 +421,8 @@ export function buildImportPlan(
         });
       else if (maxUses !== undefined && Number.isInteger(maxUses) && maxUses >= 1) usesDone = maxUses - usesLeft;
     }
-    if (usesDone !== undefined && usesDone > 0) {
+    // With a wear check the uses are counted without a limit: nothing to compare them with.
+    if (usesDone !== undefined && usesDone > 0 && !wearCheck) {
       if (maxUses === undefined)
         errors.push({
           row: rowNumber,
@@ -406,7 +472,8 @@ export function buildImportPlan(
       department,
       specialty: value(row, 'specialty'),
       manufacturer: value(row, 'manufacturer'),
-      maxUses: maxUses !== undefined && Number.isInteger(maxUses) && maxUses > 0 ? maxUses : undefined,
+      maxUses: !wearCheck && maxUses !== undefined && Number.isInteger(maxUses) && maxUses > 0 ? maxUses : undefined,
+      wearCheck: wearCheck || undefined,
       usesDone: usesDone !== undefined && Number.isInteger(usesDone) && usesDone > 0 ? usesDone : 0,
       serialNumber,
       notes: value(row, 'notes'),
@@ -462,9 +529,10 @@ export function buildImportPlan(
     name: line.name,
     specialty: line.specialty,
     manufacturer: line.manufacturer || undefined,
-    uses: line.maxUses ? line.usesDone : 0,
+    uses: line.maxUses || line.wearCheck ? line.usesDone : 0,
     sterilizations: 0,
     maxUses: line.maxUses,
+    wearCheck: line.wearCheck,
     serialNumber: line.serialNumber || undefined,
     notes: line.notes || undefined,
     importBatch: context.batch,
@@ -551,7 +619,7 @@ export const templateTable = (lang: 'el' | 'en') => ({
       'Χειρουργείο',
       'Γενική Χειρουργική',
       'Aesculap',
-      '',
+      'Χωρίς όριο',
       '',
       '',
       '',
@@ -568,13 +636,29 @@ export const templateTable = (lang: 'el' | 'en') => ({
       'Χειρουργείο',
       'Γενική Χειρουργική',
       'Aesculap',
-      '',
+      'Χωρίς όριο',
       '',
       '',
       '',
       '',
       '',
     ],
-    ['', '', 'GN100', 'Λαβίδα βιοψίας', 1, '', '', 'Γαστρεντερολογία', 'Olympus', 50, '', '', 'SN12345', ''],
+    [
+      '',
+      '',
+      'GN100',
+      'Λαβίδα βιοψίας',
+      1,
+      '',
+      '',
+      'Γαστρεντερολογία',
+      'Olympus',
+      'Περιορισμένων χρήσεων',
+      50,
+      '',
+      '',
+      'SN12345',
+      '',
+    ],
   ],
 });

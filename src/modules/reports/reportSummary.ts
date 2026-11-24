@@ -31,6 +31,11 @@ export function reportSummary(active: ReportId, rows: Row[], warningThreshold: n
         value: count(rows, r => r.status === 'Επιλυμένη'),
         test: r => r.status === 'Επιλυμένη',
       },
+      {
+        label: tr('Αποσύρθηκαν'),
+        value: count(rows, r => r.status === 'Αποσύρθηκε'),
+        test: r => r.status === 'Αποσύρθηκε',
+      },
     ];
   if (active === 'usage')
     return [

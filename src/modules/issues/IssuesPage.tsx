@@ -13,6 +13,7 @@ import {
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {Suspense, useMemo, useState} from 'react';
 import {lazyPage} from '../../core/resilience';
+import {issueWithdrawn} from '../../core/issueOutcome';
 import {useSurgi} from '../../store/SurgiStore';
 import AssetFilterBar from '../../components/assets/AssetFilterBar';
 import ScrollableListPanel from '../../components/ui/ScrollableListPanel';
@@ -356,7 +357,11 @@ export default function IssuesPage() {
                                 {tr('Ανοικτή')} · {issueAge(i.created)}
                               </span>
                             ) : (
-                              <span className="badge">{tr('Επιλυμένη')}</span>
+                              <>
+                                <span className="badge">{issueWithdrawn(i) ? tr('Αποσύρθηκε') : tr('Επιλυμένη')}</span>
+                                {/* Who made the final assessment (reports closed before it was kept have none). */}
+                                {i.resolvedBy && <small className="row-sub">{i.resolvedBy}</small>}
+                              </>
                             )}
                           </td>
                           {(withReplacements || canDelete) && (

@@ -1,6 +1,7 @@
 import AppButton from '../../../components/ui/AppButton';
-import {IMPORT_FIELDS} from '../assetImport';
+import {FIXED_FIELDS, IMPORT_FIELDS, USAGE_TYPES, type FixedField} from '../assetImport';
 import {autoMapping} from '../assetImport';
+import {useLibraries} from '../../../core/LibraryStore';
 import type {ImportState} from './useAssetImport';
 
 export default function MapStep({s}: {s: ImportState}) {
@@ -20,7 +21,20 @@ export default function MapStep({s}: {s: ImportState}) {
     sample,
     setHeaderRow,
     setMapping,
+    fixed,
+    setFixed,
+    organizationDepartments,
+    organizationSpecialties,
   } = s;
+  // A department or specialty the file does not say can be given here for every row.
+  const {specialties} = useLibraries();
+  const choicesFor: Record<FixedField, string[]> = {
+    department: organizationDepartments.map(d => d.name),
+    // The chosen hospital's own list; the open workspace's when it could not be read.
+    specialty: organizationSpecialties.length ? organizationSpecialties : specialties.map(x => x.el),
+    usageType: USAGE_TYPES.map(u => L(u.el, u.en)),
+  };
+  const isFixed = (key: string): key is FixedField => (FIXED_FIELDS as readonly string[]).includes(key);
   return (
     <div className="asset-import-map">
       <p className="asset-import-lead">
@@ -59,17 +73,45 @@ export default function MapStep({s}: {s: ImportState}) {
               {(lang === 'el' ? field.hintEl : field.hintEn) && <small>{L(field.hintEl, field.hintEn)}</small>}
             </span>
             <select
-              value={mapping[field.key]}
-              onChange={e => setMapping(m => ({...m, [field.key]: Number(e.target.value)}))}
+              value={
+                mapping[field.key] >= 0
+                  ? String(mapping[field.key])
+                  : isFixed(field.key) && fixed[field.key]
+                    ? `=${fixed[field.key]}`
+                    : '-1'
+              }
+              onChange={e => {
+                const v = e.target.value;
+                // «=Name»: that value for every row; a number: the file's column.
+                if (isFixed(field.key)) setFixed(f => ({...f, [field.key]: v.startsWith('=') ? v.slice(1) : ''}));
+                setMapping(m => ({...m, [field.key]: v.startsWith('=') ? -1 : Number(v)}));
+              }}
             >
-              <option value={-1}>{L('— Χωρίς —', '— None —')}</option>
-              {headers.map((h, i) => (
-                <option key={i} value={i}>
-                  {h || L(`Στήλη ${i + 1}`, `Column ${i + 1}`)}
-                </option>
-              ))}
+              <option value="-1">{L('— Χωρίς —', '— None —')}</option>
+              <optgroup label={L('Στήλη του αρχείου', 'Column of the file')}>
+                {headers.map((h, i) => (
+                  <option key={i} value={String(i)}>
+                    {h || L(`Στήλη ${i + 1}`, `Column ${i + 1}`)}
+                  </option>
+                ))}
+              </optgroup>
+              {isFixed(field.key) && choicesFor[field.key].length > 0 && (
+                <optgroup label={L('Ίδιο σε όλες τις γραμμές', 'The same for every row')}>
+                  {choicesFor[field.key].map(name => (
+                    <option key={name} value={`=${name}`}>
+                      {name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
-            <em>{mapping[field.key] >= 0 ? sample.map(r => r[mapping[field.key]] || '·').join(' | ') : ''}</em>
+            <em>
+              {mapping[field.key] >= 0
+                ? sample.map(r => r[mapping[field.key]] || '·').join(' | ')
+                : isFixed(field.key) && fixed[field.key]
+                  ? L('Σε όλες τις γραμμές', 'In every row')
+                  : ''}
+            </em>
           </label>
         ))}
       </div>
