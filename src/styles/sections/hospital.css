@@ -1576,6 +1576,31 @@ html body .hospital-admin .hospital-people > .hospital-roles > .studio-body.stud
     justify-content: space-between;
   }
 }
+/* A short laptop window: a lower band, so the cards under it keep their rows (Ροή down to «Παράδοση»). */
+@media (min-width: 901px) and (max-height: 820px) {
+  html body .today-band {
+    gap: 6px 24px;
+    margin-bottom: 6px;
+    padding: 8px 18px;
+    border-radius: 12px;
+  }
+  html body .today-main {
+    gap: 2px;
+  }
+  html body .today-count b {
+    font-size: 1.45rem;
+  }
+  html body .today-week li {
+    padding: 3px 0 2px;
+    border-radius: 9px;
+  }
+  html body .today-bar {
+    height: 22px;
+  }
+  html body .hospital-overview .page-head {
+    margin-bottom: 0;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .today-count,
   .today-next {
