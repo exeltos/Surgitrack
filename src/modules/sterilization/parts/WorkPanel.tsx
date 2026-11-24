@@ -274,6 +274,65 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
           </div>
         </details>
       )}
+      {/* Released loads (recall, pending biological indicators) at the top of the stage, not under the list. */}
+      {queue === 'RELEASE' && releasedLoads.length > 0 && (
+        <details
+          className="released-loads"
+          open={releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') || undefined}
+        >
+          <summary>
+            {tr('Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης')}
+            {releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') &&
+              ` · ${tr('{0} με βιολογικό σε αναμονή', releasedLoads.filter(load => load.biologicalIndicatorResult === 'PENDING').length)}`}
+          </summary>
+          <div>
+            {releasedLoads.map(load => (
+              <div key={load.id}>
+                <span>
+                  <b>{loadLabel(load)}</b> · {load.items.length} {tr('αντικείμενα')}
+                </span>
+                <span className="released-load-actions">
+                  {load.biologicalIndicatorResult === 'PENDING' && (
+                    <>
+                      <span className="released-load-bi">{tr('Βιολογικός σε αναμονή')}</span>
+                      <button className="bi-pass" onClick={() => s.recordBiologicalResult(load.id, 'PASS')}>
+                        <CheckCircle2 size={14} /> {tr('BI επιτυχής')}
+                      </button>
+                      <button
+                        className="bi-fail"
+                        onClick={() =>
+                          void askConfirm({
+                            title: tr('BI ανεπιτυχής'),
+                            message: tr(
+                              'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;',
+                              load.cycleNumber,
+                            ),
+                            confirmLabel: tr('Ανάκληση φορτίου'),
+                            danger: true,
+                          }).then(sure => sure !== false && s.recordBiologicalResult(load.id, 'FAIL'))
+                        }
+                      >
+                        <TriangleAlert size={14} /> {tr('BI ανεπιτυχής')}
+                      </button>
+                    </>
+                  )}
+                  <button onClick={() => s.printLoadForm(load.id)}>
+                    <Printer size={14} /> {tr('Έντυπο')}
+                  </button>
+                  {load.cycleData && (
+                    <button onClick={() => s.printCycle(load.id)}>
+                      <Activity size={14} /> {tr('Αναφορά κύκλου')}
+                    </button>
+                  )}
+                  <button onClick={() => recallLoad(load.id)}>
+                    <TriangleAlert size={14} /> {tr('Ανάκληση')}
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
       {withTests && queue === 'PROCESS' && <SterilizerTests />}
       {withTests && queue === 'WASHING' && <SterilizerTests equipment="washers" />}
       {queue === 'IN_STERILIZER' ? (
@@ -556,64 +615,6 @@ export default function WorkPanel({s}: {s: SterilizationPageState}) {
             })}
           </div>
         </>
-      )}
-      {queue === 'RELEASE' && releasedLoads.length > 0 && (
-        <details
-          className="released-loads"
-          open={releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') || undefined}
-        >
-          <summary>
-            {tr('Πρόσφατα αποδεσμευμένα φορτία · δυνατότητα ανάκλησης')}
-            {releasedLoads.some(load => load.biologicalIndicatorResult === 'PENDING') &&
-              ` · ${tr('{0} με βιολογικό σε αναμονή', releasedLoads.filter(load => load.biologicalIndicatorResult === 'PENDING').length)}`}
-          </summary>
-          <div>
-            {releasedLoads.map(load => (
-              <div key={load.id}>
-                <span>
-                  <b>{loadLabel(load)}</b> · {load.items.length} {tr('αντικείμενα')}
-                </span>
-                <span className="released-load-actions">
-                  {load.biologicalIndicatorResult === 'PENDING' && (
-                    <>
-                      <span className="released-load-bi">{tr('Βιολογικός σε αναμονή')}</span>
-                      <button className="bi-pass" onClick={() => s.recordBiologicalResult(load.id, 'PASS')}>
-                        <CheckCircle2 size={14} /> {tr('BI επιτυχής')}
-                      </button>
-                      <button
-                        className="bi-fail"
-                        onClick={() =>
-                          void askConfirm({
-                            title: tr('BI ανεπιτυχής'),
-                            message: tr(
-                              'Ανεπιτυχής βιολογικός δείκτης: όλο το φορτίο {0} θα ανακληθεί. Συνέχεια;',
-                              load.cycleNumber,
-                            ),
-                            confirmLabel: tr('Ανάκληση φορτίου'),
-                            danger: true,
-                          }).then(sure => sure !== false && s.recordBiologicalResult(load.id, 'FAIL'))
-                        }
-                      >
-                        <TriangleAlert size={14} /> {tr('BI ανεπιτυχής')}
-                      </button>
-                    </>
-                  )}
-                  <button onClick={() => s.printLoadForm(load.id)}>
-                    <Printer size={14} /> {tr('Έντυπο')}
-                  </button>
-                  {load.cycleData && (
-                    <button onClick={() => s.printCycle(load.id)}>
-                      <Activity size={14} /> {tr('Αναφορά κύκλου')}
-                    </button>
-                  )}
-                  <button onClick={() => recallLoad(load.id)}>
-                    <TriangleAlert size={14} /> {tr('Ανάκληση')}
-                  </button>
-                </span>
-              </div>
-            ))}
-          </div>
-        </details>
       )}
       {returning && <StageReturnModal asset={returning} onClose={() => setReturning(undefined)} />}
     </div>
