@@ -248,7 +248,12 @@ export default function EquipmentDetails({
           )}
         </section>
 
-        <section className={`asset-section equipment-top${row.trouble?.items.length ? '' : ' equipment-wide'}`}>
+        {/* A load of many items takes the whole width (its list in two columns); a small one shares the row. */}
+        <section
+          className={`asset-section equipment-top${
+            row.trouble?.items.length && (shownLoad?.items.length ?? 0) <= 6 ? '' : ' equipment-wide'
+          }`}
+        >
           <div className="asset-section-head">
             <div>
               <h2>
