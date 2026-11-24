@@ -1,4 +1,5 @@
 import {createClient} from '@supabase/supabase-js';
+import {watchSessionLoss} from './sessionLoss';
 
 // No built-in fallback: a build without these settings must not quietly talk to a real project.
 // See .env.example; production builds are also checked in vite.config.ts.
@@ -30,6 +31,18 @@ if (typeof window !== 'undefined' && /type=(recovery|invite)/.test(window.locati
 
 export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {persistSession: true, autoRefreshToken: true, detectSessionInUrl: true},
+  global: {
+    // The hospital's tables answered as if no one were signed in: with no session left in this tab either, end it
+    // here as well («SIGNED_OUT» takes the app to the sign-in screen and keeps unsaved work).
+    fetch: watchSessionLoss(
+      (...args) => fetch(...args),
+      supabasePublishableKey,
+      () =>
+        void supabase.auth.getSession().then(({data}) => {
+          if (!data.session) void supabase.auth.signOut({scope: 'local'});
+        }),
+    ),
+  },
 });
 
 // Links that carry no "type" in the URL (code exchange) announce themselves with this event.
