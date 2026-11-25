@@ -52,4 +52,17 @@ describe('Ιχνηλάτηση › Φορτίο κλιβάνου', () => {
     fireEvent.click(screen.getAllByRole('button', {name: 'Φορτίο'})[0]);
     expect(screen.getByRole('heading', {name: /κύκλος #/})).toBeInTheDocument();
   });
+
+  it('for a load not released, says what became of each item: its next cycle, or none yet', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?tab=load&load=L-DEMO-0911'});
+    const held = screen.getByRole('region', {name: 'Τι ήταν στο φορτίο'});
+    expect(within(held).getByRole('columnheader', {name: 'Επόμενος κύκλος'})).toBeInTheDocument();
+    expect(document.querySelector('.trace-after')).not.toBeNull();
+  });
+
+  it('shows no next cycle for a released load', () => {
+    renderPage(<TraceabilityPage />, {path: '/traceability?tab=load&load=L-DEMO-0928'});
+    const held = screen.getByRole('region', {name: 'Τι ήταν στο φορτίο'});
+    expect(within(held).queryByRole('columnheader', {name: 'Επόμενος κύκλος'})).toBeNull();
+  });
 });
