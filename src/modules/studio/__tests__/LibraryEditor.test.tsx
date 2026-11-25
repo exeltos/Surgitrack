@@ -57,5 +57,10 @@ describe('how a sterilizer cycle ends', () => {
     fireEvent.click(screen.getByRole('radio', {name: /Αυτόματα/}));
     expect(screen.getByRole('alert')).toHaveTextContent('Όλος ο κύκλος');
     expect(screen.getByRole('button', {name: 'Αποθήκευση'})).toBeDisabled();
+    // Zero minutes is no length.
+    fireEvent.change(screen.getByLabelText('Συνολική διάρκεια προγράμματος 1 (λεπτά)'), {target: {value: '0'}});
+    expect(screen.getByRole('button', {name: 'Αποθήκευση'})).toBeDisabled();
+    fireEvent.change(screen.getByLabelText('Συνολική διάρκεια προγράμματος 1 (λεπτά)'), {target: {value: '45'}});
+    expect(screen.getByRole('button', {name: 'Αποθήκευση'})).toBeEnabled();
   });
 });

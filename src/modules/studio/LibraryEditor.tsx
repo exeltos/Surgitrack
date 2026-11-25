@@ -39,8 +39,8 @@ export default function LibraryEditor({
   const [cycleEnd, setCycleEnd] = useState<'AUTO' | 'MANUAL'>(
     item?.cycleEnd ?? (item?.programs?.some(p => programFields(p).total) ? 'AUTO' : 'MANUAL'),
   );
-  // Ending by itself needs every program's whole-cycle length.
-  const missingTotal = withPrograms && cycleEnd === 'AUTO' && programs.some(p => !p.total);
+  // Ending by itself needs every program's whole-cycle length, in minutes above zero (0 is not saved).
+  const missingTotal = withPrograms && cycleEnd === 'AUTO' && programs.some(p => !(Number(p.total) > 0));
   const setField = (index: number, key: keyof ProgramFields, value: string) =>
     setOwnPrograms(
       programs.map((p, i) =>
