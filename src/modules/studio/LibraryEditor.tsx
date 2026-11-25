@@ -88,25 +88,32 @@ export default function LibraryEditor({
           {withPrograms && (
             <fieldset className="studio-programs">
               <legend>{tr('Προγράμματα')}</legend>
+              {/* How the cycle ends: two choices side by side, each with what it means under it. */}
               <div className="studio-cycle-end" role="radiogroup" aria-label={tr('Τέλος κύκλου')}>
-                <span>{tr('Τέλος κύκλου')}</span>
-                <label>
+                <span className="studio-cycle-end-title">{tr('Τέλος κύκλου')}</span>
+                <label className={cycleEnd === 'MANUAL' ? 'chosen' : undefined}>
                   <input
                     type="radio"
                     name="cycle-end"
                     checked={cycleEnd === 'MANUAL'}
                     onChange={() => setCycleEnd('MANUAL')}
                   />
-                  {tr('Χειροκίνητα, με «Τέλος κύκλου»')}
+                  <span>
+                    <b>{tr('Χειροκίνητο')}</b>
+                    <small>{tr('Κλείνει όταν πατηθεί «Τέλος κύκλου»')}</small>
+                  </span>
                 </label>
-                <label>
+                <label className={cycleEnd === 'AUTO' ? 'chosen' : undefined}>
                   <input
                     type="radio"
                     name="cycle-end"
                     checked={cycleEnd === 'AUTO'}
                     onChange={() => setCycleEnd('AUTO')}
                   />
-                  {tr('Αυτόματα, στο τέλος του προγράμματος')}
+                  <span>
+                    <b>{tr('Αυτόματο')}</b>
+                    <small>{tr('Κλείνει μόνος του στο τέλος του προγράμματος')}</small>
+                  </span>
                 </label>
               </div>
               <div className="studio-program-row studio-program-head" aria-hidden="true">

@@ -45,16 +45,16 @@ describe('how a sterilizer cycle ends', () => {
   it('starts as automatic for a sterilizer whose programs give their length, and saves the choice', () => {
     const onSave = vi.fn();
     editor(onSave);
-    expect(screen.getByRole('radio', {name: /Αυτόματα/})).toBeChecked();
-    fireEvent.click(screen.getByRole('radio', {name: /Χειροκίνητα/}));
+    expect(screen.getByRole('radio', {name: /Αυτόματο/})).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', {name: /Χειροκίνητο/}));
     fireEvent.click(screen.getByRole('button', {name: 'Αποθήκευση'}));
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({cycleEnd: 'MANUAL'}));
   });
 
   it('asks for every program’s whole length before ending by itself', () => {
     editor(vi.fn(), ['134°C · 5 min']);
-    expect(screen.getByRole('radio', {name: /Χειροκίνητα/})).toBeChecked();
-    fireEvent.click(screen.getByRole('radio', {name: /Αυτόματα/}));
+    expect(screen.getByRole('radio', {name: /Χειροκίνητο/})).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', {name: /Αυτόματο/}));
     expect(screen.getByRole('alert')).toHaveTextContent('Όλος ο κύκλος');
     expect(screen.getByRole('button', {name: 'Αποθήκευση'})).toBeDisabled();
     // Zero minutes is no length.
