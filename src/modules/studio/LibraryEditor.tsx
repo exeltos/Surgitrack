@@ -35,6 +35,12 @@ export default function LibraryEditor({
     item?.programs?.length ? item.programs.map(programFields) : null,
   );
   const programs = ownPrograms ?? programsOf({el}).map(programFields);
+  // How its cycles end: chosen here; before the choice existed, by itself wherever a program gave its length.
+  const [cycleEnd, setCycleEnd] = useState<'AUTO' | 'MANUAL'>(
+    item?.cycleEnd ?? (item?.programs?.some(p => programFields(p).total) ? 'AUTO' : 'MANUAL'),
+  );
+  // Ending by itself needs every program's whole-cycle length, in minutes above zero (0 is not saved).
+  const missingTotal = withPrograms && cycleEnd === 'AUTO' && programs.some(p => !(Number(p.total) > 0));
   const setField = (index: number, key: keyof ProgramFields, value: string) =>
     setOwnPrograms(
       programs.map((p, i) =>
@@ -108,7 +114,8 @@ export default function LibraryEditor({
                   <input
                     inputMode="numeric"
                     value={program.total}
-                    placeholder="45"
+                    disabled={cycleEnd === 'MANUAL'}
+                    placeholder={cycleEnd === 'MANUAL' ? '—' : '45'}
                     aria-label={tr('Συνολική διάρκεια προγράμματος {0} (λεπτά)', index + 1)}
                     onChange={e => setField(index, 'total', e.target.value)}
                   />
@@ -139,11 +146,6 @@ export default function LibraryEditor({
                   </button>
                 </div>
               ))}
-              <small className="studio-programs-note">
-                {tr(
-                  'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Αν το συμπληρώσετε, ο κύκλος τελειώνει αυτόματα. Αλλιώς τελειώνει με «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.',
-                )}
-              </small>
               <AppButton
                 size="sm"
                 icon={<Plus size={15} />}
@@ -151,6 +153,44 @@ export default function LibraryEditor({
               >
                 {tr('Προσθήκη προγράμματος')}
               </AppButton>
+              {/* How the cycle ends: under the programs, two choices side by side, each with what it means under it. */}
+              <div className="studio-cycle-end" role="radiogroup" aria-label={tr('Τέλος κύκλου')}>
+                <span className="studio-cycle-end-title">{tr('Τέλος κύκλου')}</span>
+                <label className={cycleEnd === 'MANUAL' ? 'chosen' : undefined}>
+                  <input
+                    type="radio"
+                    name="cycle-end"
+                    checked={cycleEnd === 'MANUAL'}
+                    onChange={() => setCycleEnd('MANUAL')}
+                  />
+                  <span>
+                    <b>{tr('Χειροκίνητο')}</b>
+                    <small>{tr('Κλείνει όταν πατηθεί «Τέλος κύκλου»')}</small>
+                  </span>
+                </label>
+                <label className={cycleEnd === 'AUTO' ? 'chosen' : undefined}>
+                  <input
+                    type="radio"
+                    name="cycle-end"
+                    checked={cycleEnd === 'AUTO'}
+                    onChange={() => setCycleEnd('AUTO')}
+                  />
+                  <span>
+                    <b>{tr('Αυτόματο')}</b>
+                    <small>{tr('Κλείνει μόνος του στο τέλος του προγράμματος')}</small>
+                  </span>
+                </label>
+              </div>
+              {missingTotal && (
+                <small className="studio-programs-missing" role="alert">
+                  {tr('Για αυτόματο τέλος συμπληρώστε σε κάθε πρόγραμμα «Όλος ο κύκλος (λεπτά)».')}
+                </small>
+              )}
+              <small className="studio-programs-note">
+                {tr(
+                  'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Με αυτόματο τέλος, ο κύκλος τελειώνει μόνος του όταν περάσει αυτός ο χρόνος. Με χειροκίνητο, τελειώνει όταν πατηθεί «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.',
+                )}
+              </small>
             </fieldset>
           )}
         </div>
@@ -158,14 +198,14 @@ export default function LibraryEditor({
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
-            disabled={!el.trim()}
+            disabled={!el.trim() || missingTotal}
             onClick={() =>
               onSave({
                 el: el.trim(),
                 en: english || el.trim(),
                 code: code.trim() || undefined,
                 ...(withPrograms
-                  ? {programs: programs.map(programFromFields).filter(program => programBase(program))}
+                  ? {programs: programs.map(programFromFields).filter(program => programBase(program)), cycleEnd}
                   : {}),
               })
             }

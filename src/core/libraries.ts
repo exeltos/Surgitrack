@@ -30,6 +30,11 @@ export type LibraryItem = {
   /** A sterilizer's programs, as offered when a load starts (none set: the usual ones, see sterilizerPrograms). */
   programs?: string[];
   /**
+   * How a sterilizer's cycle ends: «AUTO» by itself at its program's whole-cycle length, «MANUAL» by «Τέλος κύκλου».
+   * None set (before the choice existed): by itself wherever a program gives its length.
+   */
+  cycleEnd?: 'AUTO' | 'MANUAL';
+  /**
    * The tests this sterilizer or washer is held to (Settings → Sterilization); none set: the usual ones for its
    * kind (a plasma sterilizer has no Bowie-Dick or vacuum leak test). See testKindsOf.
    */
