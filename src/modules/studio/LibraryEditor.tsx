@@ -88,34 +88,6 @@ export default function LibraryEditor({
           {withPrograms && (
             <fieldset className="studio-programs">
               <legend>{tr('Προγράμματα')}</legend>
-              {/* How the cycle ends: two choices side by side, each with what it means under it. */}
-              <div className="studio-cycle-end" role="radiogroup" aria-label={tr('Τέλος κύκλου')}>
-                <span className="studio-cycle-end-title">{tr('Τέλος κύκλου')}</span>
-                <label className={cycleEnd === 'MANUAL' ? 'chosen' : undefined}>
-                  <input
-                    type="radio"
-                    name="cycle-end"
-                    checked={cycleEnd === 'MANUAL'}
-                    onChange={() => setCycleEnd('MANUAL')}
-                  />
-                  <span>
-                    <b>{tr('Χειροκίνητο')}</b>
-                    <small>{tr('Κλείνει όταν πατηθεί «Τέλος κύκλου»')}</small>
-                  </span>
-                </label>
-                <label className={cycleEnd === 'AUTO' ? 'chosen' : undefined}>
-                  <input
-                    type="radio"
-                    name="cycle-end"
-                    checked={cycleEnd === 'AUTO'}
-                    onChange={() => setCycleEnd('AUTO')}
-                  />
-                  <span>
-                    <b>{tr('Αυτόματο')}</b>
-                    <small>{tr('Κλείνει μόνος του στο τέλος του προγράμματος')}</small>
-                  </span>
-                </label>
-              </div>
               <div className="studio-program-row studio-program-head" aria-hidden="true">
                 <span>°C</span>
                 <span>{tr('Αποστείρωση (λεπτά)')}</span>
@@ -174,6 +146,41 @@ export default function LibraryEditor({
                   </button>
                 </div>
               ))}
+              <AppButton
+                size="sm"
+                icon={<Plus size={15} />}
+                onClick={() => setOwnPrograms([...programs, {name: '', temperature: '', exposure: '', total: ''}])}
+              >
+                {tr('Προσθήκη προγράμματος')}
+              </AppButton>
+              {/* How the cycle ends: under the programs, two choices side by side, each with what it means under it. */}
+              <div className="studio-cycle-end" role="radiogroup" aria-label={tr('Τέλος κύκλου')}>
+                <span className="studio-cycle-end-title">{tr('Τέλος κύκλου')}</span>
+                <label className={cycleEnd === 'MANUAL' ? 'chosen' : undefined}>
+                  <input
+                    type="radio"
+                    name="cycle-end"
+                    checked={cycleEnd === 'MANUAL'}
+                    onChange={() => setCycleEnd('MANUAL')}
+                  />
+                  <span>
+                    <b>{tr('Χειροκίνητο')}</b>
+                    <small>{tr('Κλείνει όταν πατηθεί «Τέλος κύκλου»')}</small>
+                  </span>
+                </label>
+                <label className={cycleEnd === 'AUTO' ? 'chosen' : undefined}>
+                  <input
+                    type="radio"
+                    name="cycle-end"
+                    checked={cycleEnd === 'AUTO'}
+                    onChange={() => setCycleEnd('AUTO')}
+                  />
+                  <span>
+                    <b>{tr('Αυτόματο')}</b>
+                    <small>{tr('Κλείνει μόνος του στο τέλος του προγράμματος')}</small>
+                  </span>
+                </label>
+              </div>
               {missingTotal && (
                 <small className="studio-programs-missing" role="alert">
                   {tr('Για αυτόματο τέλος συμπληρώστε σε κάθε πρόγραμμα «Όλος ο κύκλος (λεπτά)».')}
@@ -184,13 +191,6 @@ export default function LibraryEditor({
                   'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Με αυτόματο τέλος, ο κύκλος τελειώνει μόνος του όταν περάσει αυτός ο χρόνος. Με χειροκίνητο, τελειώνει όταν πατηθεί «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.',
                 )}
               </small>
-              <AppButton
-                size="sm"
-                icon={<Plus size={15} />}
-                onClick={() => setOwnPrograms([...programs, {name: '', temperature: '', exposure: '', total: ''}])}
-              >
-                {tr('Προσθήκη προγράμματος')}
-              </AppButton>
             </fieldset>
           )}
         </div>

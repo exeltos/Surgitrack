@@ -1678,12 +1678,12 @@
   color: var(--c-gray-45);
   font-size: 11px;
 }
-/* How the sterilizer's cycle ends, above its programs: two choices side by side, the chosen one marked. */
+/* How the sterilizer's cycle ends, under its programs: two choices side by side, the chosen one marked. */
 .studio-cycle-end {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  margin-bottom: 12px;
+  margin: 14px 0 6px;
 }
 .studio-cycle-end-title {
   grid-column: 1 / -1;
