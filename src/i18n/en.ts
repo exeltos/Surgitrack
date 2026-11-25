@@ -1848,6 +1848,12 @@ export const en: Record<string, string> = {
   'Τύπος φορτίου': 'Load type',
   'Τέλος κύκλου': 'End of cycle',
   'Τέλος κύκλου από': 'Cycle ended by',
+  'Χειροκίνητα, με «Τέλος κύκλου»': 'By hand, with «End of cycle»',
+  'Αυτόματα, στο τέλος του προγράμματος': 'Automatically, when the program ends',
+  'Για αυτόματο τέλος συμπληρώστε σε κάθε πρόγραμμα «Όλος ο κύκλος (λεπτά)».':
+    'To end automatically, fill in «Whole cycle (minutes)» for every program.',
+  'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Με αυτόματο τέλος, ο κύκλος τελειώνει μόνος του όταν περάσει αυτός ο χρόνος. Με χειροκίνητο, τελειώνει όταν πατηθεί «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.':
+    'Sterilization: how many minutes it holds the temperature (e.g. 5). Whole cycle: from the start until the sterilizer opens, with heating and drying (e.g. 45). Ending automatically, the cycle ends by itself once that time has passed. Ending by hand, it ends when «End of cycle» is pressed. The sterilizer takes a new load only once its cycle has ended.',
   'Επόμενος κύκλος': 'Next cycle',
   'Δεν ξαναμπήκε ακόμα': 'Not loaded again yet',
   'Όλα ξαναμπήκαν σε νέο κύκλο.': 'All went into a new cycle.',
@@ -2592,6 +2598,4 @@ export const en: Record<string, string> = {
   'Συνολική διάρκεια προγράμματος {0} (λεπτά)': 'Whole length of program {0} (minutes)',
   'Ο κλίβανος «{0}» έχει ακόμα τον κύκλο {1}: πρώτα «Τέλος κύκλου» ή «Αποτυχία κύκλου».':
     'Sterilizer «{0}» is still running cycle {1}: first «End of cycle» or «Cycle failed».',
-  'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Αν το συμπληρώσετε, ο κύκλος τελειώνει αυτόματα. Αλλιώς τελειώνει με «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.':
-    'Sterilization: the minutes held at temperature (e.g. 5). Whole cycle: from the start until the sterilizer opens, with heating and drying (e.g. 45). When filled in, the cycle ends by itself; otherwise with «End of cycle». A sterilizer takes a new load only once its cycle has ended.',
 };

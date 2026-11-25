@@ -1678,6 +1678,30 @@
   color: var(--c-gray-45);
   font-size: 11px;
 }
+/* How the sterilizer's cycle ends, above its programs: by hand or by itself. */
+.studio-cycle-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.studio-cycle-end > span {
+  font-weight: 600;
+}
+.studio-cycle-end label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.studio-programs-missing {
+  display: block;
+  margin: 4px 0;
+  color: var(--c-red-40-2);
+  font-size: 12px;
+}
 .studio-programs-note {
   color: var(--c-gray-45);
   font-size: 11.5px;

@@ -5,11 +5,14 @@ export const PLASMA_PROGRAMS = ['60°C'];
 /** A plasma sterilizer by its name (STERRAD, «Πλάσμα»…), for its usual programs. */
 export const isPlasma = (name: string) => /πλ[αά]σμα|plasma|sterr?ad|h2o2/i.test(name);
 
-/** The programs a sterilizer offers: its own, or the usual ones for its kind. */
-export const programsOf = (sterilizer?: {el: string; programs?: string[]}) => {
+/**
+ * The programs a sterilizer offers: its own, or the usual ones for its kind. A sterilizer whose cycles end by hand
+ * («MANUAL») offers them without their whole-cycle length, so no load started on it ends by itself.
+ */
+export const programsOf = (sterilizer?: {el: string; programs?: string[]; cycleEnd?: 'AUTO' | 'MANUAL'}) => {
   const own = (sterilizer?.programs || []).map(p => p.trim()).filter(Boolean);
-  if (own.length) return own;
-  return sterilizer && isPlasma(sterilizer.el) ? PLASMA_PROGRAMS : STEAM_PROGRAMS;
+  const offered = own.length ? own : sterilizer && isPlasma(sterilizer.el) ? PLASMA_PROGRAMS : STEAM_PROGRAMS;
+  return sterilizer?.cycleEnd === 'MANUAL' ? offered.map(programBase) : offered;
 };
 
 // A program may say how long the whole cycle lasts, as «134°C · 5 min · σύνολο 45 min»: then its end is known and

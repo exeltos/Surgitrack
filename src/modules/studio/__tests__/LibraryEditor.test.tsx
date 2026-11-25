@@ -29,3 +29,33 @@ describe('a sterilizer program removed in Settings', () => {
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({programs: ['121°C · 18 min']}));
   });
 });
+
+describe('how a sterilizer cycle ends', () => {
+  const editor = (onSave = vi.fn(), programs = ['134°C · 5 min · σύνολο 45 min']) =>
+    render(
+      <LibraryEditor
+        withPrograms
+        title="Κλίβανοι"
+        item={{id: 'k1', el: 'Κλίβανος Α', en: 'Sterilizer A', programs}}
+        onClose={() => undefined}
+        onSave={onSave}
+      />,
+    );
+
+  it('starts as automatic for a sterilizer whose programs give their length, and saves the choice', () => {
+    const onSave = vi.fn();
+    editor(onSave);
+    expect(screen.getByRole('radio', {name: /Αυτόματα/})).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', {name: /Χειροκίνητα/}));
+    fireEvent.click(screen.getByRole('button', {name: 'Αποθήκευση'}));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({cycleEnd: 'MANUAL'}));
+  });
+
+  it('asks for every program’s whole length before ending by itself', () => {
+    editor(vi.fn(), ['134°C · 5 min']);
+    expect(screen.getByRole('radio', {name: /Χειροκίνητα/})).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', {name: /Αυτόματα/}));
+    expect(screen.getByRole('alert')).toHaveTextContent('Όλος ο κύκλος');
+    expect(screen.getByRole('button', {name: 'Αποθήκευση'})).toBeDisabled();
+  });
+});

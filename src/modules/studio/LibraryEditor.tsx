@@ -35,6 +35,12 @@ export default function LibraryEditor({
     item?.programs?.length ? item.programs.map(programFields) : null,
   );
   const programs = ownPrograms ?? programsOf({el}).map(programFields);
+  // How its cycles end: chosen here; before the choice existed, by itself wherever a program gave its length.
+  const [cycleEnd, setCycleEnd] = useState<'AUTO' | 'MANUAL'>(
+    item?.cycleEnd ?? (item?.programs?.some(p => programFields(p).total) ? 'AUTO' : 'MANUAL'),
+  );
+  // Ending by itself needs every program's whole-cycle length.
+  const missingTotal = withPrograms && cycleEnd === 'AUTO' && programs.some(p => !p.total);
   const setField = (index: number, key: keyof ProgramFields, value: string) =>
     setOwnPrograms(
       programs.map((p, i) =>
@@ -82,6 +88,27 @@ export default function LibraryEditor({
           {withPrograms && (
             <fieldset className="studio-programs">
               <legend>{tr('Προγράμματα')}</legend>
+              <div className="studio-cycle-end" role="radiogroup" aria-label={tr('Τέλος κύκλου')}>
+                <span>{tr('Τέλος κύκλου')}</span>
+                <label>
+                  <input
+                    type="radio"
+                    name="cycle-end"
+                    checked={cycleEnd === 'MANUAL'}
+                    onChange={() => setCycleEnd('MANUAL')}
+                  />
+                  {tr('Χειροκίνητα, με «Τέλος κύκλου»')}
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="cycle-end"
+                    checked={cycleEnd === 'AUTO'}
+                    onChange={() => setCycleEnd('AUTO')}
+                  />
+                  {tr('Αυτόματα, στο τέλος του προγράμματος')}
+                </label>
+              </div>
               <div className="studio-program-row studio-program-head" aria-hidden="true">
                 <span>°C</span>
                 <span>{tr('Αποστείρωση (λεπτά)')}</span>
@@ -108,7 +135,8 @@ export default function LibraryEditor({
                   <input
                     inputMode="numeric"
                     value={program.total}
-                    placeholder="45"
+                    disabled={cycleEnd === 'MANUAL'}
+                    placeholder={cycleEnd === 'MANUAL' ? '—' : '45'}
                     aria-label={tr('Συνολική διάρκεια προγράμματος {0} (λεπτά)', index + 1)}
                     onChange={e => setField(index, 'total', e.target.value)}
                   />
@@ -139,9 +167,14 @@ export default function LibraryEditor({
                   </button>
                 </div>
               ))}
+              {missingTotal && (
+                <small className="studio-programs-missing" role="alert">
+                  {tr('Για αυτόματο τέλος συμπληρώστε σε κάθε πρόγραμμα «Όλος ο κύκλος (λεπτά)».')}
+                </small>
+              )}
               <small className="studio-programs-note">
                 {tr(
-                  'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Αν το συμπληρώσετε, ο κύκλος τελειώνει αυτόματα. Αλλιώς τελειώνει με «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.',
+                  'Αποστείρωση: πόσα λεπτά μένει στη θερμοκρασία (π.χ. 5). Όλος ο κύκλος: από την έναρξη μέχρι να ανοίξει ο κλίβανος, με προθέρμανση και στέγνωμα (π.χ. 45). Με αυτόματο τέλος, ο κύκλος τελειώνει μόνος του όταν περάσει αυτός ο χρόνος. Με χειροκίνητο, τελειώνει όταν πατηθεί «Τέλος κύκλου». Ο κλίβανος δέχεται νέο φορτίο μόνο όταν τελειώσει ο κύκλος του.',
                 )}
               </small>
               <AppButton
@@ -158,14 +191,14 @@ export default function LibraryEditor({
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton
             variant="primary"
-            disabled={!el.trim()}
+            disabled={!el.trim() || missingTotal}
             onClick={() =>
               onSave({
                 el: el.trim(),
                 en: english || el.trim(),
                 code: code.trim() || undefined,
                 ...(withPrograms
-                  ? {programs: programs.map(programFromFields).filter(program => programBase(program))}
+                  ? {programs: programs.map(programFromFields).filter(program => programBase(program)), cycleEnd}
                   : {}),
               })
             }
