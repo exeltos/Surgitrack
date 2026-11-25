@@ -29,8 +29,9 @@ export default function QueueTabs({s}: {s: SterilizationPageState}) {
     washing,
   } = s;
   const strip = useRef<HTMLDivElement>(null);
-  // The open stage stands out; a stage with nothing in it fades (it stays clickable).
-  const step = (id: string, count: number) => [queue === id ? 'active' : '', count ? '' : 'empty'].join(' ').trim();
+  // The open stage stands out; a stage with nothing in it fades (it stays clickable). Not «empty»: that class is the
+  // app's empty-list message, whose spacing pushed the stage's name down.
+  const step = (id: string, count: number) => [queue === id ? 'active' : '', count ? '' : 'no-items'].join(' ').trim();
   // On a phone the stages scroll sideways: the open one is kept in view.
   useEffect(() => {
     const active = strip.current?.querySelector<HTMLElement>('button.active');

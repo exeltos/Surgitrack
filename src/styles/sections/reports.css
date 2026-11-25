@@ -330,6 +330,18 @@ html body .reports-table tr.report-group-row .report-group-part {
   color: var(--c-gray-45);
   font-weight: 500;
 }
+/* Sterilizer loads on screen: when on one line, who on a small line under it. */
+.load-when {
+  display: grid;
+  white-space: nowrap;
+}
+.load-when small {
+  max-width: 200px;
+  color: var(--st-muted);
+  font-size: 11.5px;
+  line-height: 1.3;
+  white-space: normal;
+}
 /* Sterilizer loads on screen: the indicators as marks, the state as a badge, the contents one click away. */
 .load-marks {
   display: inline-flex;

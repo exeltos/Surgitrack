@@ -9,6 +9,8 @@ import CycleMonitor from './CycleMonitor';
 export default function LoadContents({load}: {load: ProcessLoadRecord}) {
   const {tools} = useSurgi();
   const data = load.cycleData;
+  const sets = load.items.filter(item => item.assetKind === 'SET').length;
+  const instruments = load.items.length - sets;
   return (
     <>
       {load.status === 'OPEN' && <CycleMonitor load={load} />}
@@ -33,10 +35,22 @@ export default function LoadContents({load}: {load: ProcessLoadRecord}) {
             .join(' · ')}
         </p>
       )}
-      <h4>
+      {/* The cycle in one line (number, program, when it went in, who loaded it), then what it holds. */}
+      <p className="load-details-cycle">
+        {[load.cycleNumber && `${tr('Κύκλος')} ${load.cycleNumber}`, load.program, load.createdAt, load.createdByName]
+          .filter(Boolean)
+          .join(' · ')}
+      </p>
+      <h4 className="load-details-count">
         {tr('Περιεχόμενο φορτίου')} · {load.items.length}
+        {sets > 0 && instruments > 0 && (
+          <small>
+            {' '}
+            ({sets} {tr('Σετ')} · {instruments} {tr('εργαλεία')})
+          </small>
+        )}
       </h4>
-      <ul className="load-details-items">
+      <ul className={`load-details-items${load.items.length > 6 ? ' many' : ''}`}>
         {load.items.map(item => {
           const inside = item.assetKind === 'SET' ? tools.filter(t => t.setId === item.assetId) : [];
           return (

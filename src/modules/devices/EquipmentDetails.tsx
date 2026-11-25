@@ -248,7 +248,8 @@ export default function EquipmentDetails({
           )}
         </section>
 
-        <section className={`asset-section equipment-top${row.trouble?.items.length ? '' : ' equipment-wide'}`}>
+        {/* The load, the tests and the failures each take the whole width, one under the other. */}
+        <section className="asset-section equipment-top equipment-wide">
           <div className="asset-section-head">
             <div>
               <h2>
@@ -388,7 +389,7 @@ export default function EquipmentDetails({
         )}
 
         {row.trouble && row.trouble.items.length > 0 && (
-          <section className="asset-section equipment-top">
+          <section className="asset-section equipment-top equipment-wide">
             <div className="asset-section-head">
               <div>
                 <h2>

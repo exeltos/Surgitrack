@@ -42,8 +42,18 @@ import {reportSummary} from './reportSummary';
 import LoadCell from './loadCells';
 
 export default function ReportsPage() {
-  const {sets, tools, retiredTools, issues, processLoads, sterilizationReleases, receipts, deliveries, movements} =
-    useSurgi();
+  const {
+    sets,
+    tools,
+    retiredTools,
+    issues,
+    processLoads,
+    sterilizationReleases,
+    sterilizationCycles,
+    receipts,
+    deliveries,
+    movements,
+  } = useSurgi();
   const warningThreshold = useLibraries().systemSettings.usageWarningThreshold;
   // The report open is in the address (?report=…): «Πίσω» returns to the one before, and a link opens it.
   const [params, setParams] = useSearchParams();
@@ -117,6 +127,7 @@ export default function ReportsPage() {
           issues,
           processLoads,
           sterilizationReleases,
+          sterilizationCycles,
           receipts,
           deliveries,
           warningThreshold,
@@ -145,6 +156,7 @@ export default function ReportsPage() {
       retiredTools,
       processLoads,
       sterilizationReleases,
+      sterilizationCycles,
       loadStatus,
       sterilizerName,
       expiryState,
@@ -393,6 +405,7 @@ export default function ReportsPage() {
             {key: 'indicators', label: tr('Δείκτες')},
             {key: 'cycleReadings', label: tr('Παράμετροι κύκλου')},
             {key: 'loadStatus', label: tr('Κατάσταση')},
+            {key: 'endedInfo', label: tr('Τέλος κύκλου')},
             {key: 'releasedInfo', label: tr('Αποδέσμευση')},
           ]
         : reportData.columns;
@@ -415,7 +428,8 @@ export default function ReportsPage() {
       screenColumns.map(c => [
         c.key,
         // A column that shows a date with a name after it (the release of a load) sorts by the date underneath.
-        (row: Row) => displaySortValue(c.key === 'releasedInfo' ? row.released : row[c.key]),
+        (row: Row) =>
+          displaySortValue(c.key === 'releasedInfo' ? row.released : c.key === 'endedInfo' ? row.ended : row[c.key]),
       ]),
     ),
   );
@@ -657,7 +671,8 @@ export default function ReportsPage() {
                               >
                                 {c.key === 'stateLabel' && typeof row.state === 'string' && row.state ? (
                                   <StatusBadge value={row.state} />
-                                ) : active === 'loads' && ['indicators', 'loadStatus', 'items'].includes(c.key) ? (
+                                ) : active === 'loads' &&
+                                  ['indicators', 'loadStatus', 'items', 'endedInfo', 'releasedInfo'].includes(c.key) ? (
                                   <LoadCell column={c.key} row={row} />
                                 ) : (
                                   cellText(c.key, row[c.key])
