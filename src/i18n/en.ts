@@ -1848,6 +1848,12 @@ export const en: Record<string, string> = {
   'Τύπος φορτίου': 'Load type',
   'Τέλος κύκλου': 'End of cycle',
   'Τέλος κύκλου από': 'Cycle ended by',
+  'Επόμενος κύκλος': 'Next cycle',
+  'Δεν ξαναμπήκε ακόμα': 'Not loaded again yet',
+  'Όλα ξαναμπήκαν σε νέο κύκλο.': 'All went into a new cycle.',
+  '{0} από {1} ξαναμπήκαν σε νέο κύκλο· τα υπόλοιπα δεν έχουν ξαναμπεί ακόμα.':
+    '{0} of {1} went into a new cycle; the rest have not been loaded again yet.',
+  'Κανένα δεν έχει ξαναμπεί σε νέο κύκλο ακόμα.': 'None has gone into a new cycle yet.',
   αναμονή: 'pending',
   αυτόματα: 'automatically',
   Μονάδα: 'Unit',

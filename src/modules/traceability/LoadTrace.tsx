@@ -158,6 +158,7 @@ export default function LoadTrace({
             onRecall={reason => recallProcessLoad(load.id, reason)}
             onItem={onItem}
             onPatient={onPatient}
+            onLoad={onOpen}
           />
         ) : (
           <SplitEmpty
@@ -181,6 +182,7 @@ function LoadView({
   onRecall,
   onItem,
   onPatient,
+  onLoad,
 }: {
   load: ProcessLoadRecord;
   sets: ReturnType<typeof useSurgi>['sets'];
@@ -191,8 +193,11 @@ function LoadView({
   onRecall: (reason: string) => void;
   onItem: (barcode: string) => void;
   onPatient: (code: string) => void;
+  onLoad: (loadId: string) => void;
 }) {
   const status = LOAD_STATUS[load.status];
+  // A load that was not released (failed, not released, recalled): what became of each item, its next cycle.
+  const notReleased = load.status === 'FAILED' || load.status === 'REPROCESS' || load.status === 'RECALLED';
   const indicators = [
     {label: 'Φυσικές παράμετροι', value: physical(load.physicalParametersOk)},
     {label: 'Χημικός δείκτης', value: indicator(load.chemicalIndicatorResult)},
@@ -203,8 +208,20 @@ function LoadView({
     const asset =
       item.assetKind === 'SET' ? sets.find(s => s.id === item.assetId) : tools.find(t => t.id === item.assetId);
     const used = firstUseAfter(load, item, loads, movements);
-    return {item, asset, used};
+    // The first load it went into after this one (the same item, a later cycle).
+    const next = notReleased
+      ? loads
+          .filter(
+            l =>
+              l.id !== load.id &&
+              time(l.createdAt) > time(load.createdAt) &&
+              l.items.some(i => i.assetKind === item.assetKind && i.assetId === item.assetId),
+          )
+          .sort((a, b) => time(a.createdAt) - time(b.createdAt))[0]
+      : undefined;
+    return {item, asset, used, next};
   });
+  const again = rows.filter(r => r.next).length;
   const usedCount = rows.filter(r => r.used).length;
   const recall = async () => {
     const reason = await askConfirm({
@@ -289,17 +306,27 @@ function LoadView({
           <h3>{tr('Τι ήταν στο φορτίο')}</h3>
           {usedCount > 0 && <span className="trace-used">{tr('Χρησιμοποιήθηκαν ήδη σε ασθενή: {0}', usedCount)}</span>}
         </div>
+        {notReleased && (
+          <p className="trace-after">
+            {again === rows.length
+              ? tr('Όλα ξαναμπήκαν σε νέο κύκλο.')
+              : again > 0
+                ? tr('{0} από {1} ξαναμπήκαν σε νέο κύκλο· τα υπόλοιπα δεν έχουν ξαναμπεί ακόμα.', again, rows.length)
+                : tr('Κανένα δεν έχει ξαναμπεί σε νέο κύκλο ακόμα.')}
+          </p>
+        )}
         <div className="trace-table-wrap" role="region" tabIndex={0} aria-label={tr('Τι ήταν στο φορτίο')}>
           <table className="trace-table">
             <thead>
               <tr>
                 <th>{tr('Σετ / Εργαλείο')}</th>
+                {notReleased && <th>{tr('Επόμενος κύκλος')}</th>}
                 <th>{tr('Πού είναι τώρα')}</th>
                 <th>{tr('Ασθενής')}</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map(({item, asset, used}) => (
+              {rows.map(({item, asset, used, next}) => (
                 <tr key={`${item.assetKind}:${item.assetId}`}>
                   <td>
                     <button type="button" className="trace-link mono" onClick={() => onItem(item.barcode)}>
@@ -307,6 +334,22 @@ function LoadView({
                     </button>
                     <small>{item.assetName}</small>
                   </td>
+                  {notReleased && (
+                    <td>
+                      {next ? (
+                        <>
+                          <button type="button" className="trace-link" onClick={() => onLoad(next.id)}>
+                            {next.equipment} · #{shortCycleNumber(next.cycleNumber)}
+                          </button>
+                          <small>
+                            {next.createdAt} · {tr(LOAD_STATUS[next.status].label)}
+                          </small>
+                        </>
+                      ) : (
+                        <small>{tr('Δεν ξαναμπήκε ακόμα')}</small>
+                      )}
+                    </td>
+                  )}
                   <td>
                     <b>{asset ? trData(asset.department) || tr('Απόθεμα') : '—'}</b>
                     {asset && <small>{statusLabel(asset.state)}</small>}
