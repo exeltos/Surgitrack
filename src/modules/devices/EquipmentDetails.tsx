@@ -446,10 +446,11 @@ export default function EquipmentDetails({
                       </small>
                     </>
                   );
-                  // Each one opens in Traceability: what was in the load, where each item went after it, who used it.
+                  // A sterilizer's opens in Traceability (sterilizer loads only): what was in it, where each item went, who
+                  // used it.
                   return (
                     <li key={item.loadId}>
-                      {canTrace ? (
+                      {canTrace && row.kind !== 'WASHER' ? (
                         <Link
                           className="trouble-row"
                           to={`/traceability?tab=load&load=${encodeURIComponent(item.loadId)}`}
