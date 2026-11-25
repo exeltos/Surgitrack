@@ -80,4 +80,27 @@ describe('loads report', () => {
     const [row] = report([load({status: 'RELEASED', note: 'Σημείωση αποδέσμευσης'})], [autoRecord]).rows;
     expect(row.endedBy).toBe('αυτόματα');
   });
+
+  it('lists the instruments kept until worn in the usage report, with their uses and no limit', () => {
+    const rows = buildReport(
+      'usage',
+      {
+        sets: [],
+        tools: [
+          {id: 't1', barcode: 'T1', name: 'ΨΑΛΙΔΙ', department: 'ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ', uses: 3, wearCheck: true},
+          {id: 't2', barcode: 'T2', name: 'ΛΑΒΙΔΑ', department: 'ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ', uses: 0},
+        ],
+        retiredTools: [],
+        issues: [],
+        processLoads: [],
+        sterilizationReleases: [],
+        receipts: [],
+        deliveries: [],
+        warningThreshold: 3,
+      } as unknown as ReportInput,
+      filters,
+    ).rows;
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({barcode: 'T1', uses: 3, maxUses: 'Με έλεγχο φθοράς', remaining: '—'});
+  });
 });

@@ -1,7 +1,18 @@
 import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {useHasModule} from '../../data/cloud/modulesContext';
-import {Cable, FlaskConical, KeyRound, Pencil, Plus, Trash2, TriangleAlert, Upload, Wrench} from 'lucide-react';
+import {
+  Cable,
+  ChevronRight,
+  FlaskConical,
+  KeyRound,
+  Pencil,
+  Plus,
+  Trash2,
+  TriangleAlert,
+  Upload,
+  Wrench,
+} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import AppButton from '../../components/ui/AppButton';
 import BackLink from '../../components/ui/BackLink';
@@ -22,6 +33,7 @@ import type {ProcessLoadRecord} from '../../types/domain';
 import LoadContents from '../sterilization/parts/LoadContents';
 import {isSimulatedDevice} from '../../data/cloud/simulatedDevice';
 import type {Lang} from './deviceUi';
+import {useSurgi} from '../../store/SurgiStore';
 
 /** One piece of equipment as the unified screen lists it: a sterilizer or washer of the hospital, with its device. */
 export type EquipmentRow = {
@@ -135,6 +147,8 @@ export default function EquipmentDetails({
     ]),
   });
   const shownLoad = row.load ?? row.lastLoad;
+  // The failures open in Traceability, for whoever may see it.
+  const canTrace = useSurgi().can('traceability.view');
   const stateOf = row.load
     ? L('Σε λειτουργία', 'Running')
     : row.outOfService
@@ -414,23 +428,42 @@ export default function EquipmentDetails({
             </div>
             <div className="asset-section-body">
               <ul className="equipment-trouble">
-                {row.trouble.items.slice(0, 10).map(item => (
-                  <li key={item.loadId}>
-                    <b>{item.cycleNumber}</b>
-                    <span>{item.program}</span>
-                    <span className={`device-result ${item.kind === 'CYCLE_FAILED' ? 'fail' : 'unknown'}`}>
-                      {item.kind === 'CYCLE_FAILED'
-                        ? row.kind === 'WASHER'
-                          ? L('Αποτυχία πλύσης', 'Wash failed')
-                          : L('Αποτυχία κύκλου', 'Cycle failed')
-                        : L('Δεν αποδεσμεύτηκε', 'Not released')}
-                    </span>
-                    <small>
-                      {item.at}
-                      {item.note ? ` · ${item.note}` : ''}
-                    </small>
-                  </li>
-                ))}
+                {row.trouble.items.slice(0, 10).map(item => {
+                  const cells = (
+                    <>
+                      <b>{item.cycleNumber}</b>
+                      <span>{item.program}</span>
+                      <span className={`device-result ${item.kind === 'CYCLE_FAILED' ? 'fail' : 'unknown'}`}>
+                        {item.kind === 'CYCLE_FAILED'
+                          ? row.kind === 'WASHER'
+                            ? L('Αποτυχία πλύσης', 'Wash failed')
+                            : L('Αποτυχία κύκλου', 'Cycle failed')
+                          : L('Δεν αποδεσμεύτηκε', 'Not released')}
+                      </span>
+                      <small>
+                        {item.at}
+                        {item.note ? ` · ${item.note}` : ''}
+                      </small>
+                    </>
+                  );
+                  // Each one opens in Traceability: what was in the load, where each item went after it, who used it.
+                  return (
+                    <li key={item.loadId}>
+                      {canTrace ? (
+                        <Link
+                          className="trouble-row"
+                          to={`/traceability?tab=load&load=${encodeURIComponent(item.loadId)}`}
+                          title={L('Άνοιγμα στην Ιχνηλάτηση', 'Open in Traceability')}
+                        >
+                          {cells}
+                          <ChevronRight size={15} aria-hidden="true" />
+                        </Link>
+                      ) : (
+                        <div className="trouble-row">{cells}</div>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </section>

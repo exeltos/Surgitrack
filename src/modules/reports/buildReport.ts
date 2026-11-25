@@ -146,7 +146,7 @@ export function buildReport(
     };
   }
   if (active === 'usage') {
-    // Limited-use Sets and instruments in service, then the instruments taken out of service.
+    // Limited-use Sets and instruments in service, those kept until worn, then the instruments taken out of service.
     const inService = [
       ...sets
         .filter(s => s.maxUses)
@@ -181,6 +181,23 @@ export function buildReport(
         reason: '',
       }))
       .sort((a, b) => a.remaining - b.remaining);
+    // Instruments kept until they wear out (no number of uses): their uses so far, no limit, after the limited ones.
+    const untilWorn = tools
+      .filter(t => !t.maxUses && t.wearCheck)
+      .map(t => ({
+        kind: 'Εργαλείο',
+        barcode: t.barcode,
+        name: t.name,
+        department: t.department || 'Απόθεμα',
+        uses: t.uses || 0,
+        maxUses: tr('Με έλεγχο φθοράς'),
+        remaining: '—',
+        stateLabel: 'Σε χρήση',
+        fresh: t.uses ? '—' : 'Ναι',
+        retiredAt: '',
+        reason: '',
+      }))
+      .sort((a, b) => b.uses - a.uses || a.name.localeCompare(b.name, 'el'));
     const retired = retiredTools
       .map(t => ({
         kind: 'Εργαλείο',
@@ -210,6 +227,10 @@ export function buildReport(
                     ? a.uses > 0 && a.remaining > 0
                     : a.remaining === 0),
           )),
+      // Until worn: among all, the unused and the used (they have no limit to reach or come close to).
+      ...(usageFilter === 'ALL' || usageFilter === 'NEW' || usageFilter === 'USED'
+        ? untilWorn.filter(a => usageFilter === 'ALL' || (usageFilter === 'NEW' ? a.fresh === 'Ναι' : a.uses > 0))
+        : []),
       ...(usageFilter === 'ALL' || usageFilter === 'RETIRED' ? retired : []),
     ]
       .filter(a => department === 'ALL' || a.department === department)
