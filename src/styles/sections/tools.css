@@ -222,9 +222,16 @@ html body .tools-registry td:nth-child(4) .row-sub {
   font-size: 11.5px;
 }
 /* Instrument card: the moves of the Set it travels in, under its own. */
-/* Standalone list (same columns as the Sets list): uses get room for «Χωρίς όριο»; a group opens in place. */
-html body .standalone-registry th:nth-child(5) {
-  width: 96px;
+/* Standalone list (same columns as the Sets list): the uses get room for «10 / 10» and the «Εξαντλημένο» mark on one
+   line (they broke over three; three classes, to win over the Sets list's widths in assets.css, read after); the state column, with short badges, gives that room back. A group opens in place. */
+html body .sets-registry.sets-main.standalone-registry th:nth-child(5) {
+  width: 168px;
+}
+html body .sets-registry.sets-main.standalone-registry td:nth-child(5) {
+  white-space: nowrap;
+}
+html body .sets-registry.sets-main.standalone-registry th:nth-child(6) {
+  width: 150px;
 }
 html body .standalone-registry button.row-title-link {
   padding: 0;

@@ -16,48 +16,73 @@ const expiry = (x: {state: string; sterileUntil?: string}) =>
 /** The instruments of a list as a table: name, barcode, where, uses (used, limit, remaining) and expiry. */
 const sum = (values: Array<number | undefined>) => values.reduce<number>((total, v) => total + (v || 0), 0);
 
-const baseToolsTable = (tools: Tool[], title: string): ExportTable => ({
-  title,
-  totals: [
-    tr('Σύνολο εργαλείων: {0}', tools.length),
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-    sum(tools.filter(t => t.maxUses).map(t => t.uses)),
-    '',
-    '',
-    '',
-  ],
-  headers: [
-    tr('Ονομασία'),
-    'Barcode',
-    tr('Κωδικός'),
-    tr('Εταιρεία'),
-    tr('Ειδικότητα'),
-    tr('Τμήμα'),
-    tr('Κατάσταση'),
-    tr('Χρήσεις'),
-    tr('Όριο χρήσεων'),
-    tr('Υπόλοιπο'),
-    tr('Λήξη'),
-  ],
-  rows: tools.map(t => [
-    t.name,
-    t.barcode,
-    t.code || '',
-    t.manufacturer || '',
-    trData(t.specialty) || '',
-    trData(t.department) || '',
-    statusLabel(t.state),
-    t.uses || 0,
-    t.maxUses || '',
-    remainingUses(t),
-    expiry(t),
-  ]),
-});
+/**
+ * The instruments in the order of what is left of them, each part under a band of its own: the exhausted ones first
+ * (none left, to be replaced), then those in use, then those with no limit, and the new ones (a limit, no use made)
+ * always last. In each part the list's own order is kept. With only one part there are no bands.
+ */
+const byUsage = (tools: Tool[]) => {
+  const parts = [
+    {title: tr('Εξαντλημένα: καμία χρήση δεν απομένει, για αντικατάσταση'), tools: tools.filter(isExhausted)},
+    {title: tr('Σε χρήση'), tools: tools.filter(t => t.maxUses && !isExhausted(t) && !isNew(t))},
+    {title: tr('Χωρίς όριο χρήσεων'), tools: tools.filter(t => !t.maxUses)},
+    {title: tr('Αχρησιμοποίητα: καινούρια τεμάχια, καμία χρήση ακόμα'), tools: tools.filter(isNew)},
+  ].filter(part => part.tools.length);
+  const sections: Array<{before: number; title: string}> = [];
+  let before = 0;
+  for (const part of parts) {
+    sections.push({before, title: part.title});
+    before += part.tools.length;
+  }
+  return {tools: parts.flatMap(part => part.tools), sections: parts.length > 1 ? sections : undefined};
+};
+
+const baseToolsTable = (listed: Tool[], title: string): ExportTable => {
+  const {tools, sections} = byUsage(listed);
+  return {
+    title,
+    ...(sections ? {sections} : {}),
+    totals: [
+      tr('Σύνολο εργαλείων: {0}', tools.length),
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      sum(tools.filter(t => t.maxUses).map(t => t.uses)),
+      '',
+      '',
+      '',
+    ],
+    headers: [
+      tr('Ονομασία'),
+      'Barcode',
+      tr('Κωδικός'),
+      tr('Εταιρεία'),
+      tr('Ειδικότητα'),
+      tr('Τμήμα'),
+      tr('Κατάσταση'),
+      tr('Χρήσεις'),
+      tr('Όριο χρήσεων'),
+      tr('Υπόλοιπο'),
+      tr('Λήξη'),
+    ],
+    rows: tools.map(t => [
+      t.name,
+      t.barcode,
+      t.code || '',
+      t.manufacturer || '',
+      trData(t.specialty) || '',
+      trData(t.department) || '',
+      statusLabel(t.state),
+      t.uses || 0,
+      t.maxUses || '',
+      remainingUses(t),
+      expiry(t),
+    ]),
+  };
+};
 
 /**
  * The instruments as they were on a past day: those that existed then, with the uses of that day (the limit is the
@@ -163,21 +188,39 @@ export const toolsGroupedExportTable = (
       limited.filter(isNew).length,
     ];
   };
-  // The pieces of each kind that are in use (or have no limit) first; the new ones, with no use made, on their own
-  // rows at the end of the list, so their uses left (all of them) are not mixed with those of the used pieces.
-  const inUse = kinds
-    .map(g => ({g: g.filter(t => !isNew(t)), name: g[0].name}))
-    .filter(part => part.g.length)
-    .map(part => rowOf(part.g, part.name));
-  const unused = kinds
-    .map(g => ({g: g.filter(isNew), name: g[0].name}))
-    .filter(part => part.g.length)
-    .map(part => rowOf(part.g, tr('{0} (αχρησιμοποίητα)', part.name)));
-  const rows = [...inUse, ...unused];
-  // The new pieces are set apart under a band of their own.
-  const sections = unused.length
-    ? [{before: inUse.length, title: tr('Αχρησιμοποίητα: καινούρια τεμάχια, καμία χρήση ακόμα')}]
-    : undefined;
+  // The exhausted pieces of each kind first, on rows of their own (to be replaced); then the pieces in use (or with
+  // no limit); the new ones, with no use made, on their own rows at the end of the list, so their uses left (all of
+  // them) are not mixed with those of the used pieces. Each part under a band of its own.
+  const part = (keep: (t: Tool) => boolean, label: (name: string) => string) =>
+    kinds
+      .map(g => ({g: g.filter(keep), name: g[0].name}))
+      .filter(p => p.g.length)
+      .map(p => rowOf(p.g, label(p.name)));
+  const parts = [
+    {
+      title: tr('Εξαντλημένα: καμία χρήση δεν απομένει, για αντικατάσταση'),
+      rows: part(isExhausted, name => tr('{0} (εξαντλημένα)', name)),
+    },
+    {
+      title: tr('Σε χρήση'),
+      rows: part(
+        t => !isExhausted(t) && !isNew(t),
+        name => name,
+      ),
+    },
+    {
+      title: tr('Αχρησιμοποίητα: καινούρια τεμάχια, καμία χρήση ακόμα'),
+      rows: part(isNew, name => tr('{0} (αχρησιμοποίητα)', name)),
+    },
+  ].filter(p => p.rows.length);
+  const rows = parts.flatMap(p => p.rows);
+  let before = 0;
+  const bands = parts.map(p => {
+    const band = {before, title: p.title};
+    before += p.rows.length;
+    return band;
+  });
+  const sections = parts.length > 1 ? bands : undefined;
   const column = (index: number) => sum(rows.map(row => row[index] as number));
   return {
     title: onDay ? onDayTitle(title, onDay) : title,

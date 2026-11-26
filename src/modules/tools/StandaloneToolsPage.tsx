@@ -149,7 +149,7 @@ export default function StandaloneToolsPage() {
         {trData(t.department) || '—'}
         {t.specialty ? <small className="row-sub">{trData(t.specialty)}</small> : null}
       </td>
-      <td>
+      <td className="cell-nowrap">
         {t.maxUses ? (
           <>
             <b>{t.uses}</b>
