@@ -1,3 +1,4 @@
+import {useState} from 'react';
 import type {Asset, ReceiptCheckResult} from '../../../types/domain';
 import {handoverCheck, signatureExempt} from '../../../core/handoverPolicy';
 import {electronicDispatch, latestDispatches, type Dispatch} from '../../../core/electronicDispatch';
@@ -122,6 +123,31 @@ export function useReceiptFlow(
     };
   };
 
+  // An item scanned at the receipt that its department never sent (brought by hand): asked about its use first.
+  const [undispatched, setUndispatched] = useState<SterilizationRow | null>(null);
+  /** The undispatched item recorded as sent (its use counted): it joins the receipt. */
+  const receiveUndispatched = (retired = false) => {
+    if (!undispatched) return;
+    if (retired) {
+      // Its last use: out of use now, not in the receipt; it is set aside, not reprocessed.
+      setReceiptBatchScanFeedback({
+        type: 'WARN',
+        message: tr(
+          '{0}: καταγράφηκε η τελευταία χρήση και τέθηκε εκτός χρήσης. Δεν μπαίνει στην παραλαβή· κρατήστε το χωριστά.',
+          undispatched.barcode,
+        ),
+      });
+      setUndispatched(null);
+      return;
+    }
+    const key = `${undispatched.kind}:${undispatched.id}`;
+    setReceiptBatchSelected(current => new Set([...current, key]));
+    setReceiptBatchScanFeedback({
+      type: 'OK',
+      message: tr('{0} · {1} καταγράφηκε και προστέθηκε στην παραλαβή.', undispatched.barcode, undispatched.name),
+    });
+    setUndispatched(null);
+  };
   const receiptTools = receiptDraft?.kind === 'SET' ? tools.filter(t => t.setId === receiptDraft.asset.id) : [];
   const receiptExpectedCount = receiptDraft?.kind === 'SET' ? receiptTools.length : 1;
   /** Opens the batch receipt, with `items` already picked (a department's «Παραλαβή όλων»), or none. */
@@ -135,6 +161,7 @@ export function useReceiptFlow(
     setReceiptBatchScanFeedback(null);
   };
   const closeReceiptBatch = () => {
+    setUndispatched(null);
     setReceiptBatchOpen(false);
     setReceiptBatchSelected(new Set());
     setReceiptBatchDeliverer(null);
@@ -178,6 +205,18 @@ export function useReceiptFlow(
     const item = incoming.find(x => x.barcode.toUpperCase() === barcode);
     if (!item) {
       const known = all.find(x => x.barcode.toUpperCase() === barcode);
+      // In its department, never sent: received all the same, once its use (patient, uses) is recorded.
+      if (
+        known?.state === 'IN_DEPARTMENT' &&
+        (!receiptBatchDepartment || known.department === receiptBatchDepartment)
+      ) {
+        setUndispatched(known);
+        setReceiptBatchScanFeedback({
+          type: 'WARN',
+          message: tr('{0} δεν στάλθηκε ηλεκτρονικά από το τμήμα: καταγράψτε τη χρήση του.', barcode),
+        });
+        return false;
+      }
       setReceiptBatchScanFeedback({
         type: 'ERROR',
         message: known
@@ -332,6 +371,9 @@ export function useReceiptFlow(
     setIssueNote('');
   };
   return {
+    undispatched,
+    setUndispatched,
+    receiveUndispatched,
     clearReceiptBatchSelection,
     selectReceiptBatchDepartment,
     addBarcodeToReceiptBatch,

@@ -18,6 +18,7 @@ import PrepSetIssueModal from './parts/PrepSetIssueModal';
 import PrepToolManageModal from './parts/PrepToolManageModal';
 import PrepToolActionModal from './parts/PrepToolActionModal';
 import ReleaseModal from './parts/ReleaseModal';
+import UndispatchedReceipt from './parts/UndispatchedReceipt';
 import ReceiptBatchModal from './parts/ReceiptBatchModal';
 import DeliveryBatchModal from './parts/DeliveryBatchModal';
 import DeliveryModal from './parts/DeliveryModal';
@@ -163,6 +164,7 @@ export default function SterilizationPage() {
       <PrepToolActionModal s={s} />
       <ReleaseModal s={s} />
       <ReceiptBatchModal s={s} />
+      <UndispatchedReceipt s={s} />
       <DeliveryBatchModal s={s} />
       <DeliveryModal s={s} />
       <ReceiptViewModal s={s} />

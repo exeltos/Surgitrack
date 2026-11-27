@@ -61,6 +61,7 @@ export function useReceiptAndCycleActions(
     note?: string,
     unusedToolIds: string[] = [],
     usesByToolId: Record<string, number> = {},
+    atReceipt = false,
   ) => {
     const a = assetName(kind, id);
     if (!a || !assertCirculationAllowed(kind, id)) return false;
@@ -125,7 +126,11 @@ export function useReceiptAndCycleActions(
       assetKind: kind,
       from: a.department || currentUser.department || 'Τμήμα',
       to: 'Κεντρική Αποστείρωση',
-      status: `Ηλεκτρονική αποστολή · ${currentUser.name} (${currentUser.id}) · αναμονή φυσικής παραλαβής${
+      status: `${
+        atReceipt
+          ? `Αποστολή προς αποστείρωση · χωρίς ηλεκτρονική αποστολή από το τμήμα · καταγραφή στην παραλαβή από ${currentUser.name}`
+          : `Ηλεκτρονική αποστολή · ${currentUser.name} (${currentUser.id}) · αναμονή φυσικής παραλαβής`
+      }${
         limited.length - several.length
           ? ` · −1 χρήση σε ${limited.length - several.length} εργαλεί${limited.length - several.length === 1 ? 'ο' : 'α'}`
           : ''

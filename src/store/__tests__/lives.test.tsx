@@ -77,6 +77,26 @@ describe('instrument lives', () => {
     ).toBe(true);
   });
 
+  it('lets Sterilization record the use of an item the department brought without sending it', () => {
+    sessionStorage.setItem('surgitrack-demo-role', 'STERILIZATION');
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const tool = result.current.tools.find(
+      t => t.maxUses && t.mode !== 'SET_MEMBER' && t.state === 'IN_DEPARTMENT' && t.uses + 1 < t.maxUses,
+    )!;
+    expect(tool).toBeTruthy();
+    let sent = false;
+    act(() => {
+      sent = result.current.sendToSterilization('TOOL', tool.id, 'PT-9', undefined, [], {}, true);
+    });
+    expect(sent).toBe(true);
+    const after = result.current.tools.find(t => t.id === tool.id)!;
+    expect(after.uses).toBe(tool.uses + 1);
+    expect(after.state).toBe('PENDING_STERILIZATION');
+    const move = result.current.movements.find(m => m.asset.startsWith(tool.barcode))!;
+    expect(move.status).toMatch(/^Αποστολή προς αποστείρωση · χωρίς ηλεκτρονική αποστολή από το τμήμα/);
+    expect(move.patientCode).toBe('PT-9');
+  });
+
   it('keeps lives read-only for users without the usage permission', () => {
     const {result} = renderHook(() => useSurgi(), {wrapper});
     const tool = result.current.tools.find(t => t.maxUses)!;
