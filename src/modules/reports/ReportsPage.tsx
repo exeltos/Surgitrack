@@ -39,7 +39,7 @@ const dayKey = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 const showDay = (key: string) => key.split('-').reverse().join('/');
 import {reportSummary} from './reportSummary';
-import LoadCell from './loadCells';
+import LoadCell, {IssueCell} from './loadCells';
 
 export default function ReportsPage() {
   const {
@@ -674,6 +674,8 @@ export default function ReportsPage() {
                                 ) : active === 'loads' &&
                                   ['indicators', 'loadStatus', 'items', 'endedInfo', 'releasedInfo'].includes(c.key) ? (
                                   <LoadCell column={c.key} row={row} />
+                                ) : active === 'issues' && (c.key === 'type' || c.key === 'status') && row[c.key] ? (
+                                  <IssueCell column={c.key} value={String(row[c.key])} />
                                 ) : (
                                   cellText(c.key, row[c.key])
                                 )}

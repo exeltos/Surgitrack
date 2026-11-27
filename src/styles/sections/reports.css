@@ -385,6 +385,19 @@ html body .reports-table tr.report-group-row .report-group-part {
   background: var(--c-amber-90);
   color: var(--c-amber-35);
 }
+.load-status.loss {
+  background: #efe7fb;
+  color: #5b3a9a;
+}
+.load-status.retired {
+  background: var(--c-gray-90, #e5e9ec);
+  color: var(--c-gray-25, #3b474f);
+}
+/* The faults report: the type as an outline in its colour, the state filled. */
+.load-status.outline {
+  border: 1px solid currentColor;
+  background: transparent;
+}
 .load-items summary {
   cursor: pointer;
   white-space: nowrap;
