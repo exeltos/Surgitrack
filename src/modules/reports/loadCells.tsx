@@ -1,4 +1,4 @@
-import {tr} from '../../i18n';
+import {tr, trData} from '../../i18n';
 import {indicatorText, type Row} from './reportsMeta';
 
 /** An indicator as a mark: ✓ passed, ✗ failed, «αναμονή» pending (not «…», read as cut-off text), – not done; its full text on hover and for screen readers. */
@@ -59,4 +59,24 @@ export default function LoadCell({column, row}: {column: string; row: Row}) {
   ) : (
     <>{String(row.items)}</>
   );
+}
+
+/** The faults report on screen: the type and the state as coloured marks, so an open fault stands out. */
+export function IssueCell({column, value}: {column: string; value: string}) {
+  const tone =
+    column === 'status'
+      ? value === 'Ανοικτή'
+        ? 'bad'
+        : value === 'Επιλυμένη'
+          ? 'ok'
+          : 'retired'
+      : /βλάβη/i.test(value)
+        ? 'bad'
+        : /φθορά/i.test(value)
+          ? 'wait'
+          : /απώλεια|απολεσ|έλλειψη/i.test(value)
+            ? 'loss'
+            : '';
+  // The type as an outline, the state filled: two columns, two kinds of mark.
+  return <span className={`load-status ${tone}${column === 'type' ? ' outline' : ''}`}>{trData(value)}</span>;
 }
