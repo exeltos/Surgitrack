@@ -97,35 +97,57 @@ export function templateWithAdded(
 ): Requirement[] | undefined {
   if (!template?.length || !added.length) return template ? [...template] : template;
   const lines = template.map(line => ({...line}));
+  const lineKey = (line: Requirement) => keyOf(line.code, line.name);
+  // What the template asks for and what the Set holds, per code (lines sharing a code are added up).
+  const required = new Map<string, number>();
+  for (const line of lines) required.set(lineKey(line), (required.get(lineKey(line)) || 0) + line.quantity);
   const present = new Map<string, number>();
+  const count = (map: Map<string, number>, key: string) => map.get(key) || 0;
   for (const member of members) {
     const key = keyOf(member.code, member.name);
-    present.set(key, (present.get(key) || 0) + 1);
+    present.set(key, count(present, key) + 1);
   }
-  const has = (key: string) => present.get(key) || 0;
+  // First every incoming instrument the template asks for takes its own place, whatever the order they came in;
+  // only those left over replace what is still missing.
+  const surplus: Added[] = [];
   for (const tool of added) {
     const key = keyOf(tool.code, tool.name);
-    const own = lines.findIndex(line => keyOf(line.code, line.name) === key);
-    present.set(key, has(key) + 1);
-    if (own >= 0 && has(key) <= lines[own].quantity) continue;
-    let missing = -1;
-    lines.forEach((line, index) => {
-      const lineKey = keyOf(line.code, line.name);
-      if (lineKey === key || has(lineKey) >= line.quantity) return;
-      if (missing < 0 || likeness(line.name, tool.name) > likeness(lines[missing].name, tool.name)) missing = index;
-    });
+    if (count(present, key) < count(required, key)) present.set(key, count(present, key) + 1);
+    else surplus.push(tool);
+  }
+  for (const tool of surplus) {
+    const key = keyOf(tool.code, tool.name);
+    let missing: string | undefined;
+    let missingName = '';
+    for (const line of lines) {
+      const k = lineKey(line);
+      if (k === key || count(present, k) >= count(required, k)) continue;
+      if (missing === undefined || likeness(line.name, tool.name) > likeness(missingName, tool.name)) {
+        missing = k;
+        missingName = line.name;
+      }
+    }
     const fresh = {code: tool.code || '', name: tool.name, quantity: 1};
-    if (missing >= 0 && own < 0 && lines[missing].quantity === 1) {
-      // The replacement takes the missing one's place in the list.
-      lines[missing] = fresh;
-      continue;
+    present.set(key, count(present, key) + 1);
+    required.set(key, count(required, key) + 1);
+    if (missing !== undefined) {
+      required.set(missing, count(required, missing) - 1);
+      // The missing one's last line gives up one.
+      let at = -1;
+      lines.forEach((line, index) => {
+        if (lineKey(line) === missing) at = index;
+      });
+      const own = lines.some(line => lineKey(line) === key);
+      if (!own && lines[at].quantity === 1) {
+        // The replacement takes the missing one's place in the list.
+        lines[at] = fresh;
+        continue;
+      }
+      lines[at].quantity -= 1;
+      if (!lines[at].quantity) lines.splice(at, 1);
     }
-    if (missing >= 0) {
-      lines[missing].quantity -= 1;
-      if (!lines[missing].quantity) lines.splice(missing, 1);
-    }
-    const at = lines.findIndex(line => keyOf(line.code, line.name) === key);
-    if (at >= 0) lines[at].quantity += 1;
+    const own = lines.findIndex(line => lineKey(line) === key);
+    if (own >= 0) lines[own].quantity += 1;
     else lines.push(fresh);
   }
   return lines;

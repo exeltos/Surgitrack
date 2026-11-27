@@ -84,6 +84,32 @@ describe('the template after instruments are put into a Set by hand', () => {
     ]);
   });
 
+  it('adds up the lines that share a code before calling an instrument extra', () => {
+    const twoLines = [
+      {code: 'A1', name: 'KOCHER', quantity: 1},
+      {code: 'A1', name: 'KOCHER', quantity: 1},
+    ];
+    const a = {code: 'A1', name: 'KOCHER'};
+    expect(templateWithAdded(twoLines, [a], [a])).toEqual(twoLines);
+  });
+
+  it('gives the incoming instruments their own lines first, whatever their order', () => {
+    const empty = [
+      {code: 'A', name: 'KOCHER', quantity: 1},
+      {code: 'B', name: 'CURVED', quantity: 1},
+      {code: 'C', name: 'KOCHER STRAIGHT', quantity: 1},
+    ];
+    const x = {code: 'X', name: 'KOCHER CURVED'};
+    const a = {code: 'A', name: 'KOCHER'};
+    const one = templateWithAdded(empty, [], [x, a]);
+    const other = templateWithAdded(empty, [], [a, x]);
+    expect(one).toEqual(other);
+    // A keeps its own line; X takes the place of one still missing (B or C), never A's.
+    expect(one?.map(line => line.code)).toContain('A');
+    expect(one?.map(line => line.code)).toContain('X');
+    expect(one?.reduce((sum, line) => sum + line.quantity, 0)).toBe(3);
+  });
+
   it('keeps a Set without a template without one', () => {
     expect(templateWithAdded(undefined, [], [kocher])).toBeUndefined();
   });
