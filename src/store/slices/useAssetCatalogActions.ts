@@ -3,6 +3,7 @@ import {formatStoreDateTime, uniqueStamp} from '../helpers';
 import type {CreateSetPayload, CreateToolPayload, SurgicalCount} from '../types';
 import {tr} from '../../i18n';
 import {canRetireNow} from '../../core/replacements';
+import {templateWithAdded} from '../../core/compositionCheck';
 import {binEntryForSet, binEntryForTool} from '../../core/recycleBin';
 import type {useSurgiSession} from './useSurgiSession';
 import type {useSurgiRecords} from './useSurgiRecords';
@@ -130,7 +131,20 @@ export function useAssetCatalogActions(
           a.id === sourceSetId
             ? {...a, actual: Math.max(0, a.actual - 1)}
             : a.id === target.id
-              ? {...a, actual: a.actual + 1}
+              ? {
+                  ...a,
+                  actual: a.actual + 1,
+                  // The template follows: a replacement with another code takes the missing one's line.
+                  ...(a.compositionTemplate?.length
+                    ? {
+                        compositionTemplate: templateWithAdded(
+                          a.compositionTemplate,
+                          tools.filter(tool => tool.setId === a.id && tool.state !== 'RETIRED'),
+                          [t],
+                        ),
+                      }
+                    : {}),
+                }
               : a,
         ),
       );

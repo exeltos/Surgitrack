@@ -3,6 +3,7 @@ import type {AssetKind, AssetState} from '../../types/domain';
 import {getLifecycleAlerts, normalizeUsageLimit} from '../helpers';
 import type {SetUpdatePatch, ToolUpdatePatch} from '../types';
 import {renameComposition, staleCompositionLines} from '../../core/nameCheck';
+import {templateWithAdded} from '../../core/compositionCheck';
 import {describeChanges} from '../../core/editChanges';
 import {tr} from '../../i18n';
 import type {useSurgiSession} from './useSurgiSession';
@@ -227,6 +228,16 @@ export function useAssetEditActions(
             ...item,
             actual: item.actual + chosen.length,
             expected: Math.max(item.expected, item.actual + chosen.length),
+            // The template follows: a replacement with another code takes the missing one's line.
+            ...(item.compositionTemplate?.length
+              ? {
+                  compositionTemplate: templateWithAdded(
+                    item.compositionTemplate,
+                    tools.filter(tool => tool.setId === item.id && tool.state !== 'RETIRED'),
+                    chosen,
+                  ),
+                }
+              : {}),
           };
         return removed ? {...item, actual: Math.max(0, item.actual - removed)} : item;
       }),

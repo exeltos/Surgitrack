@@ -86,22 +86,31 @@ describe('the exports of the tool and Set lists', () => {
       3,
     );
     const at = (name: string) => table.headers.indexOf(name);
-    // The kind's pieces in use (b: exhausted, c: low), the one without a limit, and the new piece on its own row last.
-    expect(table.rows.map(r => r[0])).toEqual(['ΑΛΛΟ', 'LARGE NEEDLE DRIVER', 'LARGE NEEDLE DRIVER (αχρησιμοποίητα)']);
-    const inUse = table.rows[1];
-    expect(inUse[at('Τεμάχια')]).toBe(2);
+    // The exhausted piece (b) first, on a row of its own; then the pieces in use (c: low) and the one without a
+    // limit; the new piece on its own row last.
+    expect(table.rows.map(r => r[0])).toEqual([
+      'LARGE NEEDLE DRIVER (εξαντλημένα)',
+      'ΑΛΛΟ',
+      'LARGE NEEDLE DRIVER',
+      'LARGE NEEDLE DRIVER (αχρησιμοποίητα)',
+    ]);
+    const exhausted = table.rows[0];
+    expect(exhausted[at('Τεμάχια')]).toBe(1);
+    expect(exhausted[at('Εξαντλημένα')]).toBe(1);
+    expect(exhausted[at('Σύνολο υπολοίπων χρήσεων')]).toBe(0);
+    const inUse = table.rows[2];
+    expect(inUse[at('Τεμάχια')]).toBe(1);
     // «Με όριο χρήσεων» is not a column (it repeated «Τεμάχια»).
     expect(table.headers).not.toContain('Με όριο χρήσεων');
     expect(inUse[at('Όριο χρήσεων')]).toBe('10');
-    expect(inUse[at('Χρήσεις που έγιναν')]).toBe(18);
-    expect(inUse[at('Υπόλοιπο ανά τεμάχιο')]).toBe('0–2');
-    // 0 + 2 uses left by the two pieces in use.
+    expect(inUse[at('Χρήσεις που έγιναν')]).toBe(8);
+    expect(inUse[at('Υπόλοιπο ανά τεμάχιο')]).toBe('2');
     expect(inUse[at('Σύνολο υπολοίπων χρήσεων')]).toBe(2);
-    expect(inUse[at('Εξαντλημένα')]).toBe(1);
+    expect(inUse[at('Εξαντλημένα')]).toBe(0);
     expect(inUse[at('Λίγες χρήσεις')]).toBe(1);
     expect(inUse[at('Αχρησιμοποίητα')]).toBe(0);
     expect(String(inUse[at('Τμήμα')])).toContain('ΑΙΘΟΥΣΑ ΤΟΚΕΤΩΝ');
-    const fresh = table.rows[2];
+    const fresh = table.rows[3];
     expect(fresh[at('Τεμάχια')]).toBe(1);
     expect(fresh[at('Σύνολο υπολοίπων χρήσεων')]).toBe(10);
     expect(fresh[at('Αχρησιμοποίητα')]).toBe(1);
@@ -110,8 +119,12 @@ describe('the exports of the tool and Set lists', () => {
     expect(table.totals?.[at('Υπόλοιπο ανά τεμάχιο')]).toBe('');
     expect(table.totals?.[at('Σύνολο υπολοίπων χρήσεων')]).toBe(12);
     expect(table.totals?.[0]).toBe('Σύνολο ειδών: 2');
-    // The new pieces are set apart under a band of their own, before their first row.
-    expect(table.sections).toEqual([{before: 2, title: expect.stringContaining('Αχρησιμοποίητα')}]);
+    // Each part under a band of its own, before its first row: exhausted, in use, new.
+    expect(table.sections).toEqual([
+      {before: 0, title: expect.stringContaining('Εξαντλημένα')},
+      {before: 1, title: 'Σε χρήση'},
+      {before: 3, title: expect.stringContaining('Αχρησιμοποίητα')},
+    ]);
   });
 
   it('lists the codes of a kind in the code column, not how many there are', () => {
@@ -125,6 +138,29 @@ describe('the exports of the tool and Set lists', () => {
       3,
     );
     expect(table.rows[0][table.headers.indexOf('Κωδικός')]).toBe('K100, K300');
+  });
+
+  it('puts the exhausted instruments first and the new ones last, each part under a band', () => {
+    const table = toolsExportTable(
+      [
+        tool({id: 'n', barcode: 'NEW', uses: 0, maxUses: 10}),
+        tool({id: 'u', barcode: 'USED', uses: 4, maxUses: 10}),
+        tool({id: 'x', barcode: 'EXH', uses: 10, maxUses: 10}),
+        tool({id: 'w', barcode: 'WEAR', uses: 7, maxUses: undefined, wearCheck: true}),
+      ],
+      'Εργαλεία',
+    );
+    expect(table.rows.map(r => r[1])).toEqual(['EXH', 'USED', 'WEAR', 'NEW']);
+    expect(table.sections?.map(s => s.before)).toEqual([0, 1, 2, 3]);
+    expect(table.sections?.[0].title).toContain('Εξαντλημένα');
+    expect(table.sections?.[3].title).toContain('Αχρησιμοποίητα');
+    // The totals still count every instrument.
+    expect(table.totals?.[0]).toBe('Σύνολο εργαλείων: 4');
+  });
+
+  it('has no band in the detailed list when all the instruments are of one kind of usage', () => {
+    const table = toolsExportTable([tool({}), tool({id: 't2', barcode: 'T000002', uses: 5})], 'Εργαλεία');
+    expect(table.sections).toBeUndefined();
   });
 
   it('has no band when no piece is new', () => {
