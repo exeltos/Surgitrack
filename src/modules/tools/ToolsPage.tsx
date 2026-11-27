@@ -344,8 +344,10 @@ export default function ToolsPage() {
                     <td className="cell-nowrap">
                       {t.maxUses ? (
                         <>
-                          <b>{t.uses}</b>
-                          <span className="muted"> / {t.maxUses}</span>
+                          <span className="uses-figures">
+                            <b>{t.uses}</b>
+                            <span className="muted"> / {t.maxUses}</span>
+                          </span>
                           {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
                         </>
                       ) : t.wearCheck ? (

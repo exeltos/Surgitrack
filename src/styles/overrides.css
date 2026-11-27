@@ -4362,9 +4362,14 @@ html body .usage-exhausted-warning {
   font-size: 11px;
   font-weight: 600;
 }
+/* The uses (used / limit) are read as one figure: never broken over two lines, whatever the column's width. */
+html body .uses-figures {
+  white-space: nowrap;
+}
 /* In the lists: an instrument with no use left that is still in service, or one under repair (in Service). */
 html body .usage-exhausted-badge,
 html body .usage-service-badge {
+  display: inline-block;
   margin-left: 6px;
   padding: 1px 8px;
   border-radius: 999px;
