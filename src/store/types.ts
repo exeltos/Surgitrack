@@ -320,6 +320,11 @@ export type SurgiStoreValue = {
     unusedToolIds?: string[],
     /** Instruments used several times in the operation (a clip applier): how many uses each one had. */
     usesByToolId?: Record<string, number>,
+    /**
+     * Recorded by Sterilization at the receipt for a department that sent nothing (the item was brought by hand):
+     * the uses are counted all the same, and the history says who recorded it and where.
+     */
+    atReceipt?: boolean,
   ) => boolean;
   /** Whether the item may circulate (not used up, not recalled); when not, the reason is shown as a toast. */
   circulationAllowed: (kind: AssetKind, id: string) => boolean;

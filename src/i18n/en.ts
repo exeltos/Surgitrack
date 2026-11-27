@@ -801,6 +801,15 @@ export const en: Record<string, string> = {
   '{0} (αχρησιμοποίητα)': '{0} (unused)',
   '{0} (εξαντλημένα)': '{0} (exhausted)',
   'Χρήσεις ανά χειρουργείο': 'Uses per operation',
+  'Παραλαβή χωρίς ηλεκτρονική αποστολή': 'Receipt without electronic dispatch',
+  'Δεν στάλθηκε από το τμήμα': 'Not sent by the department',
+  'Χρησιμοποιήθηκε σε ασθενή; Γράψτε τον κωδικό ασθενούς για να αφαιρεθεί η χρήση. Ξετσεκάρετε όσα δεν χρησιμοποιήθηκαν.':
+    'Was it used on a patient? Enter the patient code so the use is counted. Untick whatever was not used.',
+  Καταγράφει: 'Recorded by',
+  'Καταγραφή και παραλαβή': 'Record and receive',
+  '{0} · {1} καταγράφηκε και προστέθηκε στην παραλαβή.': '{0} · {1} recorded and added to the receipt.',
+  '{0} δεν στάλθηκε ηλεκτρονικά από το τμήμα: καταγράψτε τη χρήση του.':
+    '{0} was not sent electronically by the department: record its use.',
   Μία: 'One',
   'Πολλές (π.χ. clips) · ερώτηση στην αποστολή': 'Several (e.g. clips) · asked at dispatch',
   'Clips / χρήσεις': 'Clips / uses',

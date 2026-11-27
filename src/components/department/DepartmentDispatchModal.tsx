@@ -20,12 +20,21 @@ export default function DepartmentDispatchModal({
   barcode,
   name,
   onClose,
+  atReceipt = false,
+  onSent,
 }: {
   kind: AssetKind;
   id: string;
   barcode: string;
   name: string;
   onClose: () => void;
+  /**
+   * Sterilization at the receipt, for an item the department brought by hand without sending it: the same questions
+   * (patient, the uses), recorded by the one receiving it, with no count of the department's.
+   */
+  atReceipt?: boolean;
+  /** After the item is recorded as sent (at the receipt: so it joins the receipt). */
+  onSent?: () => void;
 }) {
   const {currentUser, sendToSterilization, sets, tools, preparations, sterilizationReleases, organizationName} =
     useSurgi();
@@ -36,7 +45,8 @@ export default function DepartmentDispatchModal({
   // Operating theatres sign the instrument count (its own window) before the Set can be sent.
   const asset = kind === 'SET' ? sets.find(x => x.id === id) : tools.find(x => x.id === id);
   const withCount = useHasModule('SURGICAL_COUNT');
-  const counting = withCount && countsAtDepartment(asset?.department, systemSettings.surgicalCountDepartments);
+  const counting =
+    withCount && !atReceipt && countsAtDepartment(asset?.department, systemSettings.surgicalCountDepartments);
   const [countOpen, setCountOpen] = useState(false);
   const [count, setCount] = useState<SurgicalCount | null>(null);
   const printSigned = () =>
@@ -84,7 +94,16 @@ export default function DepartmentDispatchModal({
     clipsGiven;
   const send = () => {
     if (!canSend) return;
-    sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined, [...unused], usesById);
+    sendToSterilization(
+      kind,
+      id,
+      patientCode.trim() || undefined,
+      note.trim() || undefined,
+      [...unused],
+      usesById,
+      atReceipt,
+    );
+    onSent?.();
     onClose();
   };
   return (
@@ -95,18 +114,27 @@ export default function DepartmentDispatchModal({
       <div className="asset-modal department-send-modal">
         <header>
           <div>
-            <span className="eyebrow">{tr('Ηλεκτρονική προώθηση')}</span>
-            <h2>{tr('Αποστολή προς Αποστείρωση')}</h2>
+            <span className="eyebrow">
+              {atReceipt ? tr('Παραλαβή χωρίς ηλεκτρονική αποστολή') : tr('Ηλεκτρονική προώθηση')}
+            </span>
+            <h2>{atReceipt ? tr('Δεν στάλθηκε από το τμήμα') : tr('Αποστολή προς Αποστείρωση')}</h2>
             <p>
               {barcode} · {name}
             </p>
+            {atReceipt && (
+              <p className="department-send-at-receipt">
+                {tr(
+                  'Χρησιμοποιήθηκε σε ασθενή; Γράψτε τον κωδικό ασθενούς για να αφαιρεθεί η χρήση. Ξετσεκάρετε όσα δεν χρησιμοποιήθηκαν.',
+                )}
+              </p>
+            )}
           </div>
         </header>
         <div className="modal-body department-send-body">
           <div className="department-send-route">
             <div>
               <span>{tr('Από')}</span>
-              <strong>{trData(currentUser.department)}</strong>
+              <strong>{trData(atReceipt ? asset?.department : currentUser.department)}</strong>
             </div>
             <Send size={22} />
             <div>
@@ -233,7 +261,7 @@ export default function DepartmentDispatchModal({
           <div className="department-signature-card">
             <ShieldCheck size={21} />
             <div>
-              <span>{tr('Αποστέλλει')}</span>
+              <span>{atReceipt ? tr('Καταγράφει') : tr('Αποστέλλει')}</span>
               <strong>{currentUser.name}</strong>
               <small>
                 {trData(currentUser.department)} {tr('· η ενέργεια καταγράφεται αυτόματα στο ιστορικό')}
@@ -256,7 +284,7 @@ export default function DepartmentDispatchModal({
         <footer>
           <AppButton onClick={onClose}>{tr('Ακύρωση')}</AppButton>
           <AppButton variant="primary" icon={<Send size={17} />} onClick={send} disabled={!canSend}>
-            {tr('Αποστολή προς Αποστείρωση')}
+            {atReceipt ? tr('Καταγραφή και παραλαβή') : tr('Αποστολή προς Αποστείρωση')}
           </AppButton>
         </footer>
       </div>

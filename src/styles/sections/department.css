@@ -363,6 +363,13 @@ html body .department-lives-clips input {
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
+/* Sterilization's receipt of an item never sent: what is asked, under the title. */
+html body .department-send-modal .department-send-at-receipt {
+  margin-top: 6px;
+  color: var(--c-orange-45-2, #b45309);
+  font-size: 12px;
+  font-weight: 600;
+}
 html body .department-lives-hint {
   display: block;
   margin: 6px 0 2px;

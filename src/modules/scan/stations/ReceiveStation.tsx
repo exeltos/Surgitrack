@@ -8,6 +8,7 @@ import {useSterilizationPage} from '../../sterilization/useSterilizationPage';
 import ScanCamera from '../ScanCamera';
 import {ScanWaiting, ScanDone, ScanItemList, ScanRefused, ScanScreen} from '../ScanParts';
 import {useScanAnswers} from '../useScanAnswers';
+import UndispatchedReceipt from '../../sterilization/parts/UndispatchedReceipt';
 
 /**
  * Receipt at Sterilization: scan what a department brings (one department per round), then the person
@@ -162,6 +163,7 @@ export default function ReceiveStation({onStations}: {onStations: () => void}) {
         onRemove={s.toggleReceiptBatchAsset}
         empty={tr('Σκανάρετε τα Σετ και τα εργαλεία που φέρνει το τμήμα.')}
       />
+      <UndispatchedReceipt s={s} />
     </ScanScreen>
   );
 }
