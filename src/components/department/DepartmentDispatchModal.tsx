@@ -94,15 +94,19 @@ export default function DepartmentDispatchModal({
     clipsGiven;
   const send = () => {
     if (!canSend) return;
-    sendToSterilization(
-      kind,
-      id,
-      patientCode.trim() || undefined,
-      note.trim() || undefined,
-      [...unused],
-      usesById,
-      atReceipt,
-    );
+    // Refused (used up, recalled): nothing was recorded, so the dialog stays and nothing is said to be sent.
+    if (
+      !sendToSterilization(
+        kind,
+        id,
+        patientCode.trim() || undefined,
+        note.trim() || undefined,
+        [...unused],
+        usesById,
+        atReceipt,
+      )
+    )
+      return;
     onSent?.();
     onClose();
   };
