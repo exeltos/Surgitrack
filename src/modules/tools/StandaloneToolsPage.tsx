@@ -152,8 +152,10 @@ export default function StandaloneToolsPage() {
       <td className="cell-nowrap">
         {t.maxUses ? (
           <>
-            <b>{t.uses}</b>
-            <span className="muted"> / {t.maxUses}</span>
+            <span className="uses-figures">
+              <b>{t.uses}</b>
+              <span className="muted"> / {t.maxUses}</span>
+            </span>
             {isExhausted(t) && <span className="usage-exhausted-badge">{tr('Εξαντλημένο')}</span>}
           </>
         ) : t.wearCheck ? (
@@ -163,6 +165,7 @@ export default function StandaloneToolsPage() {
         ) : (
           <span className="muted">{tr('Χωρίς όριο')}</span>
         )}
+        {t.state === 'SERVICE' && <span className="usage-service-badge">{tr('Σε βλάβη')}</span>}
       </td>
       <td>
         <StatusBadge value={t.state} />
