@@ -163,6 +163,7 @@ export default function StandaloneToolsPage() {
         ) : (
           <span className="muted">{tr('Χωρίς όριο')}</span>
         )}
+        {t.state === 'SERVICE' && <span className="usage-service-badge">{tr('Σε βλάβη')}</span>}
       </td>
       <td>
         <StatusBadge value={t.state} />

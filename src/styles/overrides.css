@@ -4362,8 +4362,9 @@ html body .usage-exhausted-warning {
   font-size: 11px;
   font-weight: 600;
 }
-/* In the lists: an instrument with no use left that is still in service. */
-html body .usage-exhausted-badge {
+/* In the lists: an instrument with no use left that is still in service, or one under repair (in Service). */
+html body .usage-exhausted-badge,
+html body .usage-service-badge {
   margin-left: 6px;
   padding: 1px 8px;
   border-radius: 999px;

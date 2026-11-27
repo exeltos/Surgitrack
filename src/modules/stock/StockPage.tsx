@@ -290,6 +290,7 @@ export default function StockPage() {
                         ) : (
                           <span className="muted">{tr('Χωρίς όριο')}</span>
                         )}
+                        {t.state === 'SERVICE' && <span className="usage-service-badge">{tr('Σε βλάβη')}</span>}
                       </td>
                       <td>
                         {/* Every row of this page is in stock: that is plain text, a badge only for another state. */}
