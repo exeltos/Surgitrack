@@ -807,6 +807,8 @@ export const en: Record<string, string> = {
     'Was it used on a patient? Enter the patient code so the use is counted. Untick whatever was not used.',
   Καταγράφει: 'Recorded by',
   'Καταγραφή και παραλαβή': 'Record and receive',
+  '{0}: καταγράφηκε η τελευταία χρήση και τέθηκε εκτός χρήσης. Δεν μπαίνει στην παραλαβή· κρατήστε το χωριστά.':
+    '{0}: its last use was recorded and it is now out of use. It is not part of the receipt; set it aside.',
   '{0} · {1} καταγράφηκε και προστέθηκε στην παραλαβή.': '{0} · {1} recorded and added to the receipt.',
   '{0} δεν στάλθηκε ηλεκτρονικά από το τμήμα: καταγράψτε τη χρήση του.':
     '{0} was not sent electronically by the department: record its use.',
