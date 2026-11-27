@@ -126,8 +126,20 @@ export function useReceiptFlow(
   // An item scanned at the receipt that its department never sent (brought by hand): asked about its use first.
   const [undispatched, setUndispatched] = useState<SterilizationRow | null>(null);
   /** The undispatched item recorded as sent (its use counted): it joins the receipt. */
-  const receiveUndispatched = () => {
+  const receiveUndispatched = (retired = false) => {
     if (!undispatched) return;
+    if (retired) {
+      // Its last use: out of use now, not in the receipt; it is set aside, not reprocessed.
+      setReceiptBatchScanFeedback({
+        type: 'WARN',
+        message: tr(
+          '{0}: καταγράφηκε η τελευταία χρήση και τέθηκε εκτός χρήσης. Δεν μπαίνει στην παραλαβή· κρατήστε το χωριστά.',
+          undispatched.barcode,
+        ),
+      });
+      setUndispatched(null);
+      return;
+    }
     const key = `${undispatched.kind}:${undispatched.id}`;
     setReceiptBatchSelected(current => new Set([...current, key]));
     setReceiptBatchScanFeedback({

@@ -33,8 +33,11 @@ export default function DepartmentDispatchModal({
    * (patient, the uses), recorded by the one receiving it, with no count of the department's.
    */
   atReceipt?: boolean;
-  /** After the item is recorded as sent (at the receipt: so it joins the receipt). */
-  onSent?: () => void;
+  /**
+   * After the item is recorded as sent (at the receipt: so it joins the receipt). `retired`: an instrument whose last
+   * use this was is out of use now, not sent.
+   */
+  onSent?: (retired: boolean) => void;
 }) {
   const {currentUser, sendToSterilization, sets, tools, preparations, sterilizationReleases, organizationName} =
     useSurgi();
@@ -94,6 +97,9 @@ export default function DepartmentDispatchModal({
     clipsGiven;
   const send = () => {
     if (!canSend) return;
+    // A standalone instrument whose last use this is goes out of use instead of to Sterilization.
+    const retired =
+      kind === 'TOOL' && usedTools.some(t => t.id === id && !!t.maxUses && t.uses + (usesById[t.id] ?? 1) >= t.maxUses);
     // Refused (used up, recalled): nothing was recorded, so the dialog stays and nothing is said to be sent.
     if (
       !sendToSterilization(
@@ -107,7 +113,7 @@ export default function DepartmentDispatchModal({
       )
     )
       return;
-    onSent?.();
+    onSent?.(retired);
     onClose();
   };
   return (
