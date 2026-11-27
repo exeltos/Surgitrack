@@ -101,6 +101,8 @@ export default function SetDetailPage() {
   // using optional access so they stay safe when `set` is undefined.
   const members = useMemo(() => (set ? tools.filter(tool => tool.setId === set.id) : []), [tools, set]);
 
+  // Reprinting the same label: also whoever prepares in Sterilization (a new barcode stays the supervisor's).
+  const canPrintLabel = can('asset.barcode.reissue') || can('sterilization.prepare');
   if (!set)
     return (
       <div className="empty">
@@ -173,7 +175,7 @@ export default function SetDetailPage() {
                   });
                 },
               },
-              ...(can('asset.barcode.reissue')
+              ...(canPrintLabel
                 ? [
                     {
                       key: 'label',

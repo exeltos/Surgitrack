@@ -1,3 +1,4 @@
+import {usesThisTime} from '../../../core/usageStatus';
 import {usesAreCounted} from '../../../store/helpers';
 import {useState} from 'react';
 import {useHasModule} from '../../../data/cloud/modulesContext';
@@ -33,6 +34,8 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const [livesConfirmed, setLivesConfirmed] = useState(false);
   // Limited-use instruments not used this time: sent without losing a use.
   const [unused, setUnused] = useState<Set<string>>(new Set());
+  // Instruments used several times in the operation (a clip applier): how many uses, typed in for each.
+  const [clips, setClips] = useState<Record<string, string>>({});
   const [ticked, setTicked] = useState<Set<string>>(new Set());
   const [bulk, setBulk] = useState(false);
   const answers = useScanAnswers(feedback);
@@ -55,6 +58,7 @@ export default function SendStation({onStations}: {onStations: () => void}) {
     setNote('');
     setLivesConfirmed(false);
     setUnused(new Set());
+    setClips({});
     setTicked(new Set());
     setBulk(false);
     setFound(item);
@@ -109,6 +113,9 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const used = limited.filter(t => !unused.has(t.id));
   const limitedSet = kind === 'SET' && !!found.asset.maxUses;
   const consumesLives = used.length > 0 || limitedSet;
+  const several = used.filter(t => t.multiUse && t.maxUses);
+  const clipsGiven = several.every(t => Number(clips[t.id]) >= 1);
+  const usesById = Object.fromEntries(several.map(t => [t.id, usesThisTime(t, Number(clips[t.id]))]));
   // Limited-use instruments sent back unused (no use recorded) were used on no patient: the department's rule
   // does not ask for the code then.
   // A Set may hold instruments without a limit that were used: only a standalone instrument is exempt.
@@ -118,6 +125,7 @@ export default function SendStation({onStations}: {onStations: () => void}) {
   const ready =
     (!needsPatient || patientCode.trim().length > 0) &&
     (!consumesLives || livesConfirmed) &&
+    clipsGiven &&
     (!counting || counted > 0);
 
   const tick = (id: string) =>
@@ -177,7 +185,16 @@ export default function SendStation({onStations}: {onStations: () => void}) {
       });
       if (!count) return;
     }
-    if (!sendToSterilization(kind, asset.id, patientCode.trim() || undefined, note.trim() || undefined, [...unused]))
+    if (
+      !sendToSterilization(
+        kind,
+        asset.id,
+        patientCode.trim() || undefined,
+        note.trim() || undefined,
+        [...unused],
+        usesById,
+      )
+    )
       return;
     setSent(found);
     setFound(null);
@@ -266,34 +283,59 @@ export default function SendStation({onStations}: {onStations: () => void}) {
               const remaining = Math.max(0, (tool.maxUses || 0) - tool.uses);
               const isUsed = !unused.has(tool.id);
               const noLimit = !tool.maxUses;
+              const many = isUsed && !!tool.multiUse && !noLimit;
+              const typed = Number(clips[tool.id]);
+              const take = many ? (typed >= 1 ? usesThisTime(tool, typed) : 0) : 1;
               return (
-                <label key={tool.id} className={isUsed ? 'on' : ''}>
-                  <input
-                    type="checkbox"
-                    checked={isUsed}
-                    onChange={() =>
-                      setUnused(current => {
-                        const next = new Set(current);
-                        if (next.has(tool.id)) next.delete(tool.id);
-                        else next.add(tool.id);
-                        return next;
-                      })
-                    }
-                    aria-label={tr('Χρησιμοποιήθηκε: {0}', tool.barcode)}
-                  />
-                  <span>
-                    <b>{tool.name}</b>
-                    <small>
-                      {isUsed && noLimit
-                        ? `${tr('Χρήσεις')}: ${tool.uses} → ${tool.uses + 1} · ${tr('έλεγχος φθοράς')}`
-                        : isUsed
-                          ? `${tr('Υπόλοιπο χρήσεων')}: ${remaining} → ${Math.max(0, remaining - 1)}${
-                              remaining <= 1 ? ` · ${tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}` : ''
-                            }`
-                          : tr('χωρίς χρήση')}
-                    </small>
-                  </span>
-                </label>
+                <div key={tool.id} className="scan-check-with-clips">
+                  <label className={isUsed ? 'on' : ''}>
+                    <input
+                      type="checkbox"
+                      checked={isUsed}
+                      onChange={() =>
+                        setUnused(current => {
+                          const next = new Set(current);
+                          if (next.has(tool.id)) next.delete(tool.id);
+                          else next.add(tool.id);
+                          return next;
+                        })
+                      }
+                      aria-label={tr('Χρησιμοποιήθηκε: {0}', tool.barcode)}
+                    />
+                    <span>
+                      <b>{tool.name}</b>
+                      <small>
+                        {isUsed && noLimit
+                          ? `${tr('Χρήσεις')}: ${tool.uses} → ${tool.uses + 1} · ${tr('έλεγχος φθοράς')}`
+                          : isUsed
+                            ? `${tr('Υπόλοιπο χρήσεων')}: ${remaining} → ${Math.max(0, remaining - take)}${
+                                remaining - take <= 0 && (!many || typed >= 1)
+                                  ? ` · ${tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}`
+                                  : ''
+                              }`
+                            : tr('χωρίς χρήση')}
+                      </small>
+                    </span>
+                  </label>
+                  {many && (
+                    <div className="scan-clips">
+                      <span>{tr('Clips / χρήσεις: {0}', tool.barcode)}</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={remaining || undefined}
+                        inputMode="numeric"
+                        aria-label={tr('Clips / χρήσεις: {0}', tool.barcode)}
+                        value={clips[tool.id] || ''}
+                        placeholder={tr('Πόσα χρησιμοποιήθηκαν;')}
+                        onChange={e => setClips(c => ({...c, [tool.id]: e.target.value}))}
+                      />
+                      {typed > remaining && (
+                        <small>{tr('Απομένουν μόνο {0} χρήσεις: καταγράφονται {0}.', remaining)}</small>
+                      )}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -301,7 +343,11 @@ export default function SendStation({onStations}: {onStations: () => void}) {
             <div className="scan-checks">
               <label className={livesConfirmed ? 'on' : ''}>
                 <input type="checkbox" checked={livesConfirmed} onChange={e => setLivesConfirmed(e.target.checked)} />
-                <span>{tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}</span>
+                <span>
+                  {several.length
+                    ? tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφονται οι χρήσεις που έγραψα)')
+                    : tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}
+                </span>
               </label>
             </div>
           )}

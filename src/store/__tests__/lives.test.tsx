@@ -54,6 +54,29 @@ describe('instrument lives', () => {
     expect(after.state).toBe('PENDING_STERILIZATION');
   });
 
+  it('takes as many uses as clips from an instrument used several times in one operation, one from any other', () => {
+    sessionStorage.setItem('surgitrack-demo-role', 'ADMIN');
+    const {result} = renderHook(() => useSurgi(), {wrapper});
+    const [clipper, other] = result.current.tools.filter(
+      t => t.maxUses && t.mode !== 'SET_MEMBER' && t.state === 'IN_DEPARTMENT',
+    );
+    expect(clipper && other).toBeTruthy();
+    act(() => result.current.updateTool(clipper.id, {maxUses: clipper.uses + 20, multiUse: true}));
+    expect(result.current.tools.find(t => t.id === clipper.id)!.multiUse).toBe(true);
+
+    act(() => {
+      result.current.sendToSterilization('TOOL', clipper.id, 'PT-1', undefined, [], {[clipper.id]: 12});
+      result.current.sendToSterilization('TOOL', other.id, 'PT-1', undefined, [], {[other.id]: 12});
+    });
+    expect(result.current.tools.find(t => t.id === clipper.id)!.uses).toBe(clipper.uses + 12);
+    expect(result.current.tools.find(t => t.id === other.id)!.uses).toBe(other.uses + 1);
+    expect(
+      result.current.movements.some(
+        m => m.asset.startsWith(clipper.barcode) && m.status.includes('−12 χρήσεις (clips)'),
+      ),
+    ).toBe(true);
+  });
+
   it('keeps lives read-only for users without the usage permission', () => {
     const {result} = renderHook(() => useSurgi(), {wrapper});
     const tool = result.current.tools.find(t => t.maxUses)!;

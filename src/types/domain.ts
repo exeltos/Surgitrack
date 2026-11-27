@@ -44,6 +44,11 @@ export interface Tool {
   maxUses?: number;
   /** Used with a wear check: no usage limit, but the uses are counted (and may be added by hand). */
   wearCheck?: boolean;
+  /**
+   * With a limit, used several times in one operation (a clip applier: each clip is a use): the dispatch asks how
+   * many uses were made and records them all.
+   */
+  multiUse?: boolean;
   uses: number;
   sterilizations: number;
   serialNumber?: string;

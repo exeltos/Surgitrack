@@ -12,6 +12,7 @@ import AppButton from '../ui/AppButton';
 import {useSurgi} from '../../store/SurgiStore';
 import type {AssetKind} from '../../types/domain';
 import {tr, trData} from '../../i18n';
+import {usesThisTime} from '../../core/usageStatus';
 
 export default function DepartmentDispatchModal({
   kind,
@@ -58,6 +59,11 @@ export default function DepartmentDispatchModal({
   // Limited-use instruments not used this time (the Set was opened, the instrument was not): no use recorded.
   const [unused, setUnused] = useState<Set<string>>(new Set());
   const usedTools = limitedTools.filter(t => !unused.has(t.id));
+  // Instruments used several times in the operation (a clip applier): how many uses, typed in for each.
+  const [clips, setClips] = useState<Record<string, string>>({});
+  const several = usedTools.filter(t => t.multiUse && t.maxUses);
+  const clipsGiven = several.every(t => Number(clips[t.id]) >= 1);
+  const usesById = Object.fromEntries(several.map(t => [t.id, usesThisTime(t, Number(clips[t.id]))]));
   const consumesLives = usedTools.length > 0 || limitedSet;
   const toggleUnused = (toolId: string) =>
     setUnused(current => {
@@ -72,10 +78,13 @@ export default function DepartmentDispatchModal({
   const sentUnused = kind === 'TOOL' && limitedTools.length > 0 && !consumesLives;
   const patientRequired = consumesLives || (!sentUnused && patientCodeRequired(asset?.department, systemSettings));
   const canSend =
-    (!counting || !!count) && (!patientRequired || patientCode.trim().length > 0) && (!consumesLives || livesConfirmed);
+    (!counting || !!count) &&
+    (!patientRequired || patientCode.trim().length > 0) &&
+    (!consumesLives || livesConfirmed) &&
+    clipsGiven;
   const send = () => {
     if (!canSend) return;
-    sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined, [...unused]);
+    sendToSterilization(kind, id, patientCode.trim() || undefined, note.trim() || undefined, [...unused], usesById);
     onClose();
   };
   return (
@@ -157,10 +166,13 @@ export default function DepartmentDispatchModal({
                   const remaining = Math.max(0, (t.maxUses || 0) - t.uses);
                   const noLimit = !t.maxUses;
                   const used = !unused.has(t.id);
+                  const many = used && !!t.multiUse && !noLimit;
+                  const typed = Number(clips[t.id]);
+                  const take = many ? (typed >= 1 ? usesThisTime(t, typed) : 0) : 1;
                   return (
                     <li
                       key={t.id}
-                      className={`${used && !noLimit && remaining <= 1 ? 'last-life' : ''} ${used ? '' : 'not-used'}`}
+                      className={`${used && !noLimit && remaining - take <= 0 ? 'last-life' : ''} ${used ? '' : 'not-used'}`}
                     >
                       <label className="department-lives-used" title={tr('Χρησιμοποιήθηκε')}>
                         <input
@@ -178,9 +190,27 @@ export default function DepartmentDispatchModal({
                           ? tr('χωρίς χρήση')
                           : noLimit
                             ? `${t.uses} → ${t.uses + 1}`
-                            : `${remaining} → ${Math.max(0, remaining - 1)}`}
+                            : `${remaining} → ${Math.max(0, remaining - take)}`}
                       </b>
-                      {used && !noLimit && remaining <= 1 && (
+                      {many && (
+                        <label className="department-lives-clips">
+                          <span>{tr('Clips / χρήσεις')}</span>
+                          <input
+                            type="number"
+                            min={1}
+                            max={remaining || undefined}
+                            inputMode="numeric"
+                            value={clips[t.id] || ''}
+                            placeholder="—"
+                            onChange={e => setClips(c => ({...c, [t.id]: e.target.value}))}
+                            aria-label={tr('Clips / χρήσεις: {0}', t.barcode)}
+                          />
+                        </label>
+                      )}
+                      {many && typed > remaining && (
+                        <small>{tr('Απομένουν μόνο {0} χρήσεις: καταγράφονται {0}.', remaining)}</small>
+                      )}
+                      {used && !noLimit && remaining - take <= 0 && (!many || typed >= 1) && (
                         <small>{tr('Τελευταία χρήση · θα τεθεί εκτός χρήσης')}</small>
                       )}
                     </li>
@@ -193,7 +223,9 @@ export default function DepartmentDispatchModal({
               {consumesLives && (
                 <label className="department-lives-confirm">
                   <input type="checkbox" checked={livesConfirmed} onChange={e => setLivesConfirmed(e.target.checked)} />
-                  {tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}
+                  {several.length
+                    ? tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφονται οι χρήσεις που έγραψα)')
+                    : tr('Επιβεβαιώνω ότι χρησιμοποιήθηκε (καταγράφεται μία χρήση)')}
                 </label>
               )}
             </div>
