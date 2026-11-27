@@ -86,6 +86,8 @@ export default function ToolDetailPage() {
   const [deleteBlockedOpen, setDeleteBlockedOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [dispatchOpen, setDispatchOpen] = useState(false);
+  // Reprinting the same label: also whoever prepares in Sterilization (a new barcode stays the supervisor's).
+  const canPrintLabel = can('asset.barcode.reissue') || can('sterilization.prepare');
   if (!tool)
     return (
       <div className="empty">
@@ -134,7 +136,7 @@ export default function ToolDetailPage() {
             icon={<Printer size={18} />}
             label={tr('Εκτύπωση')}
             items={[
-              ...(can('asset.barcode.reissue')
+              ...(canPrintLabel
                 ? [
                     {
                       key: 'label',
