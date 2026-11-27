@@ -48,6 +48,7 @@ const TOOL_FIELDS: readonly Field[] = [
   ['uses', 'uses', 'number'],
   ['maxUses', 'max_uses', 'number'],
   ['wearCheck', 'wear_check', 'boolean'],
+  ['multiUse', 'multi_use', 'boolean'],
   ['sterilizations', 'sterilizations', 'number'],
   ['serialNumber', 'serial_number', 'text'],
   ['purchaseDate', 'purchase_date', 'text'],

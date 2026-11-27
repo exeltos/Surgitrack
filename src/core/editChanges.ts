@@ -17,6 +17,7 @@ const LABELS: Record<string, string> = {
   cost: 'Κόστος',
   maxUses: 'Όριο χρήσεων',
   wearCheck: 'Έλεγχος φθοράς',
+  multiUse: 'Πολλές χρήσεις ανά χειρουργείο',
   ownership: 'Ιδιοκτησία',
   ownerName: 'Ιδιοκτήτης',
 };

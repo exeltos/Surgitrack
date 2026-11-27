@@ -344,6 +344,25 @@ html body .department-lives-card li.not-used b {
   text-decoration: none;
   font-weight: 600;
 }
+/* An instrument used several times in one operation (a clip applier): how many uses, under its line. */
+html body .department-lives-card li .department-lives-clips {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 22px;
+  font-size: 11px;
+  color: var(--st-muted);
+}
+html body .department-lives-clips input {
+  width: 72px;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--st-line, #d7e0e5);
+  border-radius: 7px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
 html body .department-lives-hint {
   display: block;
   margin: 6px 0 2px;

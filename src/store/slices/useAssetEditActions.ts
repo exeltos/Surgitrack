@@ -28,11 +28,15 @@ export function useAssetEditActions(
   const {addMovement, can, currentUser, notify, setSets, setTools, sets, systemSettings, tools, undoable} = p;
 
   /** Lives (usage limits) change only by the admin or the Sterilization supervisor. */
-  const withoutUsageUnlessAllowed = <T extends {maxUses?: number; wearCheck?: boolean}>(patch: T): T => {
-    if (!('maxUses' in patch || 'wearCheck' in patch) || can('asset.usage.configure')) return patch;
+  const withoutUsageUnlessAllowed = <T extends {maxUses?: number; wearCheck?: boolean; multiUse?: boolean}>(
+    patch: T,
+  ): T => {
+    if (!('maxUses' in patch || 'wearCheck' in patch || 'multiUse' in patch) || can('asset.usage.configure'))
+      return patch;
     const rest = {...patch};
     delete rest.maxUses;
     delete rest.wearCheck;
+    delete rest.multiUse;
     return rest;
   };
   const updateSet = (id: string, rawPatch: SetUpdatePatch) => {

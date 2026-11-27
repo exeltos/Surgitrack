@@ -257,6 +257,7 @@ export type ToolUpdatePatch = Partial<
     | 'cost'
     | 'maxUses'
     | 'wearCheck'
+    | 'multiUse'
     | 'ownership'
     | 'ownerName'
   >
@@ -317,6 +318,8 @@ export type SurgiStoreValue = {
     note?: string,
     /** Limited-use instruments not used this time: sent without losing a use. */
     unusedToolIds?: string[],
+    /** Instruments used several times in the operation (a clip applier): how many uses each one had. */
+    usesByToolId?: Record<string, number>,
   ) => boolean;
   /** Whether the item may circulate (not used up, not recalled); when not, the reason is shown as a toast. */
   circulationAllowed: (kind: AssetKind, id: string) => boolean;

@@ -40,6 +40,7 @@ const FIELD_NAMES: Record<string, [string, string]> = {
   uses: ['χρήσεις', 'uses'],
   maxUses: ['όριο χρήσεων', 'usage limit'],
   wearCheck: ['έλεγχος φθοράς', 'wear check'],
+  multiUse: ['πολλές χρήσεις ανά χειρουργείο', 'several uses per operation'],
   actual: ['εργαλεία', 'instruments'],
   setId: ['Σετ', 'Set'],
   patientCode: ['κωδικός ασθενούς', 'patient code'],

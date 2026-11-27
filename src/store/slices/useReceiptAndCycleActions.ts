@@ -1,4 +1,5 @@
 import {releaseIndicatorVerdict} from '../../core/releaseIndicators';
+import {usesThisTime} from '../../core/usageStatus';
 import type {
   AssetKind,
   PreparationRecord,
@@ -59,6 +60,7 @@ export function useReceiptAndCycleActions(
     patientCode?: string,
     note?: string,
     unusedToolIds: string[] = [],
+    usesByToolId: Record<string, number> = {},
   ) => {
     const a = assetName(kind, id);
     if (!a || !assertCirculationAllowed(kind, id)) return false;
@@ -73,8 +75,10 @@ export function useReceiptAndCycleActions(
       return false;
     }
     const at = formatStoreDateTime();
+    const usesOf = (t: (typeof limited)[number]) => usesThisTime(t, usesByToolId[t.id]);
     // Only an instrument with a limit runs out; one used with a wear check is just counted.
-    const exhausted = limited.filter(t => !!t.maxUses && t.uses + 1 >= t.maxUses);
+    const exhausted = limited.filter(t => !!t.maxUses && t.uses + usesOf(t) >= t.maxUses);
+    const several = limited.filter(t => usesOf(t) > 1);
     const exhaustedIds = new Set(exhausted.map(t => t.id));
     const limitedIds = new Set(limited.map(t => t.id));
     const dispatchedToolExhausted = kind === 'TOOL' && exhaustedIds.has(id);
@@ -88,7 +92,7 @@ export function useReceiptAndCycleActions(
       setTools(list =>
         list.map(t => {
           if (!limitedIds.has(t.id)) return t;
-          const used = {...t, uses: t.uses + 1};
+          const used = {...t, uses: t.uses + usesOf(t)};
           return exhaustedIds.has(t.id)
             ? {
                 ...used,
@@ -122,8 +126,10 @@ export function useReceiptAndCycleActions(
       from: a.department || currentUser.department || 'Τμήμα',
       to: 'Κεντρική Αποστείρωση',
       status: `Ηλεκτρονική αποστολή · ${currentUser.name} (${currentUser.id}) · αναμονή φυσικής παραλαβής${
-        limited.length ? ` · −1 χρήση σε ${limited.length} εργαλεί${limited.length === 1 ? 'ο' : 'α'}` : ''
-      }${notUsed.length ? ` · χωρίς χρήση: ${notUsed.map(t => t.barcode).join(', ')}` : ''}`,
+        limited.length - several.length
+          ? ` · −1 χρήση σε ${limited.length - several.length} εργαλεί${limited.length - several.length === 1 ? 'ο' : 'α'}`
+          : ''
+      }${several.map(t => ` · −${usesOf(t)} χρήσεις (clips) · ${t.barcode}`).join('')}${notUsed.length ? ` · χωρίς χρήση: ${notUsed.map(t => t.barcode).join(', ')}` : ''}`,
       by: currentUser.name,
       patientCode,
       note,

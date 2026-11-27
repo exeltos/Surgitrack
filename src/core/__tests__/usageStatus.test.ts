@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {isExhausted, isLimited, isLow, isNew, isUsed, remainingUses} from '../usageStatus';
+import {isExhausted, isLimited, isLow, isNew, isUsed, remainingUses, usesThisTime} from '../usageStatus';
 
 describe('what a use limit says', () => {
   it('has no limit, then none of it applies', () => {
@@ -37,5 +37,17 @@ describe('what a use limit says', () => {
     expect(isLow({maxUses: 10, uses: 10}, 3)).toBe(false);
     expect(isExhausted({maxUses: 10, uses: 10})).toBe(true);
     expect(isExhausted({maxUses: 10, uses: 9})).toBe(false);
+  });
+});
+
+describe('the uses one dispatch takes', () => {
+  it('is one for an instrument of one use per operation, whatever is given', () => {
+    expect(usesThisTime({uses: 3, maxUses: 10}, 12)).toBe(1);
+    expect(usesThisTime({uses: 3, maxUses: undefined, multiUse: true}, 12)).toBe(1);
+  });
+  it('is the number given for a clip applier, at least one and never past what is left', () => {
+    expect(usesThisTime({uses: 17, maxUses: 100, multiUse: true}, 12)).toBe(12);
+    expect(usesThisTime({uses: 17, maxUses: 100, multiUse: true}, 0)).toBe(1);
+    expect(usesThisTime({uses: 95, maxUses: 100, multiUse: true}, 12)).toBe(5);
   });
 });

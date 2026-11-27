@@ -102,6 +102,7 @@ export default function AssetWorkbenchSidebar({
     serialNumber: tool?.serialNumber || '',
     usageType: asset.maxUses !== undefined ? 'LIMITED' : tool?.wearCheck ? 'WEAR' : 'UNLIMITED',
     maxUses: asset.maxUses?.toString() || '',
+    multiUse: !!tool?.multiUse,
     ownership: (asset.ownership || '') as Ownership | '',
     ownerName: asset.ownerName || '',
   });
@@ -122,6 +123,7 @@ export default function AssetWorkbenchSidebar({
     tool?.serialNumber,
     asset.maxUses,
     tool?.wearCheck,
+    tool?.multiUse,
     asset.ownership,
     asset.ownerName,
     editing,
@@ -148,7 +150,12 @@ export default function AssetWorkbenchSidebar({
       manufacturer: draft.manufacturer.trim(),
       state: draft.state,
       ...(canEditUsage ? {maxUses} : {}),
-      ...(canEditUsage && kind === 'TOOL' ? {wearCheck: draft.usageType === 'WEAR' || undefined} : {}),
+      ...(canEditUsage && kind === 'TOOL'
+        ? {
+            wearCheck: draft.usageType === 'WEAR' || undefined,
+            multiUse: (draft.usageType === 'LIMITED' && draft.multiUse) || undefined,
+          }
+        : {}),
       ownership: draft.ownership || undefined,
       ownerName: ((draft.ownership === 'DOCTOR' || draft.ownership === 'OTHER') && draft.ownerName.trim()) || undefined,
       ...(kind === 'TOOL' ? {serialNumber: draft.serialNumber.trim() || undefined} : {}),
@@ -427,6 +434,30 @@ export default function AssetWorkbenchSidebar({
             </dd>
           </div>
         )}
+        {kind === 'TOOL' &&
+          (editing && canEditUsage && draft.usageType === 'LIMITED' ? (
+            <div className="asset-usage-field">
+              <dt>{tr('Χρήσεις ανά χειρουργείο')}</dt>
+              <dd>
+                <select
+                  className="asset-inline-input"
+                  value={draft.multiUse ? 'MANY' : 'ONE'}
+                  onChange={e => setDraft(c => ({...c, multiUse: e.target.value === 'MANY'}))}
+                >
+                  <option value="ONE">{tr('Μία')}</option>
+                  <option value="MANY">{tr('Πολλές (π.χ. clips) · ερώτηση στην αποστολή')}</option>
+                </select>
+              </dd>
+            </div>
+          ) : (
+            asset.maxUses !== undefined &&
+            tool?.multiUse && (
+              <div className="asset-usage-field">
+                <dt>{tr('Χρήσεις ανά χειρουργείο')}</dt>
+                <dd>{tr('Πολλές (π.χ. clips) · ερώτηση στην αποστολή')}</dd>
+              </div>
+            )
+          ))}
         {(asset.maxUses !== undefined || tool?.wearCheck) && (
           <>
             <div>

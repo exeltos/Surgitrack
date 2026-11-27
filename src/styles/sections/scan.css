@@ -1581,3 +1581,30 @@ html body .scan-cycle-open {
 html body .scan-cycle-open small {
   color: var(--c-amber-40);
 }
+
+/* An instrument used several times in one operation (a clip applier): how many uses, under its tick. */
+html body .scan-check-with-clips {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+html body .scan-clips {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a5a64;
+}
+html body .scan-clips input {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+  font-size: 16px;
+}
+html body .scan-clips small {
+  color: #b3261e;
+  font-weight: 600;
+}

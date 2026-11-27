@@ -18,3 +18,13 @@ export const isNew = (x: Lives) => isLimited(x) && !(x.uses || 0) && remainingUs
 export const isUsed = (x: Lives) => isLimited(x) && (x.uses || 0) > 0 && remainingUses(x) > 0;
 export const isLow = (x: Lives, warningThreshold: number) =>
   isLimited(x) && remainingUses(x) > 0 && remainingUses(x) <= warningThreshold;
+
+/**
+ * The uses one dispatch takes from an instrument: one, or for an instrument used several times in one operation (a
+ * clip applier) the number given at the dispatch, at least one and never past what it has left.
+ */
+export const usesThisTime = (t: {uses: number; maxUses?: number; multiUse?: boolean}, given?: number) => {
+  if (!t.multiUse || !t.maxUses) return 1;
+  const left = Math.max(1, t.maxUses - t.uses);
+  return Math.min(left, Math.max(1, Math.round(Number(given) || 1)));
+};
