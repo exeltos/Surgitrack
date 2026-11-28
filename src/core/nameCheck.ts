@@ -84,7 +84,9 @@ export function cleanName(name: string) {
  * No code: none typed, or a «no code» written any of the ways people write it («ΧΩΡΙΣ ΚΩΔΙΚΟ», «XΩΡΙΣ ΚΩΔΙΚΟΣ»
  * with a Latin X, «χωρίς κωδικό»…). Never a code that instruments share: they are different instruments.
  */
-export const isNoCode = (code: string | undefined | null) => !code?.trim() || /^ΧΩΡΙΣ ΚΩΔΙΚ/.test(cleanName(code));
+// The English label too («No code», what the download writes in English), read back by an import.
+export const isNoCode = (code: string | undefined | null) =>
+  !code?.trim() || /^(ΧΩΡΙΣ ΚΩΔΙΚ|NO CODE\b|WITHOUT CODE\b)/.test(cleanName(code));
 
 /** What two names have in common once punctuation and spacing are set aside. */
 export const nameKey = (name: string) =>

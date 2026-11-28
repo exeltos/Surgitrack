@@ -6,6 +6,8 @@ describe('an instrument with no code', () => {
   it('is any «no code», however it was typed, and an empty one', () => {
     for (const code of ['', '  ', 'ΧΩΡΙΣ ΚΩΔΙΚΟΣ', 'XΩΡΙΣ ΚΩΔΙΚΟ', 'ΧΩΡΙΣ ΚΩΔΙKΟ', 'Χωρίς κωδικό', 'χωρίς κωδικό'])
       expect(isNoCode(code)).toBe(true);
+    expect(isNoCode('No code')).toBe(true);
+    expect(isNoCode('NO CODE')).toBe(true);
     expect(isNoCode('10.180.12')).toBe(false);
     expect(isNoCode(undefined)).toBe(true);
   });
