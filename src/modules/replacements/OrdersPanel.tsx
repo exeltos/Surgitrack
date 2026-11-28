@@ -1,3 +1,4 @@
+import {codeLabel} from '../../core/toolCode';
 import {useState} from 'react';
 import {ClipboardList, PackageCheck, Plus, Printer} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
@@ -63,7 +64,7 @@ export default function OrdersPanel({
               <tbody>
                 {order.lines.map(line => (
                   <tr key={`${line.code}-${line.name}`}>
-                    <td className="mono">{line.code || '—'}</td>
+                    <td className="mono">{codeLabel(line.code)}</td>
                     <td>
                       <strong>{line.name}</strong>
                       <small>{line.manufacturer || ''}</small>

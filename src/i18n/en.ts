@@ -808,6 +808,7 @@ export const en: Record<string, string> = {
   Καταγράφει: 'Recorded by',
   'Καταγραφή και παραλαβή': 'Record and receive',
   'Σε βλάβη': 'Under repair',
+  'Χωρίς κωδικό': 'No code',
   '{0}: καταγράφηκε η τελευταία χρήση και τέθηκε εκτός χρήσης. Δεν μπαίνει στην παραλαβή· κρατήστε το χωριστά.':
     '{0}: its last use was recorded and it is now out of use. It is not part of the receipt; set it aside.',
   '{0} · {1} καταγράφηκε και προστέθηκε στην παραλαβή.': '{0} · {1} recorded and added to the receipt.',

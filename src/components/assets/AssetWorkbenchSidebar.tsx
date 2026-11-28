@@ -1,3 +1,4 @@
+import {isNoCode} from '../../core/toolCode';
 import {useLibraries} from '../../core/LibraryStore';
 import {useEffect, useState} from 'react';
 import {useUnsavedChanges} from '../../app/UnsavedChanges';
@@ -177,7 +178,10 @@ export default function AssetWorkbenchSidebar({
             <span className="eyebrow">{kind === 'SET' ? tr('Καρτέλα Σετ') : tr('Καρτέλα εργαλείου')}</span>
             <h1>{asset.name}</h1>
             {/* The code is shown under the name only when it says something else. */}
-            {asset.code && asset.code.trim().toLowerCase() !== asset.name.trim().toLowerCase() && <p>{asset.code}</p>}
+            {asset.code &&
+              asset.code.trim().toLowerCase() !== asset.name.trim().toLowerCase() &&
+              !isNoCode(asset.code) && <p>{asset.code}</p>}
+            {kind === 'TOOL' && isNoCode(asset.code) && <p>{tr('Χωρίς κωδικό')}</p>}
           </div>
         </div>
         <div className="asset-workbench-title-status">

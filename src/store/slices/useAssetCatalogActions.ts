@@ -1,4 +1,5 @@
 import type {AssetKind, AssetPhoto, AssetState, SetAsset, Tool} from '../../types/domain';
+import {normalizeCode} from '../../core/toolCode';
 import {formatStoreDateTime, uniqueStamp} from '../helpers';
 import type {CreateSetPayload, CreateToolPayload, SurgicalCount} from '../types';
 import {tr} from '../../i18n';
@@ -482,7 +483,7 @@ export function useAssetCatalogActions(
     const created: Tool[] = Array.from({length: p.quantity}, (_, i) => ({
       id: `tool-${stamp}-${i}`,
       barcode: `T${String(++max).padStart(6, '0')}`,
-      code: p.code,
+      code: normalizeCode(p.code),
       name: p.name,
       department: mode === 'STOCK' ? undefined : department,
       specialty: p.specialty.trim(),

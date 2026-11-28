@@ -1,3 +1,4 @@
+import {codeLabel} from '../../core/toolCode';
 import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {createContext, useContext, useMemo, useState} from 'react';
@@ -596,7 +597,7 @@ function ToolsList({
                 <tr key={t.id} onClick={() => navigate(`/tools/${t.id}`)}>
                   <td className="mono">{t.barcode}</td>
                   <td>{t.name}</td>
-                  <td>{t.code || '—'}</td>
+                  <td>{codeLabel(t.code)}</td>
                   <td>{place(t)}</td>
                   <td>{statusLabel(t.state)}</td>
                   <td className="go">

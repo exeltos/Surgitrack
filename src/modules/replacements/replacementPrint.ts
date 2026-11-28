@@ -1,3 +1,4 @@
+import {codeLabel} from '../../core/toolCode';
 import type {PurchaseOrder} from '../../types/domain';
 import type {ReplacementItem} from '../../core/replacements';
 import {REASON_LABEL} from '../../core/replacements';
@@ -98,7 +99,7 @@ export function purchaseOrderHtml(order: PurchaseOrder, hospital?: string) {
     .map(
       (line, index) => `<tr>
 <td class="num">${index + 1}</td>
-<td class="mono">${esc(line.code || '—')}</td>
+<td class="mono">${esc(codeLabel(line.code))}</td>
 <td class="name">${esc(line.name)}</td>
 <td>${esc(line.manufacturer || '—')}</td>
 <td class="qty">${line.received ? `${line.received}/${line.quantity}` : line.quantity}</td>
