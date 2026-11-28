@@ -117,3 +117,16 @@ describe('Set composition names', () => {
     expect(stale('08.281.18', 'ΨΑΛΙΔΙ')).toBeUndefined();
   });
 });
+
+describe('instruments with no code in the name check', () => {
+  it('never groups them as one code, however «no code» was written', () => {
+    const items = [
+      {id: '1', name: 'ΛΑΒΙΔΕΣ', code: 'ΧΩΡΙΣ ΚΩΔΙΚΟΣ'},
+      {id: '2', name: 'ΧΩΝΑΚΙ', code: 'XΩΡΙΣ ΚΩΔΙΚΟ'},
+      {id: '3', name: 'ΡΙΝΟΣΚΟΠΙΟ', code: ''},
+    ];
+    expect(codeGroups(items)).toEqual([]);
+    expect(namesByCode(items).size).toBe(0);
+    expect(staleCompositionLines(items)('ΧΩΡΙΣ ΚΩΔΙΚΟΣ', 'ΛΑΒΙΔΕΣ')).toBeUndefined();
+  });
+});

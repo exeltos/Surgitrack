@@ -1,3 +1,4 @@
+import {codeLabel} from '../../core/toolCode';
 import {useMemo, useState} from 'react';
 import {Plus, ShoppingCart, Trash2} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
@@ -78,7 +79,7 @@ export default function OrderDialog({
             <tbody>
               {lines.map((line, index) => (
                 <tr key={`${line.code}-${line.name}`}>
-                  <td className="mono">{line.code || '—'}</td>
+                  <td className="mono">{codeLabel(line.code)}</td>
                   <td>
                     <strong>{line.name}</strong>
                     <small>{line.manufacturer || ''}</small>

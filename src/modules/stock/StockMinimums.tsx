@@ -1,3 +1,4 @@
+import {codeLabel} from '../../core/toolCode';
 import {SortTh} from '../../components/ui/SortHeader';
 import {useTableSort} from '../../components/ui/useTableSort';
 import {useMemo, useState} from 'react';
@@ -155,7 +156,7 @@ export default function StockMinimums() {
                   <td>
                     <strong>{r.name}</strong>
                     <small className="stock-min-sub">
-                      {r.code || '—'}
+                      {codeLabel(r.code)}
                       {r.manufacturer ? ` · ${r.manufacturer}` : ''}
                     </small>
                   </td>

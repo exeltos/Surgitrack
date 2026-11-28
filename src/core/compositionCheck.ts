@@ -1,4 +1,5 @@
 import {nameKey} from './nameCheck';
+import {codeLabel, isNoCode} from './toolCode';
 
 type TemplateLine = {code: string; name: string; quantity: number};
 type Member = {barcode: string; code?: string; name: string; manufacturer?: string};
@@ -17,7 +18,8 @@ export type CompositionLine = {
 };
 
 const keyOf = (code: string | undefined, name: string) => {
-  const c = (code || '').trim().toUpperCase();
+  // A «no code» (written any way) is no code: matched by name, not lumped with every other one.
+  const c = isNoCode(code) ? '' : (code || '').trim().toUpperCase();
   return c ? `C:${c}` : `N:${nameKey(name)}`;
 };
 
@@ -46,7 +48,7 @@ export function compositionLines(
     pool.set(key, available.slice(taken.length));
     lines.push({
       name: line.name,
-      code: line.code || '—',
+      code: codeLabel(line.code),
       manufacturer: taken.find(t => t.manufacturer)?.manufacturer || '—',
       expected: line.quantity,
       present: taken.length,
@@ -62,7 +64,7 @@ export function compositionLines(
   const rest = [...groups.values()]
     .map(members => ({
       name: members[0].name,
-      code: members[0].code || '—',
+      code: codeLabel(members[0].code),
       manufacturer: members[0].manufacturer || '—',
       present: members.length,
       missing: 0,

@@ -1,3 +1,4 @@
+import {codeLabel} from '../../core/toolCode';
 import {useState} from 'react';
 import {PackageCheck} from 'lucide-react';
 import AppButton from '../../components/ui/AppButton';
@@ -43,7 +44,7 @@ export default function ReceiveDialog({
             <tbody>
               {order.lines.map((line, i) => (
                 <tr key={`${line.code}-${line.name}`}>
-                  <td className="mono">{line.code || '—'}</td>
+                  <td className="mono">{codeLabel(line.code)}</td>
                   <td>
                     <strong>{line.name}</strong>
                     <small>{line.manufacturer || ''}</small>

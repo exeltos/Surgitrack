@@ -1,4 +1,5 @@
 import type {SetAsset, Tool} from '../../types/domain';
+import {normalizeCode} from '../../core/toolCode';
 import type {SheetRows} from '../../core/sheetImport';
 import {formatDate} from '../../core/displayDate';
 
@@ -465,7 +466,7 @@ export function buildImportPlan(
       });
     const line: Line = {
       rowNumber,
-      code: value(row, 'code'),
+      code: normalizeCode(value(row, 'code')),
       name,
       quantity: Number.isInteger(quantity) && quantity > 0 ? Math.min(quantity, MAX_QUANTITY) : 1,
       barcode,

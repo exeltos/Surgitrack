@@ -1,3 +1,4 @@
+import {codeLabel} from '../../../core/toolCode';
 import AssetTypeIcon from '../../../components/assets/AssetTypeIcon';
 import {CheckCircle2, TriangleAlert, UserRoundCheck, X, IdCard} from 'lucide-react';
 import {tr, trData} from '../../../i18n';
@@ -282,7 +283,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                               key={t.id}
                             >
                               <span className="mono receipt-tool-barcode">{t.barcode}</span>
-                              <span className="receipt-tool-code">{t.code || '—'}</span>
+                              <span className="receipt-tool-code">{codeLabel(t.code)}</span>
                               <div className="receipt-tool-name">
                                 <strong>{t.name}</strong>
                                 {t.serialNumber && <small>S/N {t.serialNumber}</small>}
@@ -352,7 +353,7 @@ export default function ReceiptModal({s}: {s: SterilizationPageState}) {
                             className={`receipt-verification-row ${checked ? 'checked' : ''} ${problem ? 'has-issue' : ''}`}
                           >
                             <span className="mono receipt-tool-barcode">{t.barcode}</span>
-                            <span className="receipt-tool-code">{t.code || '—'}</span>
+                            <span className="receipt-tool-code">{codeLabel(t.code)}</span>
                             <div className="receipt-tool-name">
                               <strong>{t.name}</strong>
                               {t.serialNumber && <small>S/N {t.serialNumber}</small>}

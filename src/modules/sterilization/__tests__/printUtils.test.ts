@@ -59,7 +59,8 @@ describe('composition sheet', () => {
       marker: [{name: 'Μπλε', colors: ['#1f5fbf']}],
     });
     expect(html).toContain('<td class="qty">2</td>');
-    expect(html).toContain('<td>—</td>');
+    // An instrument with no code says so.
+    expect(html).toContain('<td>Χωρίς κωδικό</td>');
     expect(html).toContain('class="issue"');
     expect(html).toContain('Ονοματεπώνυμο & υπογραφή');
     expect(html).toContain('Μπλε');

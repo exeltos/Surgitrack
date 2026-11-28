@@ -1,3 +1,4 @@
+import {isPlatformOwner} from '../../core/platformOnly';
 import {ListEmpty} from '../../components/ui/EmptyState';
 import {useBrowseList} from '../../core/browseList';
 import {useDeferredValue, useMemo} from 'react';
@@ -122,7 +123,8 @@ export default function ToolsPage() {
                 label={tr('Ενέργειες')}
                 align="right"
                 items={[
-                  ...(can('asset.edit')
+                  // The name check rewrites names across the hospital: the platform owner's alone.
+                  ...(can('asset.edit') && isPlatformOwner()
                     ? [
                         {
                           key: 'names',

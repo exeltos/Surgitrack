@@ -1,3 +1,4 @@
+import {codeLabel} from './toolCode';
 import {statusLabel} from '../components/ui/statusLabel';
 import {tr, trData} from '../i18n';
 import {STERILE_STATES, formatExpiry} from './sterileExpiry';
@@ -71,7 +72,7 @@ const baseToolsTable = (listed: Tool[], title: string): ExportTable => {
     rows: tools.map(t => [
       t.name,
       t.barcode,
-      t.code || '',
+      codeLabel(t.code),
       t.manufacturer || '',
       trData(t.specialty) || '',
       trData(t.department) || '',

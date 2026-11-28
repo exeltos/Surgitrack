@@ -1,4 +1,5 @@
 import {useMemo} from 'react';
+import {normalizeCode} from '../../core/toolCode';
 import type {AssetKind, AssetState} from '../../types/domain';
 import {getLifecycleAlerts, normalizeUsageLimit} from '../helpers';
 import type {SetUpdatePatch, ToolUpdatePatch} from '../types';
@@ -141,6 +142,7 @@ export function useAssetEditActions(
       setId,
       state,
       department: invariantDepartment,
+      ...(patch.code !== undefined ? {code: normalizeCode(patch.code)} : {}),
       ...(normalizedBarcode ? {barcode: normalizedBarcode} : {}),
       ...(barcodeChanged ? {legacyBarcodes: [...(before.legacyBarcodes || []), before.barcode]} : {}),
     };

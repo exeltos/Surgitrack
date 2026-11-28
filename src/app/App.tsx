@@ -1,3 +1,4 @@
+import {isPlatformOwner} from '../core/platformOnly';
 import {Suspense, useEffect, useRef, useState, type ReactNode} from 'react';
 import {createPortal} from 'react-dom';
 import {Routes, Route, Navigate, useLocation, useNavigate} from 'react-router-dom';
@@ -410,7 +411,8 @@ export default function App() {
             path="/tools/names"
             element={
               <Guard permission="asset.edit">
-                <NameCheckPage />
+                {/* The platform owner's alone: anyone else is sent back to the instruments. */}
+                {isPlatformOwner() ? <NameCheckPage /> : <Navigate to="/tools" replace />}
               </Guard>
             }
           />

@@ -1,3 +1,4 @@
+import {codeLabel} from '../../core/toolCode';
 import {useState} from 'react';
 import {ChevronDown, ChevronRight, TriangleAlert} from 'lucide-react';
 import type {Issue, Tool} from '../../types/domain';
@@ -33,7 +34,7 @@ export default function BatchSetTools({
                 <li key={tool.id} className={openIssues.length ? 'has-issue' : ''}>
                   <span className="mono">{tool.barcode}</span>
                   <strong title={tool.name}>{tool.name}</strong>
-                  <span>{tool.code || '—'}</span>
+                  <span>{codeLabel(tool.code)}</span>
                   <span className="batch-set-tools-state">
                     {openIssues.map(i => (
                       <em key={i.id}>
