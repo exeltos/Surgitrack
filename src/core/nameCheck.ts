@@ -80,6 +80,12 @@ export function cleanName(name: string) {
   return clean;
 }
 
+/**
+ * No code: none typed, or a «no code» written any of the ways people write it («ΧΩΡΙΣ ΚΩΔΙΚΟ», «XΩΡΙΣ ΚΩΔΙΚΟΣ»
+ * with a Latin X, «χωρίς κωδικό»…). Never a code that instruments share: they are different instruments.
+ */
+export const isNoCode = (code: string | undefined | null) => !code?.trim() || /^ΧΩΡΙΣ ΚΩΔΙΚ/.test(cleanName(code));
+
 /** What two names have in common once punctuation and spacing are set aside. */
 export const nameKey = (name: string) =>
   cleanName(name)
@@ -126,8 +132,8 @@ export type CodeGroup = {code: string; total: number; names: CodeName[]; suggest
 export function codeGroups<T extends Named>(items: readonly T[]): CodeGroup[] {
   const byCode = new Map<string, Map<string, string[]>>();
   for (const item of items) {
+    if (isNoCode(item.code)) continue;
     const code = (item.code || '').trim().toUpperCase();
-    if (!code) continue;
     const names = byCode.get(code) || new Map<string, string[]>();
     const name = cleanName(item.name);
     const ids = names.get(name);
@@ -162,8 +168,8 @@ export function namesByCode<T extends Named>(items: readonly T[]) {
   const result = new Map<string, string>();
   const counts = new Map<string, Map<string, number>>();
   for (const item of items) {
+    if (isNoCode(item.code)) continue;
     const code = (item.code || '').trim().toUpperCase();
-    if (!code) continue;
     const names = counts.get(code) || new Map<string, number>();
     const name = cleanName(item.name);
     names.set(name, (names.get(name) || 0) + 1);
@@ -209,8 +215,8 @@ export function renameComposition<T extends Line>(
 export function staleCompositionLines<T extends Named>(items: readonly T[]) {
   const names = new Map<string, Set<string>>();
   for (const item of items) {
+    if (isNoCode(item.code)) continue;
     const code = (item.code || '').trim().toUpperCase();
-    if (!code) continue;
     names.set(code, (names.get(code) || new Set()).add(item.name));
   }
   const single = new Map<string, string>();
